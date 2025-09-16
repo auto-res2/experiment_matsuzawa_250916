@@ -1,0 +1,10 @@
+{
+  "research_topic": "プロンプトの自動最適化の改善",
+  "queries": [
+    "automatic prompt optimization",
+    "gradient-based prompt tuning",
+    "reinforcement learning prompt tuning",
+    "differentiable prompt learning",
+    "bayesian prompt optimization"
+  ]
+}
