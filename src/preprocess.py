@@ -10,6 +10,7 @@ import requests
 from bs4 import BeautifulSoup
 from datasets import load_dataset, DownloadConfig
 import tiktoken
+import numpy as np  # Added import for numpy
 
 # --- Constants ---
 MAX_TOKENS = 2048
