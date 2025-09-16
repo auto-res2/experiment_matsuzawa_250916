@@ -1,35 +1,46 @@
-name: 'smoke_test_config'
-experiment_to_run: 1
+name: 'smoke_test'
+experiment_ids_to_run: [1] # Run only one experiment for a quick check
 
 paths:
-  secure_data_path: null
-  processed_data_path: 'data/processed/smoke_test'
-  training_output_path: '.research/iteration2/training/smoke_test'
-  evaluation_output_path: '.research/iteration2/analysis/smoke_test'
+  # MIMIC-IV is a private dataset, path must be configured by user.
+  # For smoke test, we rely on public data and skip this.
+  mimic_iv_dir: '/tmp/mimic-iv-notes-dummy'
+  processed_data_path: 'data/smoke_test'
+  training_output_path: '.research/iteration12/training_smoke'
 
 api_details:
-  provider: 'simulated'
+  provider: 'huggingface' # Use local models to avoid API costs for testing
 
 model_names:
-  encoder: 'cambridgeltl/trans-encoder-bi-simcse-roberta-base'
-  generator: 'gpt-3.5-0613'
-  scorer: 'gpt-4-0125'
-  paraphraser: 'lmsys/vicuna-13b-v1.5'
+  encoder: 'sentence-transformers/all-MiniLM-L6-v2' # Smaller encoder for speed
+  generator: 'gpt2'
+  scorer: 'gpt-4-0613' # Scorer is often critical, keep as specified but expect it to be mocked if key is absent
+  paraphraser: 'tuner007/pegasus_paraphrase'
+  continual_backend: 'gpt2'
 
 seeds: [42]
 
+# --- Experiment 1 Config ---
 experiment_1:
-  datasets: []
+  tasks: ['FinReg-Compliance']
 
+# --- Experiment 2 Config ---
 experiment_2:
   methods: ['REFLECT-BO', 'REFLECT-BO-NoDP']
-  total_prompts: 100
+  tasks: ['Super-NI']
 
+# --- Experiment 3 Config ---
 experiment_3:
-  datasets: ['gsm8k']
+  tasks: ['GSM8K']
+
+sec_edgar_ciks: ['0000320193'] # Just Apple Inc. for a quick test
+
+model_drift_schedule:
+  - 'gpt2'
+  - 'distilgpt2'
 
 optimization_params:
-  api_budget: 5
+  api_budget: 6
   bootstrap_budget: 2
 
 hyperparameters:

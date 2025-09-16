@@ -1,33 +1,52 @@
-name: 'full_experiment_config'
-experiment_to_run: 1
+name: 'full_experiment'
+experiment_ids_to_run: [1, 2, 3]
 
 paths:
-  secure_data_path: '/mnt/secure_cluster/data'
-  processed_data_path: 'data/processed/full_experiment'
-  training_output_path: '.research/iteration2/training/full_experiment'
-  evaluation_output_path: '.research/iteration2/analysis/full_experiment'
+  # IMPORTANT: User must place the MIMIC-IV 'discharge.csv' in this directory.
+  mimic_iv_dir: 'data/raw/mimic-iv-2.2/note/'
+  processed_data_path: 'data/full_experiment'
+  training_output_path: '.research/iteration12/training_full'
 
 api_details:
+  # Set to 'openai' to use the GPT-4 grader. Requires OPENAI_API_KEY.
+  # Set to 'huggingface' to use local/simulated models.
   provider: 'openai'
 
 model_names:
   encoder: 'cambridgeltl/trans-encoder-bi-simcse-roberta-base'
-  generator: 'gpt-3.5-0613'
-  scorer: 'gpt-4-0125'
+  generator: 'gpt-3.5-turbo-1106'
+  scorer: 'gpt-4-0613'
   paraphraser: 'lmsys/vicuna-13b-v1.5'
   continual_backend: 'NousResearch/Llama-2-70b-chat-hf'
 
-seeds: [0, 1, 2, 3, 4]
+seeds: [101, 202, 303, 404, 505]
 
+# --- Experiment 1 Config ---
 experiment_1:
-  datasets: ['HIPAA-MedTriage-5', 'FinReg-Compliance-5']
+  tasks: ['HIPAA-MedTriage', 'FinReg-Compliance']
 
+# --- Experiment 2 Config ---
 experiment_2:
-  methods: ['REFLECT-BO', 'REFLECT-BO-NoShift', 'REFLECT-BO-NoDP', 'SHIFT-BO']
-  total_prompts: 5000
+  methods: ['REFLECT-BO', 'REFLECT-BO-NoDP', 'REFLECT-BO-NoShift']
+  tasks: ['Super-NI']
 
+# --- Experiment 3 Config ---
 experiment_3:
-  datasets: ['gsm8k', 'aqua_rat', 'cnn_dailymail']
+  tasks: ['GSM8K', 'creative_story']
+
+sec_edgar_ciks: 
+  - '0000320193' # Apple
+  - '0001018724' # Alphabet (Google)
+  - '0000789019' # Microsoft
+  - '0001652044' # Meta Platforms
+  - '0001045810' # JPMorgan Chase
+
+model_drift_schedule:
+  # Pre-fine-tuned Llama-2 checkpoints should be specified here.
+  # Using variants as placeholders for the drift mechanism.
+  - 'NousResearch/Llama-2-70b-chat-hf'
+  - 'meta-llama/Llama-2-70b-chat-hf' # Simulate a slight variant
+  - 'togethercomputer/Llama-2-70B-32K-Instruct'
 
 optimization_params:
   api_budget: 60
