@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import argparse
 import importlib
+import importlib.util
 import sys
 from pathlib import Path
 from types import ModuleType
@@ -37,12 +38,9 @@ import yaml  # noqa: E402  pylint: disable=wrong-import-position
 def _lazy_import(name: str) -> ModuleType:
     """Import *name* with multiple fallbacks.
 
-    1. Try as a top-level module (works for editable installs / source checkout).
-    2. Try relative to *__package__* (works when ``python -m ...`` is used).
-    3. Try relative to the *root* distribution package (works from the installed
-       wheel where modules are laid out as ``scarf_experiment.<module>``).
-    4. FINAL SAFETY NET: load the *file* directly from ROOT_DIR **or src/** if
-       present.
+    The search strategy is purposely exhaustive because the package can be
+    executed in a variety of layouts (editable install, sdist, wheel, or direct
+    source invocation in the CI sandbox).
     """
     # (1) plain import first ---------------------------------------------------
     try:
@@ -55,7 +53,7 @@ def _lazy_import(name: str) -> ModuleType:
             except ModuleNotFoundError:
                 pass
 
-        # (3) relative to the *root* package ----------------------------------
+        # (3) relative to the *root* distribution package ---------------------
         root_pkg = __name__.split(".")[0]  # e.g. "scarf_experiment"
         if root_pkg and root_pkg != name:
             try:
@@ -64,13 +62,15 @@ def _lazy_import(name: str) -> ModuleType:
                 pass
 
         # (4) FINAL fallback – direct file import -----------------------------
-        for base in (ROOT_DIR, SRC_DIR):
+        # We look inside ROOT_DIR, its *parent* (needed for wheels where the
+        # loose modules sit in site-packages/), and SRC_DIR.
+        for base in (ROOT_DIR, ROOT_DIR.parent, SRC_DIR):
             candidate = base / f"{name}.py"
             if candidate.exists():
                 spec = importlib.util.spec_from_file_location(name, candidate)
                 if spec and spec.loader:
                     module = importlib.util.module_from_spec(spec)
-                    sys.modules[name] = module  # cache so subsequent imports work
+                    sys.modules[name] = module  # cache for subsequent imports
                     spec.loader.exec_module(module)  # type: ignore[attr-defined]
                     return module
 

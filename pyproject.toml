@@ -1,6 +1,6 @@
 [project]
 name = "scarf-experiment"
-version = "0.1.2"
+version = "0.1.3"
 description = "Minimal scaffolding for SCARF research pipeline smoke-tests."
 authors = [
     { name = "OpenAI AutoFix", email = "noreply@example.com" }
