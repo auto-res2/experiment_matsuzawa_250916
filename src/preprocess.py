@@ -197,8 +197,13 @@ def run_preprocessing(config):
             all_tasks_df = pd.concat([all_tasks_df, df_sec], ignore_index=True)
 
     elif exp_id == 2:
+        # Fixed dataset path (remove deprecated 'allenai/' prefix)
         all_tasks_df = download_hf_dataset(
-            'Super-NI', 'allenai/super_natural_instructions', 'train[:5%]', 'definition', 'Super-NI'
+            'Super-NI',
+            'super_natural_instructions',  # Correct HF dataset ID
+            'train[:5%]',
+            'definition',
+            'Super-NI'
         )
 
     elif exp_id == 3:
