@@ -309,9 +309,9 @@ def run(config: dict):
     exp_id = config["experiment_id"]
     run_dir = Path(config["paths"]["training_output_path"])
 
-    # Mandatory output directories per spec (iteration25)
-    json_dir = Path(".research/iteration25/")
-    img_dir = Path(".research/iteration25/images/")
+    # Mandatory output directories per spec (iteration26)
+    json_dir = Path(".research/iteration26/")
+    img_dir = Path(".research/iteration26/images/")
     json_dir.mkdir(parents=True, exist_ok=True)
     img_dir.mkdir(parents=True, exist_ok=True)
 
