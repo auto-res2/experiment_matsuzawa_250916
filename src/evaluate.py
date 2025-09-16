@@ -10,10 +10,10 @@ from datetime import datetime
 # -----------------------------------------------------------------------------
 # Directory constants – comply with mandatory research directory structure
 # -----------------------------------------------------------------------------
-# NOTE: The specification requires that *all* image artefacts are written under
-# .research/iteration4/images and JSON artefacts under .research/iteration4/.
+# ALL image artefacts must be written under .research/iteration5/images
+# ALL JSON artefacts must be written under .research/iteration5/
 # -----------------------------------------------------------------------------
-JSON_DIR = os.path.join(".research", "iteration4")
+JSON_DIR = os.path.join(".research", "iteration5")
 IMAGES_DIR = os.path.join(JSON_DIR, "images")
 
 # Ensure the required directories exist
@@ -87,6 +87,7 @@ def analyze_experiment_1(df):
                 & (summary["corruption"] == "shot_noise")
             ]
             if subset.empty:
+                plt.close()
                 continue
             sns.barplot(data=subset, x="method", y="mean", hue="model")
             plt.title(f"Accuracy on {dataset} (shot_noise, eta={eta})")

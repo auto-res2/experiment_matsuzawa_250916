@@ -52,7 +52,8 @@ def main():
     # --- 1. Setup --- 
     config = load_config(config_path)
     timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-    results_dir = os.path.join('.research/iteration1', f'results_{timestamp}')
+    # Ensure results under iteration5
+    results_dir = os.path.join('.research', 'iteration5', f'results_{timestamp}')
     os.makedirs(results_dir, exist_ok=True)
     config['results_dir'] = results_dir
     
@@ -73,8 +74,6 @@ def main():
 
     # --- 2. Data Preparation ---
     logger.info("Preparing dataloaders...")
-    # The config structure from YAML might need to be massaged for get_dataloaders
-    # For now, we assume a flat list of experiments in the config.
     dataloaders = get_dataloaders(config)
     if not dataloaders:
         logger.error("No dataloaders were created. Please check the dataset configurations.")
@@ -90,7 +89,7 @@ def main():
             set_seed(exp_config['seed'])
             # Merge global config with run-specific config
             run_config = {**config, **exp_config}
-            run_config['results_dir'] = results_dir # ensure path is correct
+            run_config['results_dir'] = results_dir  # ensure path is correct
             try:
                 run_experiment(run_config, dataloaders[run_name], device)
             except Exception as e:
