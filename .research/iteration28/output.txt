@@ -1,0 +1,25 @@
+=== uv sync start Tue Sep 16 02:49:06 PM UTC 2025 ===
+=== uv install end Tue Sep 16 02:49:12 PM UTC 2025 ===
+=== [PHASE 1/2] Smoke test start Tue Sep 16 02:49:12 PM UTC 2025 ===
+--- Mode: SMOKE TEST ---
+
+############################################################
+# Experiment ID: 1                                         #
+############################################################
+
+==================== RUNNING STAGE: PREPROCESS ====================
+Preprocessing data for experiment 1. Output to: artifacts/data/smoke_test
+Acquiring FinReg-Compliance data from SEC EDGAR...
+Loaded a total of 90 raw prompts.
+Cleaning and tokenizing text...
+Creating deterministic splits...
+--- Preprocessing Complete ---
+Optimization set: 75 samples saved to artifacts/data/smoke_test/optimization.parquet
+Hold-out test set: 15 samples saved to artifacts/data/smoke_test/test.parquet
+==================== STAGE COMPLETE: PREPROCESS ====================
+
+==================== RUNNING STAGE: TRAIN ====================
+Using device: cuda
+
+--- Running Trial: Method=REFLECT-BO, Seed=42 ---
+Initializing models...
