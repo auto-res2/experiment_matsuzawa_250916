@@ -1,0 +1,131 @@
+Using CPython 3.11.13
+Creating virtual environment at: .venv
+Resolved 63 packages in 580ms
+Downloading sympy (6.0MiB)
+Downloading tokenizers (3.2MiB)
+Downloading networkx (1.9MiB)
+Downloading setuptools (1.1MiB)
+Downloading triton (148.3MiB)
+Downloading nvidia-nccl-cu12 (307.4MiB)
+Downloading nvidia-cufft-cu12 (184.2MiB)
+Downloading nvidia-nvjitlink-cu12 (37.4MiB)
+Downloading nvidia-cufile-cu12 (1.1MiB)
+Downloading pyarrow (40.8MiB)
+Downloading nvidia-cusparselt-cu12 (273.9MiB)
+Downloading nvidia-cudnn-cu12 (674.0MiB)
+Downloading nvidia-curand-cu12 (60.7MiB)
+Downloading hf-xet (3.0MiB)
+Downloading nvidia-cublas-cu12 (566.8MiB)
+Downloading nvidia-cuda-nvrtc-cu12 (84.0MiB)
+Downloading pandas (11.8MiB)
+Downloading nvidia-cusolver-cu12 (255.1MiB)
+Downloading nvidia-cusparse-cu12 (274.9MiB)
+Downloading nvidia-cuda-cupti-cu12 (9.8MiB)
+Downloading transformers (11.1MiB)
+Downloading numpy (16.2MiB)
+Downloading torch (846.9MiB)
+Downloading aiohttp (1.7MiB)
+ Downloading nvidia-cufile-cu12
+ Downloading aiohttp
+ Downloading hf-xet
+ Downloading tokenizers
+ Downloading setuptools
+ Downloading networkx
+ Downloading nvidia-cuda-cupti-cu12
+ Downloading sympy
+ Downloading numpy
+ Downloading transformers
+ Downloading nvidia-nvjitlink-cu12
+ Downloading pandas
+ Downloading nvidia-curand-cu12
+ Downloading pyarrow
+ Downloading nvidia-cuda-nvrtc-cu12
+ Downloading triton
+ Downloading nvidia-cufft-cu12
+ Downloading nvidia-cusolver-cu12
+ Downloading nvidia-cusparselt-cu12
+ Downloading nvidia-cusparse-cu12
+ Downloading nvidia-nccl-cu12
+ Downloading nvidia-cublas-cu12
+ Downloading nvidia-cudnn-cu12
+ Downloading torch
+Prepared 58 packages in 58.17s
+Installed 58 packages in 4.44s
+ + aiohappyeyeballs==2.6.1
+ + aiohttp==3.12.15
+ + aiosignal==1.4.0
+ + attrs==25.3.0
+ + certifi==2025.8.3
+ + charset-normalizer==3.4.3
+ + datasets==4.1.0
+ + dill==0.4.0
+ + filelock==3.19.1
+ + frozenlist==1.7.0
+ + fsspec==2025.9.0
+ + hf-xet==1.1.10
+ + huggingface-hub==0.34.5
+ + idna==3.10
+ + jinja2==3.1.6
+ + markupsafe==3.0.2
+ + mpmath==1.3.0
+ + multidict==6.6.4
+ + multiprocess==0.70.16
+ + networkx==3.5
+ + numpy==2.3.3
+ + nvidia-cublas-cu12==12.8.4.1
+ + nvidia-cuda-cupti-cu12==12.8.90
+ + nvidia-cuda-nvrtc-cu12==12.8.93
+ + nvidia-cuda-runtime-cu12==12.8.90
+ + nvidia-cudnn-cu12==9.10.2.21
+ + nvidia-cufft-cu12==11.3.3.83
+ + nvidia-cufile-cu12==1.13.1.3
+ + nvidia-curand-cu12==10.3.9.90
+ + nvidia-cusolver-cu12==11.7.3.90
+ + nvidia-cusparse-cu12==12.5.8.93
+ + nvidia-cusparselt-cu12==0.7.1
+ + nvidia-nccl-cu12==2.27.3
+ + nvidia-nvjitlink-cu12==12.8.93
+ + nvidia-nvtx-cu12==12.8.90
+ + packaging==25.0
+ + pandas==2.3.2
+ + propcache==0.3.2
+ + pyarrow==21.0.0
+ + python-dateutil==2.9.0.post0
+ + pytz==2025.2
+ + pyyaml==6.0.2
+ + regex==2025.9.1
+ + requests==2.32.5
+ + safetensors==0.6.2
+ + setuptools==80.9.0
+ + six==1.17.0
+ + sympy==1.14.0
+ + tokenizers==0.22.0
+ + torch==2.8.0
+ + tqdm==4.67.1
+ + transformers==4.56.1
+ + triton==3.4.0
+ + typing-extensions==4.15.0
+ + tzdata==2025.2
+ + urllib3==2.5.0
+ + xxhash==3.5.0
+ + yarl==1.20.1
+Map:   0%|          | 0/36718 [00:00<?, ? examples/s]Map:   3%|▎         | 1000/36718 [00:00<00:09, 3889.73 examples/s]Map:   5%|▌         | 2000/36718 [00:00<00:07, 4700.27 examples/s]Map:   8%|▊         | 3000/36718 [00:00<00:06, 5171.85 examples/s]Map:  11%|█         | 4000/36718 [00:00<00:06, 5385.83 examples/s]Map:  14%|█▎        | 5000/36718 [00:00<00:05, 5448.28 examples/s]Map:  16%|█▋        | 6000/36718 [00:01<00:05, 5592.09 examples/s]Map:  19%|█▉        | 7000/36718 [00:01<00:05, 5596.84 examples/s]Map:  22%|██▏       | 8000/36718 [00:01<00:06, 4628.09 examples/s]Map:  25%|██▍       | 9000/36718 [00:01<00:05, 4950.66 examples/s]Map:  27%|██▋       | 10000/36718 [00:01<00:05, 5139.34 examples/s]Map:  30%|██▉       | 11000/36718 [00:02<00:05, 5139.13 examples/s]Map:  33%|███▎      | 12000/36718 [00:02<00:04, 5313.54 examples/s]Map:  35%|███▌      | 13000/36718 [00:02<00:04, 5430.20 examples/s]Map:  38%|███▊      | 14000/36718 [00:02<00:04, 5443.38 examples/s]Map:  41%|████      | 15000/36718 [00:02<00:04, 5403.93 examples/s]Map:  44%|████▎     | 16000/36718 [00:03<00:04, 5115.26 examples/s]Map:  46%|████▋     | 17000/36718 [00:03<00:03, 5191.89 examples/s]Map:  49%|████▉     | 18000/36718 [00:03<00:03, 5322.73 examples/s]Map:  52%|█████▏    | 19000/36718 [00:03<00:03, 5432.89 examples/s]Map:  54%|█████▍    | 20000/36718 [00:03<00:03, 5468.92 examples/s]Map:  57%|█████▋    | 21000/36718 [00:03<00:02, 5453.94 examples/s]Map:  60%|█████▉    | 22000/36718 [00:04<00:02, 5531.45 examples/s]Map:  63%|██████▎   | 23000/36718 [00:04<00:02, 5500.68 examples/s]Map:  65%|██████▌   | 24000/36718 [00:04<00:02, 5485.57 examples/s]Map:  68%|██████▊   | 25000/36718 [00:04<00:02, 5469.09 examples/s]Map:  71%|███████   | 26000/36718 [00:04<00:01, 5437.94 examples/s]Map:  74%|███████▎  | 27000/36718 [00:05<00:02, 4188.92 examples/s]Map:  76%|███████▋  | 28000/36718 [00:05<00:01, 4456.76 examples/s]Map:  79%|███████▉  | 29000/36718 [00:05<00:01, 4700.15 examples/s]Map:  82%|████████▏ | 30000/36718 [00:05<00:01, 4965.71 examples/s]Map:  84%|████████▍ | 31000/36718 [00:06<00:01, 5074.68 examples/s]Map:  87%|████████▋ | 32000/36718 [00:06<00:00, 5240.80 examples/s]Map:  90%|████████▉ | 33000/36718 [00:06<00:00, 5278.95 examples/s]Map:  93%|█████████▎| 34000/36718 [00:06<00:00, 5304.77 examples/s]Map:  95%|█████████▌| 35000/36718 [00:06<00:00, 5436.89 examples/s]Map:  98%|█████████▊| 36000/36718 [00:06<00:00, 5339.88 examples/s]Map: 100%|██████████| 36718/36718 [00:07<00:00, 5348.81 examples/s]Map: 100%|██████████| 36718/36718 [00:07<00:00, 4729.33 examples/s]
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/src/main.py", line 71, in <module>
+    main()
+  File "/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/src/main.py", line 64, in main
+    _run(cfg, "smoke_test")
+  File "/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/src/main.py", line 36, in _run
+    model, train_stats = train.train_model(loader, vocab, cfg)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/src/train.py", line 39, in train_model
+    optimiser = torch.optim.AdamW(model.parameters(), lr=cfg["training"]["lr"])
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/.venv/lib/python3.11/site-packages/torch/optim/adamw.py", line 37, in __init__
+    super().__init__(
+  File "/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/.venv/lib/python3.11/site-packages/torch/optim/adam.py", line 58, in __init__
+    if not 0.0 <= lr:
+           ^^^^^^^^^
+TypeError: '<=' not supported between instances of 'float' and 'str'
