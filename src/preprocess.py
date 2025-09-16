@@ -9,7 +9,6 @@ import requests
 from bs4 import BeautifulSoup
 import time
 
-# --- Constants ---
 TOKENIZER = tiktoken.get_encoding('cl100k_base')
 MAX_TOKENS = 2048
 
@@ -19,10 +18,9 @@ def clean_text(text):
     if not isinstance(text, str):
         return ""
     text = text.lower()
-    # More robust PHI scrubber
-    text = re.sub(r'\b\d{1,2}[-/]\d{1,2}[-/]\d{2,4}\b', '<DATE>', text) # Dates
-    text = re.sub(r'\b\d{3}-\d{2}-\d{4}\b', '<SSN>', text) # SSN
-    text = re.sub(r'\[\*\*(.*?)\*\*\]', '<DEIDENTIFIED>', text) # MIMIC format
+    text = re.sub(r'\b\d{1,2}[-/]\d{1,2}[-/]\d{2,4}\b', '<DATE>', text)
+    text = re.sub(r'\b\d{3}-\d{2}-\d{4}\b', '<SSN>', text)
+    text = re.sub(r'\[\*\*(.*?)\*\*\]', '<DEIDENTIFIED>', text)
     text = re.sub(r'<NAME>|<DOB>', '', text, flags=re.IGNORECASE)
     text = re.sub(r'\s+', ' ', text).strip()
     return text
@@ -36,8 +34,6 @@ def tokenize_and_truncate(text):
 # --- Data Acquisition Functions ---
 
 def download_mimic_iv_discharge(config, output_dir):
-    # MIMIC-IV requires user credentials and is not directly downloadable.
-    # This function checks for its existence and provides instructions if absent.
     mimic_path = Path(config['paths']['mimic_iv_dir']) / 'discharge.csv'
     if not mimic_path.exists():
         raise FileNotFoundError(
@@ -60,52 +56,45 @@ def scrape_sec_edgar_10k_risk_factors(config, output_dir):
 
     for cik in ciks:
         try:
-            # Get the list of filings
             url = f'https://data.sec.gov/submissions/CIK{cik}.json'
-            response = requests.get(url, headers=headers)
+            response = requests.get(url, headers=headers, timeout=10)
             response.raise_for_status()
             filings = response.json()['filings']['recent']
-            time.sleep(0.2) # Rate limit
-            
-            # Find the most recent 10-K
+            time.sleep(0.2)
+
             ten_k_accession = None
             for acc_num, form in zip(filings['accessionNumber'], filings['form']):
                 if form == '10-K':
                     ten_k_accession = acc_num.replace('-', '')
                     primary_doc = filings['primaryDocument'][filings['accessionNumber'].index(acc_num)]
                     break
-            
             if not ten_k_accession:
                 print(f"Warning: No 10-K found for CIK {cik}. Skipping.")
                 continue
 
-            # Get the 10-K HTML
             filing_url = f"https://www.sec.gov/Archives/edgar/data/{cik}/{ten_k_accession}/{primary_doc}"
-            response = requests.get(filing_url, headers=headers)
+            response = requests.get(filing_url, headers=headers, timeout=10)
             response.raise_for_status()
             soup = BeautifulSoup(response.content, 'html.parser')
-            
-            # Find the 'Risk Factors' section (this is heuristic)
-            risk_header = soup.find(lambda tag: 'risk factors' in tag.get_text(strip=True).lower() and tag.name in ['h1','h2','h3','b'])
+
+            risk_header = soup.find(lambda tag: 'risk factors' in tag.get_text(strip=True).lower() and tag.name in ['h1', 'h2', 'h3', 'b'])
             if risk_header:
                 content = []
                 for sibling in risk_header.find_next_siblings():
-                    # Stop at the next major header
                     if sibling.name in ['h1', 'h2', 'h3']:
                         break
                     if sibling.name == 'p':
                         content.append(sibling.get_text(strip=True))
                 full_text = ' '.join(content)
                 if full_text:
-                    # Split into smaller prompt-like chunks
                     sentences = re.split(r'(?<=[.!?]) +', full_text)
-                    chunks = [' '.join(sentences[i:i+5]) for i in range(0, len(sentences), 5)]
+                    chunks = [' '.join(sentences[i:i + 5]) for i in range(0, len(sentences), 5)]
                     all_risk_factors.extend(chunks)
         except Exception as e:
             print(f"Warning: Failed to process CIK {cik}. Error: {e}")
-    
+
     if not all_risk_factors:
-         raise RuntimeError("FATAL: Failed to scrape any risk factors from SEC EDGAR. Cannot proceed.")
+        raise RuntimeError("FATAL: Failed to scrape any risk factors from SEC EDGAR. Cannot proceed.")
 
     df = pd.DataFrame(all_risk_factors, columns=['prompt'])
     df['task'] = 'FinReg-Compliance'
@@ -133,13 +122,17 @@ def run_preprocessing(config):
     all_tasks_df = pd.DataFrame()
 
     if exp_id == 1:
-        df_mimic = download_mimic_iv_discharge(config, output_path)
-        df_sec = scrape_sec_edgar_10k_risk_factors(config, output_path)
-        all_tasks_df = pd.concat([df_mimic.head(1500), df_sec.head(1500)], ignore_index=True)
+        tasks_requested = set(config.get('experiment_1', {}).get('tasks', []))
+        if 'HIPAA-MedTriage' in tasks_requested:
+            df_mimic = download_mimic_iv_discharge(config, output_path)
+            all_tasks_df = pd.concat([all_tasks_df, df_mimic], ignore_index=True)
+        if 'FinReg-Compliance' in tasks_requested:
+            df_sec = scrape_sec_edgar_10k_risk_factors(config, output_path)
+            all_tasks_df = pd.concat([all_tasks_df, df_sec], ignore_index=True)
 
     elif exp_id == 2:
         all_tasks_df = download_hf_dataset('Super-NI', 'allenai/super_natural_instructions', 'train[:5%]', 'definition', 'Super-NI')
-    
+
     elif exp_id == 3:
         df_gsm8k = download_hf_dataset('GSM8K', 'openai/gsm8k', 'train', 'question', 'GSM8K')
         df_creative = download_hf_dataset('BIG-bench', 'google/bigbench', 'reasoning_about_colored_objects', 'inputs', 'creative_story')
@@ -151,28 +144,26 @@ def run_preprocessing(config):
     print("\nCleaning and tokenizing text...")
     all_tasks_df['prompt'] = all_tasks_df['prompt'].apply(clean_text).apply(tokenize_and_truncate)
     all_tasks_df.dropna(subset=['prompt'], inplace=True)
-    all_tasks_df = all_tasks_df[all_tasks_df['prompt'].str.len() > 20] # Remove very short prompts
+    all_tasks_df = all_tasks_df[all_tasks_df['prompt'].str.len() > 20]
 
-    # Split data for each task
     opt_dfs, test_dfs, meta_dfs = [], [], []
     for task_name, group in all_tasks_df.groupby('task'):
         print(f"  Splitting task: {task_name} ({len(group)} prompts)")
-        # Create a deterministic split
         group = group.sample(frac=1, random_state=42).reset_index(drop=True)
-        
+
         test_split = group.head(50)
         remaining = group.iloc[50:]
         opt_split = remaining.head(300)
-        meta_split = remaining.iloc[300:800] # For MetaBO
+        meta_split = remaining.iloc[300:800]
 
         test_dfs.append(test_split)
         opt_dfs.append(opt_split)
-        if not meta_split.empty: meta_dfs.append(meta_split)
+        if not meta_split.empty:
+            meta_dfs.append(meta_split)
 
-    # --- Combine and Save ---
     final_optimization_df = pd.concat(opt_dfs, ignore_index=True)
     final_test_df = pd.concat(test_dfs, ignore_index=True)
-    
+
     opt_path = output_path / 'optimization.parquet'
     test_path = output_path / 'test.parquet'
     final_optimization_df.to_parquet(opt_path)
@@ -187,5 +178,5 @@ def run_preprocessing(config):
         meta_path = output_path / 'meta_train.parquet'
         final_meta_df.to_parquet(meta_path)
         print(f"  Meta-training data: {len(final_meta_df)} samples saved to {meta_path}")
-    
+
     return str(output_path)
