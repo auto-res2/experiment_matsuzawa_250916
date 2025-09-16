@@ -1,9 +1,1 @@
-seed: 13
-
-# Very small dummy setup just to exercise the code path.
-data:
-  sample_size: 3
-
-model:
-  input_dim: 4
-  output_dim: 2
+# Cannot generate smoke_test.yaml because no experiment code was provided.
