@@ -1,0 +1,29 @@
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/toma/t-80-8-b-01/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/src/main.py", line 77, in <module>
+    main()
+  File "/home/toma/t-80-8-b-01/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/src/main.py", line 63, in main
+    config = _load_yaml(cfg_path)
+             ^^^^^^^^^^^^^^^^^^^^
+  File "/home/toma/t-80-8-b-01/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/src/main.py", line 31, in _load_yaml
+    return yaml.safe_load(fp)
+           ^^^^^^^^^^^^^^^^^^
+  File "/home/toma/t-80-8-b-01/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/.venv/lib/python3.11/site-packages/yaml/__init__.py", line 125, in safe_load
+    return load(stream, SafeLoader)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/toma/t-80-8-b-01/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/.venv/lib/python3.11/site-packages/yaml/__init__.py", line 79, in load
+    loader = Loader(stream)
+             ^^^^^^^^^^^^^^
+  File "/home/toma/t-80-8-b-01/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/.venv/lib/python3.11/site-packages/yaml/loader.py", line 34, in __init__
+    Reader.__init__(self, stream)
+  File "/home/toma/t-80-8-b-01/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/.venv/lib/python3.11/site-packages/yaml/reader.py", line 85, in __init__
+    self.determine_encoding()
+  File "/home/toma/t-80-8-b-01/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/.venv/lib/python3.11/site-packages/yaml/reader.py", line 135, in determine_encoding
+    self.update(1)
+  File "/home/toma/t-80-8-b-01/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/.venv/lib/python3.11/site-packages/yaml/reader.py", line 169, in update
+    self.check_printable(data)
+  File "/home/toma/t-80-8-b-01/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/.venv/lib/python3.11/site-packages/yaml/reader.py", line 143, in check_printable
+    raise ReaderError(self.name, position, ord(character),
+yaml.reader.ReaderError: unacceptable character #x0000: special characters are not allowed
+  in "config/full_experiment.yaml", position 3836
