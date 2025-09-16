@@ -6,5 +6,82 @@
     "accuracy preservation quantization",
     "post-training 2-bit quantization",
     "mixed-precision KV cache"
+  ],
+  "research_study_list": [
+    {
+      "title": "KVQuant: Towards 10 Million Context Length LLM Inference with KV Cache Quantization"
+    },
+    {
+      "title": "KIVI: A Tuning-Free Asymmetric 2bit Quantization for KV Cache"
+    },
+    {
+      "title": "KV Cache is 1 Bit Per Channel: Efficient Large Language Model Inference with Coupled Quantization"
+    },
+    {
+      "title": "MiniCache: KV Cache Compression in Depth Dimension for Large Language Models"
+    },
+    {
+      "title": "ZipCache: Accurate and Efficient KV Cache Quantization with Salient Token Identification"
+    },
+    {
+      "title": "KVQuant: Towards 10 Million Context Length LLM Inference with KV Cache Quantization"
+    },
+    {
+      "title": "KIVI: A Tuning-Free Asymmetric 2bit Quantization for KV Cache"
+    },
+    {
+      "title": "FrameQuant: Flexible Low-Bit Quantization for Transformers"
+    },
+    {
+      "title": "2DQuant: Low-bit Post-Training Quantization for Image Super-Resolution"
+    },
+    {
+      "title": "KV Cache is 1 Bit Per Channel: Efficient Large Language Model Inference with Coupled Quantization"
+    },
+    {
+      "title": "Towards Cheaper Inference in Deep Networks with Lower Bit-Width Accumulators"
+    },
+    {
+      "title": "Searching for Low-Bit Weights in Quantized Neural Networks"
+    },
+    {
+      "title": "PowerQuant: Automorphism Search for Non-Uniform Quantization"
+    },
+    {
+      "title": "Outlier-aware Slicing for Post-Training Quantization in Vision Transformer"
+    },
+    {
+      "title": "Bit-Shrinking: Limiting Instantaneous Sharpness for Improving Post-Training Quantization"
+    },
+    {
+      "title": "Towards Accurate Post-training Network Quantization via Bit-Split and Stitching"
+    },
+    {
+      "title": "Bit-Shrinking: Limiting Instantaneous Sharpness for Improving Post-Training Quantization"
+    },
+    {
+      "title": "Accurate Post Training Quantization With Small Calibration Sets"
+    },
+    {
+      "title": "Shifted and Squeezed 8-bit Floating Point format for Low-Precision Training of Deep Neural Networks"
+    },
+    {
+      "title": "BRECQ: Pushing the Limit of Post-Training Quantization by Block Reconstruction"
+    },
+    {
+      "title": "KIVI: A Tuning-Free Asymmetric 2bit Quantization for KV Cache"
+    },
+    {
+      "title": "MiniCache: KV Cache Compression in Depth Dimension for Large Language Models"
+    },
+    {
+      "title": "KVQuant: Towards 10 Million Context Length LLM Inference with KV Cache Quantization"
+    },
+    {
+      "title": "ZipCache: Accurate and Efficient KV Cache Quantization with Salient Token Identification"
+    },
+    {
+      "title": "KV Cache is 1 Bit Per Channel: Efficient Large Language Model Inference with Coupled Quantization"
+    }
   ]
 }
