@@ -1,1 +1,8 @@
-# Placeholder
+# config/full_experiment.yaml
+experiment_name: full_experiment
+training:
+  epochs: 3   # Kept small; still a stub
+  batch_size: 32
+  lr: 0.0003
+# Even the full experiment uses stub data in this placeholder implementation.
+requires_real_data: false

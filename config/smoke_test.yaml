@@ -1,1 +1,8 @@
-# Placeholder
+# config/smoke_test.yaml
+experiment_name: smoke_test
+training:
+  epochs: 1
+  batch_size: 8
+  lr: 0.001
+# No real datasets – keep CI fast.
+requires_real_data: false

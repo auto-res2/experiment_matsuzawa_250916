@@ -1,1 +1,15 @@
-# Placeholder
+[project]
+name = "scarf-experiment"
+version = "0.1.0"
+description = "Minimal scaffolding for SCARF research pipeline smoke-tests."
+authors = [
+    { name = "OpenAI AutoFix", email = "noreply@example.com" }
+]
+requires-python = ">=3.8"
+dependencies = [
+    "PyYAML>=6.0"
+]
+
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
