@@ -474,6 +474,68 @@
       "title": "Lifelong Domain Adaptation via Consolidated Internal Distribution"
     }
   ],
+  "reference_research_study_list": [
+    {
+      "title": "Online continual learning with maximal interfered retrieval"
+    },
+    {
+      "title": "Task-free continual learning"
+    },
+    {
+      "title": "Gradient based sample selection for online continual learning"
+    },
+    {
+      "title": "Gradient ﬂows: In metric spaces and in the space of probability measures"
+    },
+    {
+      "title": "Stochastic Processes"
+    },
+    {
+      "title": "Convex optimization"
+    },
+    {
+      "title": "Towards evaluating the robustness of neural networks"
+    },
+    {
+      "title": "Efﬁcient lifelong learning with a-gem"
+    },
+    {
+      "title": "Continual learning with tiny episodic memories"
+    },
+    {
+      "title": "Stochastic gradient hamiltonian monte carlo"
+    },
+    {
+      "title": "Svgd as a kernelized wasserstein gradient ﬂow of the chi-squared divergence"
+    },
+    {
+      "title": "Online continual learning from imbalanced data"
+    },
+    {
+      "title": "Task agnostic continual learning via meta learning"
+    },
+    {
+      "title": "Gradient-based editing of memory examples for online task-free continual learning"
+    },
+    {
+      "title": "The variational formulation of the fokker–planck equation"
+    },
+    {
+      "title": "Overcoming catastrophic forgetting in neural networks"
+    },
+    {
+      "title": "Learning multiple layers of features from tiny images"
+    },
+    {
+      "title": "A neural dirichlet process mixture model for task-free continual learning"
+    },
+    {
+      "title": "Understanding mcmc dynamics as ﬂows on the wasserstein spac"
+    },
+    {
+      "title": "Stein variational gradient descent as gradient ﬂow"
+    }
+  ],
   "new_method": {
     "method": "Open Problems: (i) Current device-level CL schemes remain strictly *intra*-device; when hundreds of identical sensors scatter over a building or field, each node still over-provisions long-retention bytes although neighbouring nodes may enjoy cooler temperature or lower write load.  (ii) Short-retention bytes are merely a buffer before being distilled; they are not exploited for *online fast‐weight meta-learning* that could speed adaptation under severe concept drift.  (iii) Retention-aware schedulers are myopic: they react to measured junction-temperature but do not *predict* the next hours of thermal or harvest profile, missing anticipatory optimisation.  (iv) Existing self-healing schemes ignore privacy; regenerating data in-situ or bartering memory across nodes must not leak user information.  (v) Community benchmarks still evaluate a lone MCU; no dataset captures the spatio-temporal heterogeneity that emerges in real sensor swarms.\nMethods: We elevate PHOENIX into SYMPHONY – SYnergetic Meta-Plasticity and HYbrid-retention Optimisation in Networked memorY.  Key novelties:\nA) Retention-Aware Meta-Plasticity (RAMP).  The τ≈ 1-3 h bytes at the very top of the retention pyramid are repurposed as *fast weights* updated by an outer-loop meta-learner.  A light LSTM (512 states) stored in MRAM predicts a fast-weight delta which is directly written into RAMP bytes; gradients flow only through the delta generator, amortising SRAM.\nB) Predictive Thermal–Harvest Scheduler (PTHS).  A TinyTransformer (21 k parameters) consumes the past 48 min of on-chip temperature, irradiance and training loss and outputs a 2-h forecast.  The HiCoRe allocator from PHOENIX is upgraded to solve a *model-predictive control* (MPC) problem that allocates endurance and retention over the predicted window, yielding 6-hour energy adherence guarantees.\nC) Cooperative Retention Swarm (CReS).  Edge nodes exchange *mid-retention (τ≈ 1–7 d) replay codes* over BLE when link margin permits.  A multi-agent Restless-Bandit derives barter prices so that hot nodes can off-load cold bytes to cooler peers, improving global wear variance without central server.\nD) Private In-Cell Noise (PICN).  PHOENIX’ IGRE is modified so that write-time programming noise, calibrated per cell, realises the same distribution as differential-privacy Gaussian noise; thus both retention refresh and DP happen in one write, eliminating extra SRAM passes.\nE) Open benchmark SwarmRet-120.  We deploy 20 solar-MCUs across a 3-floor office for 120 days, logging RGB-faces, DVS hallway flow and CO₂, together with per-node temperature, harvest and BLE contact graph.  Cell-level retention failures are sampled weekly.\nF) Open-source RTL macro IGRE-Lite (4 kB) synthesised in 22 nm MRAM, allowing academic replication of in-situ generation.\nExperimental Setup: Hardware tiers: (1) 25× Nordic nRF54 with 4 MB eMRAM+CIM, (2) 10× STM32U5 w/ Adesto PCM shield (overlay mode).  Each node harvests 0.2–1.5 mW solar.\nStreams: SwarmRet-120 (ours), plus single-node RetenBench-45 for ablation.\nBudgets: Hot SRAM 64 kB/node, NVM≤4 MB/node; BLE barter window ≤20 kB/day.\nBaselines: PHOENIX, ECLIPSE, TMU, SparCL, DER++.\nMetrics (additions in bold): 1) Accuracy/BWT, 2) Joule per correct class, 3) Endurance credit, 4) **Across-swarm wear variance σ²_H**, 5) **Meta-adaptation latency (steps to recover 90 % accuracy after concept shift)**, 6) **ε-DP guarantee vs. logits**, 7) Replay-bytes to SRAM.\nAblations: −RAMP, −PTHS, −CReS, −PICN, no forecast (reactive).\nExpected Result: • SYMPHONY attains 72 % average accuracy on SwarmRet-120 (+4 pp over PHOENIX, +13 pp over SparCL) while consuming the same per-node energy.\n• Meta-adaptation latency drops 3.2× (from 320 to 100 steps) thanks to RAMP fast weights.\n• Across-swarm wear variance σ²_H shrinks by 5.6× compared with any non-bartering baseline; 95 % of nodes project >12-year lifetime.\n• Forecast-MPC cuts brown-out-induced training skips from 9 % (reactive) to 2 % of time slots.\n• PICN achieves ε=1.3 differential privacy for replay logits with <0.4 % accuracy loss and zero extra energy.\n• IGRE-Lite macro adds <3 µW standby and is released under MIT licence.\nExpected Conclusion: By turning short-retention bytes into learnable fast weights (RAMP), forecasting thermo-energy dynamics, and introducing cooperative barter of retention across a sensor swarm, SYMPHONY transcends single-device optimisation and shows that *memory, energy, privacy and endurance can be co-optimised at network scale*.  The open SwarmRet-120 benchmark and IGRE-Lite RTL will ground future cross-layer research.  Academically, the work links meta-learning, MPC and differential privacy with NVM physics; societally, it enables decade-plus, privacy-preserving adaptation of large IoT fleets at sub-milliwatt budgets.",
     "experimental_design": {
