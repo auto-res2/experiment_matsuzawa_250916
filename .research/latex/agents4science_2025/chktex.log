@@ -1,0 +1,165 @@
+Warning 13 in paper.tex line 36: Intersentence spacing (`\@') should perhaps be used.
+\title{SYMPHONY: Retention-Aware Meta-Plasticity and Predictive Scheduling for Continual Learning in Sensor Swarms}  
+               ^
+Warning 8 in paper.tex line 45: Wrong length of dash may have been used.
+Continual learning on fleets of sub-milliwatt micro-controllers is hamstrung by the physics of non-volatile memories whose retention spans hours to years, by volatile thermal and energy environments, and by the absence of benchmarks that expose fleet-scale heterogeneity. Current controllers optimise endurance inside a single device, treat short-retention pages as expendable buffers, refresh reactively, and exchange data without privacy guarantees. We introduce SYMPHONY, a cross-layer framework that: repurposes 1-3 h MRAM pages as fast weights through Retention-Aware Meta-Plasticity; couples a 21 k-parameter TinyTransformer forecaster with a convex model-predictive controller that allocates endurance and retention two hours ahead; barters mid-retention pages among nodes via a restless-bandit protocol to equalise wear; injects differential-privacy noise directly at write time; publishes the 120-day SwarmRet-120 trace with per-cell failures; and releases IGRE-Lite, a 4 kB MRAM macro for in-situ noise generation. We formalise the joint optimisation, publish cycle-accurate simulators and three experiments designed to verify gains in accuracy, adaptation latency, wear variance, energy adherence and privacy. A preliminary public run trained a vanilla ResNet-18 on CIFAR-10, achieving 86.6 \% accuracy but exercising none of SYMPHONY’s mechanisms. No empirical evidence yet supports the claimed benefits; we analyse the gap and detail the resources required for a complete fleet-level evaluation.  
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     ^
+Warning 1 in paper.tex line 49: Command terminated with space.
+Continual learning (CL) promises on-device models that adapt for years without cloud connectivity, yet most literature tacitly assumes (i) abundant DRAM, (ii) uniform, decade-long non-volatile retention and (iii) stable power availability. Real deployments violate all three assumptions. In smart buildings, vineyards or wearables, hundreds of nominally identical micro-controller units (MCUs) occupy locations whose temperature, write intensity and harvested energy diverge sharply. Manufacturers therefore grade spin-transfer MRAM pages into three retention tiers-short (\approx 1-3 h), mid (\approx 1-7 d) and long (>5 y)-but today’s controllers over-provision long-retention storage for every node while the shortest-retention bytes remain under-utilised.  
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ^
+Warning 8 in paper.tex line 49: Wrong length of dash may have been used.
+Continual learning (CL) promises on-device models that adapt for years without cloud connectivity, yet most literature tacitly assumes (i) abundant DRAM, (ii) uniform, decade-long non-volatile retention and (iii) stable power availability. Real deployments violate all three assumptions. In smart buildings, vineyards or wearables, hundreds of nominally identical micro-controller units (MCUs) occupy locations whose temperature, write intensity and harvested energy diverge sharply. Manufacturers therefore grade spin-transfer MRAM pages into three retention tiers-short (\approx 1-3 h), mid (\approx 1-7 d) and long (>5 y)-but today’s controllers over-provision long-retention storage for every node while the shortest-retention bytes remain under-utilised.  
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      ^
+Warning 1 in paper.tex line 49: Command terminated with space.
+Continual learning (CL) promises on-device models that adapt for years without cloud connectivity, yet most literature tacitly assumes (i) abundant DRAM, (ii) uniform, decade-long non-volatile retention and (iii) stable power availability. Real deployments violate all three assumptions. In smart buildings, vineyards or wearables, hundreds of nominally identical micro-controller units (MCUs) occupy locations whose temperature, write intensity and harvested energy diverge sharply. Manufacturers therefore grade spin-transfer MRAM pages into three retention tiers-short (\approx 1-3 h), mid (\approx 1-7 d) and long (>5 y)-but today’s controllers over-provision long-retention storage for every node while the shortest-retention bytes remain under-utilised.  
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         ^
+Warning 8 in paper.tex line 49: Wrong length of dash may have been used.
+Continual learning (CL) promises on-device models that adapt for years without cloud connectivity, yet most literature tacitly assumes (i) abundant DRAM, (ii) uniform, decade-long non-volatile retention and (iii) stable power availability. Real deployments violate all three assumptions. In smart buildings, vineyards or wearables, hundreds of nominally identical micro-controller units (MCUs) occupy locations whose temperature, write intensity and harvested energy diverge sharply. Manufacturers therefore grade spin-transfer MRAM pages into three retention tiers-short (\approx 1-3 h), mid (\approx 1-7 d) and long (>5 y)-but today’s controllers over-provision long-retention storage for every node while the shortest-retention bytes remain under-utilised.  
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           ^
+Warning 8 in paper.tex line 58: Wrong length of dash may have been used.
+  \item \textbf{Retention-Aware Meta-Plasticity (RAMP):} uses 1-3 h MRAM pages as fast weights that store gradient-generated deltas, amortising SRAM and enabling rapid adaptation.  
+                                                               ^
+Warning 2 in paper.tex line 63: Non-breaking space (`~') should have been used.
+  \item \textbf{Open Simulators and Benchmarks:} cycle-accurate simulators and three experiments that benchmark SYMPHONY against PHOENIX, SparCL \cite{wang-2022-sparcl}, DER++, and ECLIPSE under identical budgets.  
+                                                                                                                                                ^
+Warning 13 in paper.tex line 69: Intersentence spacing (`\@') should perhaps be used.
+The remainder of the paper is organised as follows. Section Related Work contrasts SYMPHONY with prior device-level CL controllers, memory-aware learning and predictive schedulers. Section Background reviews retention physics, meta-learning and MPC. Section Method formalises our optimisation and algorithms. Section Experimental Setup details the three evaluation protocols. Section Results summarises the available logs and identifies missing evidence. Section Conclusion outlines next steps and future research directions.  
+                                                                                                                                                                                                                                                        ^
+Warning 2 in paper.tex line 73: Non-breaking space (`~') should have been used.
+PHOENIX refreshes NVM pages inside a single MCU, ignoring inter-node heterogeneity, while SparCL accelerates CL via sparsity but presumes abundant uniform-retention memory \cite{wang-2022-sparcl}. Orthogonal-subspace training mitigates interference \cite{chaudhry-2020-continual} yet still stores full-precision weights in long-retention storage.  
+                                                                                                                                                                           ^
+Warning 2 in paper.tex line 73: Non-breaking space (`~') should have been used.
+PHOENIX refreshes NVM pages inside a single MCU, ignoring inter-node heterogeneity, while SparCL accelerates CL via sparsity but presumes abundant uniform-retention memory \cite{wang-2022-sparcl}. Orthogonal-subspace training mitigates interference \cite{chaudhry-2020-continual} yet still stores full-precision weights in long-retention storage.  
+                                                                                                                                                                                                                                                        ^
+Warning 2 in paper.tex line 76: Non-breaking space (`~') should have been used.
+Wasserstein memory evolution hardens replay buffers \cite{wang-2022-improving}; gradient-based sample selection targets maximally interfered examples \cite{aljundi-2019-gradient}; A-GEM improves efficiency via averaged constraints \cite{chaudhry-2018-lifelong}. All three operate strictly within one device and are agnostic to physical wear.  
+                                                   ^
+Warning 2 in paper.tex line 76: Non-breaking space (`~') should have been used.
+Wasserstein memory evolution hardens replay buffers \cite{wang-2022-improving}; gradient-based sample selection targets maximally interfered examples \cite{aljundi-2019-gradient}; A-GEM improves efficiency via averaged constraints \cite{chaudhry-2018-lifelong}. All three operate strictly within one device and are agnostic to physical wear.  
+                                                                                                                                                     ^
+Warning 2 in paper.tex line 76: Non-breaking space (`~') should have been used.
+Wasserstein memory evolution hardens replay buffers \cite{wang-2022-improving}; gradient-based sample selection targets maximally interfered examples \cite{aljundi-2019-gradient}; A-GEM improves efficiency via averaged constraints \cite{chaudhry-2018-lifelong}. All three operate strictly within one device and are agnostic to physical wear.  
+                                                                                                                                                                                                                                      ^
+Warning 2 in paper.tex line 79: Non-breaking space (`~') should have been used.
+UCB adapts learning rates using posterior variance \cite{ebrahimi-2019-uncertainty}; SYMPHONY instead adapts write budgets through retention time, coupling physical decay with optimisation.  
+                                                  ^
+Warning 2 in paper.tex line 82: Non-breaking space (`~') should have been used.
+Online learned compression allocates bits adaptively \cite{caccia-2019-online} but stores data locally. PICN differs by embedding differentially-private noise directly into the write operation, avoiding additional SRAM passes.  
+                                                    ^
+Warning 2 in paper.tex line 97: Non-breaking space (`~') should have been used.
+CL faces non-IID data streams that induce catastrophic forgetting \cite{kirkpatrick-2016-overcoming}. Meta-learning formulates a bi-level optimisation in which an outer loop updates meta-parameters \(\phi\) to minimise the expected loss after an inner update of weights \(\theta\). Fast-weight architectures decouple rapid adaptation (\(\Delta \theta\)) from slow weights, but prior work stores \(\Delta \theta\) in scarce SRAM.  
+                                                                 ^
+Warning 13 in paper.tex line 97: Intersentence spacing (`\@') should perhaps be used.
+CL faces non-IID data streams that induce catastrophic forgetting \cite{kirkpatrick-2016-overcoming}. Meta-learning formulates a bi-level optimisation in which an outer loop updates meta-parameters \(\phi\) to minimise the expected loss after an inner update of weights \(\theta\). Fast-weight architectures decouple rapid adaptation (\(\Delta \theta\)) from slow weights, but prior work stores \(\Delta \theta\) in scarce SRAM.  
+                                                                                                                                                                                                                                                                                                                                                                                                                                           ^
+Warning 1 in paper.tex line 130: Command terminated with space.
+\State \textbf{Inputs:} retention capacities \(C_{i}^{r}\), endurance limits, energy buffer state, BLE quota  
+      ^
+Warning 1 in paper.tex line 131: Command terminated with space.
+\State Initialise slow weights \(w_{\mathrm{long}}, w_{\mathrm{mid}}\), fast weights buffer empty  
+      ^
+Warning 1 in paper.tex line 133: Command terminated with space.
+  \State \textbf{(Streaming sample processing)}  
+        ^
+Warning 1 in paper.tex line 134: Command terminated with space.
+  \State Acquire sample \(x\), compute logits and loss \(\ell\)  
+        ^
+Warning 1 in paper.tex line 135: Command terminated with space.
+  \State Backpropagate to obtain gradient \(g = \nabla_{w} \ell\)  
+        ^
+Warning 1 in paper.tex line 136: Command terminated with space.
+  \State LSTM meta-learner emits fast delta \(\Delta w \leftarrow \mathrm{LSTM}(g)\)  
+        ^
+Warning 1 in paper.tex line 137: Command terminated with space.
+  \State Write \(\Delta w\) to short-retention pages (respecting budget \(\lambda_{i}(t)\))  
+        ^
+Warning 1 in paper.tex line 138: Command terminated with space.
+  \State Effective weights: \(w \leftarrow w_{\mathrm{long}} + w_{\mathrm{mid}} + \operatorname{decay}(\Delta w)\)  
+        ^
+Warning 1 in paper.tex line 140: Command terminated with space.
+     \State \textbf{(Forecast)} Build windowed features of temperature, irradiance, loss  
+           ^
+Warning 1 in paper.tex line 141: Command terminated with space.
+     \State Obtain 2 h forecasts \(\hat{f}, \hat{e}\) via TinyTransformer  
+           ^
+Warning 1 in paper.tex line 142: Command terminated with space.
+     \State \textbf{(MPC)} Solve convex program for next horizon to minimise brown-out, wear, staleness  
+           ^
+Warning 1 in paper.tex line 143: Command terminated with space.
+     \State Apply first-step controls: retention allocations \(a_{i}^{r}(t)\), write budgets \(\lambda_{i}(t)\)  
+           ^
+Warning 1 in paper.tex line 144: Command terminated with space.
+  \EndIf  
+        ^
+Warning 1 in paper.tex line 146: Command terminated with space.
+     \State For each candidate mid-tier page, compute shadow price via local restless bandit  
+           ^
+Warning 1 in paper.tex line 148: Command terminated with space.
+        \State Transmit delta-coded page to peer \(j\); update \(b_{ij}(t)\)  
+              ^
+Warning 1 in paper.tex line 150: Command terminated with space.
+        \State Receive page if peer offers; update local wear and storage  
+              ^
+Warning 1 in paper.tex line 151: Command terminated with space.
+     \EndIf  
+           ^
+Warning 1 in paper.tex line 152: Command terminated with space.
+  \EndIf  
+        ^
+Warning 1 in paper.tex line 153: Command terminated with space.
+  \State \textbf{(Refresh with privacy)} For pages scheduled for refresh/barter writes  
+        ^
+Warning 1 in paper.tex line 154: Command terminated with space.
+  \State \quad Apply write-current jitter with cell-calibrated variance to satisfy \(\varepsilon\)-DP  
+        ^
+Warning 1 in paper.tex line 155: Command terminated with space.
+\EndWhile  
+         ^
+Warning 8 in paper.tex line 160: Wrong length of dash may have been used.
+\subsection{Experiment 1 - 200-Node End-to-End Evaluation}  
+                         ^
+Warning 13 in paper.tex line 161: Intersentence spacing (`\@') should perhaps be used.
+We bootstrap the 20 physical SwarmRet-120 logs into 200 virtual nodes. Each node emulates a Nordic nRF54 with 4 MB MRAM, 64 kB SRAM and compute-in-memory accelerators. Modalities: 96$\times$96 RGB faces at 20 Hz processed by Tiny-ViT-0.6 M; 96$\times$96 DVS stacks at 240 Hz by ResNet-18; and CO$_2$ at 1 Hz by a GRU-128. The outer-loop meta-learner holds 1.1 M parameters; the forecaster 21 k. Baselines are PHOENIX, SparCL \cite{wang-2022-sparcl}, DER++, ECLIPSE and a reactive PHOENIX variant. Internal ablations disable RAMP, PTHS, CReS or PICN. Five seeds permute node IDs.  
+                                                                                                                                                                                                                                               ^
+Warning 2 in paper.tex line 161: Non-breaking space (`~') should have been used.
+We bootstrap the 20 physical SwarmRet-120 logs into 200 virtual nodes. Each node emulates a Nordic nRF54 with 4 MB MRAM, 64 kB SRAM and compute-in-memory accelerators. Modalities: 96$\times$96 RGB faces at 20 Hz processed by Tiny-ViT-0.6 M; 96$\times$96 DVS stacks at 240 Hz by ResNet-18; and CO$_2$ at 1 Hz by a GRU-128. The outer-loop meta-learner holds 1.1 M parameters; the forecaster 21 k. Baselines are PHOENIX, SparCL \cite{wang-2022-sparcl}, DER++, ECLIPSE and a reactive PHOENIX variant. Internal ablations disable RAMP, PTHS, CReS or PICN. Five seeds permute node IDs.  
+                                                                                                                                                                                                                                                                                                                                                                                                                                        ^
+Warning 13 in paper.tex line 161: Intersentence spacing (`\@') should perhaps be used.
+We bootstrap the 20 physical SwarmRet-120 logs into 200 virtual nodes. Each node emulates a Nordic nRF54 with 4 MB MRAM, 64 kB SRAM and compute-in-memory accelerators. Modalities: 96$\times$96 RGB faces at 20 Hz processed by Tiny-ViT-0.6 M; 96$\times$96 DVS stacks at 240 Hz by ResNet-18; and CO$_2$ at 1 Hz by a GRU-128. The outer-loop meta-learner holds 1.1 M parameters; the forecaster 21 k. Baselines are PHOENIX, SparCL \cite{wang-2022-sparcl}, DER++, ECLIPSE and a reactive PHOENIX variant. Internal ablations disable RAMP, PTHS, CReS or PICN. Five seeds permute node IDs.  
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    ^
+Warning 8 in paper.tex line 167: Wrong length of dash may have been used.
+\subsection{Experiment 2 - RAMP Micro-Benchmark}  
+                         ^
+Warning 8 in paper.tex line 170: Wrong length of dash may have been used.
+\subsection{Experiment 3 - PTHS + CReS Stress-Test}  
+                         ^
+Warning 13 in paper.tex line 171: Intersentence spacing (`\@') should perhaps be used.
+A synthetic 14-day trace imposes attic-level heat (peak 55 $^{\circ}$C) and a 40 h solar eclipse on 64 nodes (32 hot, 32 cool). Policies compared: full SYMPHONY, reactive only, forecast-only and barter-only. Metrics include training-skip ratio, wear variance and forecast MAE.  
+                                                                                                                                                                                                                                                                                   ^
+Warning 1 in paper.tex line 177: Command terminated with space.
+Only one public log is currently available: a single-GPU run that trained ResNet-18 on CIFAR-10 for 100 epochs (\approx 7 min wall-clock). Best test accuracy reached 86.58 \%. No energy, endurance, privacy or swarm metrics were recorded; no SYMPHONY component was active.  
+                                                                                                                       ^
+Warning 8 in paper.tex line 181: Wrong length of dash may have been used.
+Table 1 - Logged versus required metrics  
+        ^
+Warning 44 in paper.tex line 184: User Regex: -2:Use \toprule, midrule, or \bottomrule from booktabs.
+\hline  
+^^^^^^
+Warning 44 in paper.tex line 186: User Regex: -2:Use \toprule, midrule, or \bottomrule from booktabs.
+\hline  
+^^^^^^
+Warning 44 in paper.tex line 192: User Regex: -2:Use \toprule, midrule, or \bottomrule from booktabs.
+\hline  
+^^^^^^
+Warning 12 in paper.tex line 197: Interword spacing (`\ ') should perhaps be used.
+Limitations identified. (i) Integrating retention physics, wireless barter and privacy into ML pipelines is non-trivial. (ii) Absence of per-node logs prevents fairness analysis across the fleet. (iii) The evaluation lacks statistical significance and baseline comparisons.  
+                       ^
+Warning 12 in paper.tex line 197: Interword spacing (`\ ') should perhaps be used.
+Limitations identified. (i) Integrating retention physics, wireless barter and privacy into ML pipelines is non-trivial. (ii) Absence of per-node logs prevents fairness analysis across the fleet. (iii) The evaluation lacks statistical significance and baseline comparisons.  
+                                                                                                                        ^
+Warning 12 in paper.tex line 197: Interword spacing (`\ ') should perhaps be used.
+Limitations identified. (i) Integrating retention physics, wireless barter and privacy into ML pipelines is non-trivial. (ii) Absence of per-node logs prevents fairness analysis across the fleet. (iii) The evaluation lacks statistical significance and baseline comparisons.  
+                                                                                                                                                                                                   ^
+Warning 13 in paper.tex line 204: Intersentence spacing (`\@') should perhaps be used.
+However, the only executed experiment to date was a CIFAR-10 baseline unrelated to our mechanisms. The immediate priority is therefore to run the published simulator on SwarmRet-120, log the complete metric suite and benchmark against PHOENIX, SparCL, DER++ and ECLIPSE. Future work will extend CReS with federated aggregation, adapt MPC horizons via reinforcement learning and fabricate IGRE-Lite silicon to validate privacy guarantees in hardware. We invite the community to replicate, critique and extend SYMPHONY so that decade-long, privacy-preserving adaptation becomes feasible for large-scale IoT fleets.  
+                                                                                                                                                                                                                                                                             ^
