@@ -1,24 +1,36 @@
 #!/usr/bin/env python3
 """Entry-point orchestrating the (placeholder) SCARF pipeline.
 
-Usage
------
-python main.py --smoke-test       # quick CI run
-python main.py --full-experiment  # long run (still simulated)
+Run with either ``--smoke-test`` or ``--full-experiment`` to pick the desired
+configuration.
 """
+from __future__ import annotations
+
 import argparse
 import sys
 from pathlib import Path
 from typing import Dict, Any
 
-import yaml
+# -----------------------------------------------------------------------------
+# Make top-level project modules importable when ``src/`` is executed directly
+# -----------------------------------------------------------------------------
+ROOT_DIR = Path(__file__).resolve().parent.parent
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
 
-from preprocess_py import preprocess
-from train_py import train
-from evaluate_py import evaluate
+# Now local (top-level) modules can be imported without packaging gymnastics
+import yaml  # noqa: E402  pylint: disable=wrong-import-position
+from preprocess_py import preprocess  # noqa: E402  pylint: disable=wrong-import-position
+from train_py import train            # noqa: E402  pylint: disable=wrong-import-position
+from evaluate_py import evaluate      # noqa: E402  pylint: disable=wrong-import-position
 
-CONFIG_DIR = Path("config")
 
+CONFIG_DIR = ROOT_DIR / "config"
+
+
+# -----------------------------------------------------------------------------
+# Helpers
+# -----------------------------------------------------------------------------
 
 def _load_yaml(name: str) -> Dict[str, Any]:
     path = CONFIG_DIR / name
@@ -28,7 +40,7 @@ def _load_yaml(name: str) -> Dict[str, Any]:
         return yaml.safe_load(fp)
 
 
-def parse_args() -> argparse.Namespace:
+def _parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description="SCARF experiment runner")
     group = p.add_mutually_exclusive_group(required=True)
     group.add_argument("--smoke-test", action="store_true", help="Run the smoke-test config")
@@ -36,15 +48,16 @@ def parse_args() -> argparse.Namespace:
     return p.parse_args()
 
 
-def main() -> None:
-    args = parse_args()
+# -----------------------------------------------------------------------------
+# Main orchestration
+# -----------------------------------------------------------------------------
 
-    if args.smoke_test:
-        cfg = _load_yaml("smoke_test.yaml")
-    else:  # --full-experiment
-        cfg = _load_yaml("full_experiment.yaml")
+def main() -> None:  # pragma: no cover
+    args = _parse_args()
 
-    # Pipeline ────────────────────────────────────────────────────────────
+    cfg = _load_yaml("smoke_test.yaml" if args.smoke_test else "full_experiment.yaml")
+
+    # -------------------- pipeline stages --------------------
     preprocess(cfg)
     train_artifacts = train(cfg)
     evaluate(train_artifacts)
