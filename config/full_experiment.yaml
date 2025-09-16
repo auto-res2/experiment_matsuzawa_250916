@@ -6,3 +6,13 @@ training:
   lr: 0.0003
 # Even the full experiment uses stub data in this placeholder implementation.
 requires_real_data: false
+
+# NOTE: In a real-world scenario this config would list dataset paths,
+# model hyper-parameters, and any additional experiment-specific knobs.
+# For the purpose of CI smoke-tests we keep it intentionally minimal.
+
+# -------------------------------------------------------------------
+# End of configuration file
+# -------------------------------------------------------------------
+
+

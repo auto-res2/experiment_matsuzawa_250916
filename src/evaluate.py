@@ -2,7 +2,8 @@ import json
 from pathlib import Path
 from typing import Dict, Any
 
-_OUTPUT_DIR = Path(".research/iteration10")  # UPDATED PATH (keep consistent)
+# Persist evaluation artefacts to the *current* iteration directory
+_OUTPUT_DIR = Path(".research/iteration11")  # UPDATED PATH (keep consistent)
 
 
 def evaluate(train_artifacts: Dict[str, Any]) -> Dict[str, Any]:
