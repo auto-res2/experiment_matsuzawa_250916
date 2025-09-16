@@ -8,12 +8,12 @@ import numpy as np
 from datetime import datetime
 
 # -----------------------------------------------------------------------------
-# Directory constants – updated to new mandatory research directory structure
+# Directory constants  updated to new mandatory research directory structure
 # -----------------------------------------------------------------------------
-# ALL image artefacts must be written under .research/iteration9/images
-# ALL JSON artefacts must be written under .research/iteration9/
+# ALL image artefacts must be written under .research/iteration10/images
+# ALL JSON artefacts must be written under .research/iteration10/
 # -----------------------------------------------------------------------------
-JSON_DIR = os.path.join(".research", "iteration9")
+JSON_DIR = os.path.join(".research", "iteration10")
 IMAGES_DIR = os.path.join(JSON_DIR, "images")
 
 # Ensure the required directories exist
@@ -126,7 +126,7 @@ def analyze_experiment_1(df):
 
 def analyze_experiment_2(df):
     print("\n--- Analyzing Experiment 2: Finite-Sample Bounds ---")
-    # Placeholder – requires additional logs not yet implemented
+    # Placeholder  requires additional logs not yet implemented
     print("Analysis for Experiment 2 requires ground-truth moment logs. Skipped.")
     return {"status": "Skipped, requires custom logging"}
 
@@ -193,7 +193,7 @@ def generate_report(results_directory):
         }
 
     # ------------------------------------------------------------------
-    # Persist aggregated results as JSON – one file per analysis run
+    # Persist aggregated results as JSON  one file per analysis run
     # ------------------------------------------------------------------
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
     summary_path = os.path.join(JSON_DIR, f"final_results_{timestamp}.json")

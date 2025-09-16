@@ -163,11 +163,19 @@ def get_dataloaders(config):
                 base = ImageCorruptionDataset(ds, transform)
                 dataset = RealisticTTAStream(base, _shot_noise, exp_cfg['stream']['eta'])
 
-            # ImageNet-C placeholder – we load clean ImageNet validation as proxy
+            # ImageNet-C placeholder – fall back to Imagenette if gated
             elif 'imagenet-c' in d_name:
-                ds = _attempt_load_hf_dataset('imagenet-1k', split='validation')
+                try:
+                    ds = _attempt_load_hf_dataset('imagenet-1k', split='validation')
+                except RuntimeError as e:
+                    logging.warning(
+                        "Imagenet-1k dataset gated/unavailable ({}). Falling back to open 'imagenette'.".format(e)
+                    )
+                    ds = _attempt_load_hf_dataset('imagenette', name='full', split='validation')
+                    if 'img' in ds.column_names:
+                        ds = ds.rename_column('img', 'image')
                 dataset = ImageCorruptionDataset(ds, transform)
-                logging.warning("Using clean ImageNet-val data as a placeholder for ImageNet-C.")
+                logging.warning("Using clean validation data as a placeholder for ImageNet-C.")
 
             # EdgeHAR dummy tensor dataset for CI
             elif 'edgehar-c' in d_name:
