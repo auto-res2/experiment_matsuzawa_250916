@@ -6,5 +6,82 @@
     "differentiable prompt tuning",
     "reinforcement learning prompt tuning",
     "meta-learning prompt engineering"
+  ],
+  "research_study_list": [
+    {
+      "title": "Hard Prompts Made Easy: Gradient-Based Discrete Optimization for Prompt Tuning and Discovery"
+    },
+    {
+      "title": "Localized Zeroth-Order Prompt Optimization"
+    },
+    {
+      "title": "Large Language Models as Optimizers"
+    },
+    {
+      "title": "Connecting Large Language Models with Evolutionary Algorithms Yields Powerful Prompt Optimizers"
+    },
+    {
+      "title": "On Discrete Prompt Optimization for Diffusion Models"
+    },
+    {
+      "title": "Two-stage LLM Fine-tuning with Less Specialization and More Generalization"
+    },
+    {
+      "title": "Black-Box Tuning for Language-Model-as-a-Service"
+    },
+    {
+      "title": "Black-Box Tuning for Language-Model-as-a-Service"
+    },
+    {
+      "title": "Universality and Limitations of Prompt Tuning"
+    },
+    {
+      "title": "Zero-Shot Continuous Prompt Transfer: Generalizing Task Semantics Across Language Models"
+    },
+    {
+      "title": "Black-Box Tuning for Language-Model-as-a-Service"
+    },
+    {
+      "title": "Black-Box Tuning for Language-Model-as-a-Service"
+    },
+    {
+      "title": "DePT: Decomposed Prompt Tuning for Parameter-Efficient Fine-tuning"
+    },
+    {
+      "title": "HyperPrompt: Prompt-based Task-Conditioning of Transformers"
+    },
+    {
+      "title": "HyperPrompt: Prompt-based Task-Conditioning of Transformers"
+    },
+    {
+      "title": "Optimizing Prompts for Text-to-Image Generation"
+    },
+    {
+      "title": "TEMPERA: Test-Time Prompt Editing via Reinforcement Learning"
+    },
+    {
+      "title": "Retroformer: Retrospective Large Language Agents with Policy Gradient Optimization"
+    },
+    {
+      "title": "Reward Design with Language Models"
+    },
+    {
+      "title": "Rule Based Rewards for Language Model Safety"
+    },
+    {
+      "title": "Large Language Models are Human-Level Prompt Engineers"
+    },
+    {
+      "title": "PromptAgent: Strategic Planning with Language Models Enables Expert-level Prompt Optimization"
+    },
+    {
+      "title": "One Prompt is not Enough: Automated Construction of a Mixture-of-Expert Prompts"
+    },
+    {
+      "title": "Effective Structured Prompting by Meta-Learning and Representative Verbalizer"
+    },
+    {
+      "title": "Multitask Prompt Tuning Enables Parameter-Efficient Transfer Learning"
+    }
   ]
 }
