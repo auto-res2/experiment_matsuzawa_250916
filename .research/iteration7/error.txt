@@ -1,0 +1,161 @@
+Using CPython 3.11.13
+Creating virtual environment at: .venv
+Resolved 114 packages in 678ms
+   Building reflect-bo-research @ file:///home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916
+Downloading pygments (1.2MiB)
+Downloading torch (639.1MiB)
+Downloading scikit-learn (11.6MiB)
+Downloading tokenizers (3.4MiB)
+Downloading triton (85.1MiB)
+Downloading nvidia-curand-cu12 (53.9MiB)
+Downloading nvidia-cuda-nvrtc-cu12 (22.6MiB)
+Downloading nvidia-nvjitlink-cu12 (37.9MiB)
+Downloading nvidia-cufft-cu12 (116.0MiB)
+Downloading transformers (8.4MiB)
+Downloading scipy (34.7MiB)
+Downloading pandas (12.0MiB)
+Downloading pillow (4.3MiB)
+Downloading numpy (17.3MiB)
+Downloading matplotlib (11.1MiB)
+Downloading nvidia-cusparse-cu12 (186.9MiB)
+Downloading streamlit (8.0MiB)
+Downloading nvidia-nccl-cu12 (200.1MiB)
+Downloading nvidia-cublas-cu12 (391.6MiB)
+Downloading pydeck (6.6MiB)
+Downloading tiktoken (1.9MiB)
+Downloading nvidia-cuda-cupti-cu12 (13.5MiB)
+Downloading nvidia-cusolver-cu12 (118.4MiB)
+Downloading nvidia-cudnn-cu12 (697.8MiB)
+ Downloading tiktoken
+ Downloading pygments
+  × Failed to build `reflect-bo-research @
+  │ file:///home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916`
+  ├─▶ The build backend returned an error
+  ╰─▶ Call to `poetry.core.masonry.api.build_editable` failed (exit status: 1)
+
+      [stderr]
+      Traceback (most recent call last):
+        File "<string>", line 11, in <module>
+        File
+      "/home/toma/.cache/uv/builds-v0/.tmptJ4OLl/lib/python3.11/site-packages/poetry/core/masonry/api.py",
+      line 87, in build_editable
+          return WheelBuilder.make_in(
+                 ^^^^^^^^^^^^^^^^^^^^^
+        File
+      "/home/toma/.cache/uv/builds-v0/.tmptJ4OLl/lib/python3.11/site-packages/poetry/core/masonry/builders/wheel.py",
+      line 95, in make_in
+          wb.build(target_dir=directory)
+        File
+      "/home/toma/.cache/uv/builds-v0/.tmptJ4OLl/lib/python3.11/site-packages/poetry/core/masonry/builders/wheel.py",
+      line 129, in build
+          self._add_pth(zip_file)
+        File
+      "/home/toma/.cache/uv/builds-v0/.tmptJ4OLl/lib/python3.11/site-packages/poetry/core/masonry/builders/wheel.py",
+      line 158, in _add_pth
+          for include in self._module.includes:
+                         ^^^^^^^^^^^^
+        File
+      "/home/toma/.local/share/uv/python/cpython-3.11.13-linux-x86_64-gnu/lib/python3.11/functools.py",
+      line 1001, in __get__
+          val = self.func(instance)
+                ^^^^^^^^^^^^^^^^^^^
+        File
+      "/home/toma/.cache/uv/builds-v0/.tmptJ4OLl/lib/python3.11/site-packages/poetry/core/masonry/builders/builder.py",
+      line 70, in _module
+          return Module(
+                 ^^^^^^^
+        File
+      "/home/toma/.cache/uv/builds-v0/.tmptJ4OLl/lib/python3.11/site-packages/poetry/core/masonry/utils/module.py",
+      line 76, in __init__
+          PackageInclude(
+        File
+      "/home/toma/.cache/uv/builds-v0/.tmptJ4OLl/lib/python3.11/site-packages/poetry/core/masonry/utils/package_include.py",
+      line 31, in __init__
+          self.check_elements()
+        File
+      "/home/toma/.cache/uv/builds-v0/.tmptJ4OLl/lib/python3.11/site-packages/poetry/core/masonry/utils/package_include.py",
+      line 72, in check_elements
+          raise ValueError(
+      ValueError:
+      /home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/reflect_bo_research
+      does not contain any element
+
+      hint: This usually indicates a problem with the package or the build
+      environment.
+   Building reflect-bo-research @ file:///home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916
+Downloading pandas (12.0MiB)
+Downloading nvidia-curand-cu12 (53.9MiB)
+Downloading nvidia-nccl-cu12 (200.1MiB)
+Downloading nvidia-cusparse-cu12 (186.9MiB)
+Downloading triton (85.1MiB)
+Downloading nvidia-cuda-nvrtc-cu12 (22.6MiB)
+Downloading nvidia-cuda-cupti-cu12 (13.5MiB)
+Downloading nvidia-cufft-cu12 (116.0MiB)
+Downloading nvidia-cublas-cu12 (391.6MiB)
+Downloading nvidia-cudnn-cu12 (697.8MiB)
+Downloading torch (639.1MiB)
+Downloading numpy (17.3MiB)
+Downloading scipy (34.7MiB)
+Downloading nvidia-cusolver-cu12 (118.4MiB)
+Downloading scikit-learn (11.6MiB)
+Downloading matplotlib (11.1MiB)
+Downloading tokenizers (3.4MiB)
+Downloading pydeck (6.6MiB)
+Downloading transformers (8.4MiB)
+Downloading streamlit (8.0MiB)
+Downloading pillow (4.3MiB)
+Downloading nvidia-nvjitlink-cu12 (37.9MiB)
+  × Failed to build `reflect-bo-research @
+  │ file:///home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916`
+  ├─▶ The build backend returned an error
+  ╰─▶ Call to `poetry.core.masonry.api.build_editable` failed (exit status: 1)
+
+      [stderr]
+      Traceback (most recent call last):
+        File "<string>", line 11, in <module>
+        File
+      "/home/toma/.cache/uv/builds-v0/.tmpcfyV09/lib/python3.11/site-packages/poetry/core/masonry/api.py",
+      line 87, in build_editable
+          return WheelBuilder.make_in(
+                 ^^^^^^^^^^^^^^^^^^^^^
+        File
+      "/home/toma/.cache/uv/builds-v0/.tmpcfyV09/lib/python3.11/site-packages/poetry/core/masonry/builders/wheel.py",
+      line 95, in make_in
+          wb.build(target_dir=directory)
+        File
+      "/home/toma/.cache/uv/builds-v0/.tmpcfyV09/lib/python3.11/site-packages/poetry/core/masonry/builders/wheel.py",
+      line 129, in build
+          self._add_pth(zip_file)
+        File
+      "/home/toma/.cache/uv/builds-v0/.tmpcfyV09/lib/python3.11/site-packages/poetry/core/masonry/builders/wheel.py",
+      line 158, in _add_pth
+          for include in self._module.includes:
+                         ^^^^^^^^^^^^
+        File
+      "/home/toma/.local/share/uv/python/cpython-3.11.13-linux-x86_64-gnu/lib/python3.11/functools.py",
+      line 1001, in __get__
+          val = self.func(instance)
+                ^^^^^^^^^^^^^^^^^^^
+        File
+      "/home/toma/.cache/uv/builds-v0/.tmpcfyV09/lib/python3.11/site-packages/poetry/core/masonry/builders/builder.py",
+      line 70, in _module
+          return Module(
+                 ^^^^^^^
+        File
+      "/home/toma/.cache/uv/builds-v0/.tmpcfyV09/lib/python3.11/site-packages/poetry/core/masonry/utils/module.py",
+      line 76, in __init__
+          PackageInclude(
+        File
+      "/home/toma/.cache/uv/builds-v0/.tmpcfyV09/lib/python3.11/site-packages/poetry/core/masonry/utils/package_include.py",
+      line 31, in __init__
+          self.check_elements()
+        File
+      "/home/toma/.cache/uv/builds-v0/.tmpcfyV09/lib/python3.11/site-packages/poetry/core/masonry/utils/package_include.py",
+      line 72, in check_elements
+          raise ValueError(
+      ValueError:
+      /home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/reflect_bo_research
+      does not contain any element
+
+      hint: This usually indicates a problem with the package or the build
+      environment.
