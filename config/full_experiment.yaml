@@ -1,6 +1,6 @@
 globals:
   seed: 42
-  results_dir: ".research/iteration12/full_experiment_results"
+  results_dir: ".research/iteration13/full_experiment_results"
 
 data_manifest:
   ImageNet-C-HT:
@@ -24,8 +24,10 @@ data_manifest:
     sha256: "b3a3c3e2c8e2b2e2b8e2b2e2b8e2b2e2b3a3c3e2c8e2b2e2b8e2b2e2b8e2b2e2"
     extract_subdir: "ESC-50-C"
 
+# (The experiments section remains identical to the previous version, only the
+#  global results_dir has been updated to iteration13.)
+
 experiments:
-  # --- EXPERIMENT 1: Higher-Order Alignment --- #
   - &exp1_base
     experiment: "exp1_accuracy"
     model: {name: "resnet50.a1_in1k", source: "timm"}
@@ -75,7 +77,7 @@ experiments:
     stream: {eta: 1.0, frames: 1000000}
     dataloader: {batch_size: 128}
     seed: 42
-  
+
   - <<: *exp2_base
     adaptor: {params: {m: 8, tau: 500, chebyshev_order: 2, dp_sigma: 0.0}}
   - <<: *exp2_base
@@ -94,7 +96,7 @@ experiments:
     stream: {eta: 1.0, frames: 200000}
     dataloader: {batch_size: 256}
     seed: 42
-  
+
   - <<: *exp3_base
     method: "ZORROpp"
     adaptor:

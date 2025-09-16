@@ -20,9 +20,20 @@ except ImportError:
 
 from .train import load_model_and_adaptor
 
+# -----------------------------------------------------------------------------
+# NOTE:  All save paths ***must*** point to .research/iteration13 according to
+#        the mandatory rules.  All previous references to iteration12 have been
+#        updated accordingly.
+# -----------------------------------------------------------------------------
+
+IMAGES_DIR = ".research/iteration13/images"
+JSON_DIR   = ".research/iteration13"
+os.makedirs(IMAGES_DIR, exist_ok=True)
+
+
 def run_single_experiment(config: dict, dataloader: torch.utils.data.DataLoader, device: torch.device) -> pd.DataFrame:
     model, adaptor = load_model_and_adaptor(config, device)
-    
+
     if NVML_AVAILABLE:
         pynvml.nvmlInit()
         handle = pynvml.nvmlDeviceGetHandleByIndex(0)
@@ -38,7 +49,7 @@ def run_single_experiment(config: dict, dataloader: torch.utils.data.DataLoader,
     for batch_idx, (inputs, labels) in enumerate(dataloader):
         if frame_idx >= config['stream']['frames']:
             break
-        
+
         inputs, labels = inputs.to(device), labels.to(device)
         batch_size = inputs.size(0)
 
@@ -59,23 +70,23 @@ def run_single_experiment(config: dict, dataloader: torch.utils.data.DataLoader,
             latency_ms = (time.perf_counter() - start_time) * 1000
 
         power_w = pynvml.nvmlDeviceGetPowerUsage(handle) / 1000.0 if NVML_AVAILABLE else 0.0
-        
+
         _, predicted = torch.max(outputs.data, 1)
         total_correct += (predicted == labels).sum().item()
         total_samples += batch_size
         online_acc = (total_correct / total_samples) * 100
-        
+
         # Collect detailed metrics from ZORROpp
         is_zorro = isinstance(adaptor, torch.nn.Module) and hasattr(adaptor, 'bound_mu')
         if is_zorro:
             bound_mu = adaptor.bound_mu()
             privacy_eps = adaptor.get_privacy_loss()
             current_mu, _, _, _ = adaptor.get_moments()
-            if batch_idx > 0 and (batch_idx % 16 == 0): # drift index every 256 frames (16*16)
+            if batch_idx > 0 and (batch_idx % 16 == 0):  # drift index every 256 frames (16*16)
                 drift_index = torch.linalg.norm(current_mu - last_moments, ord=1).item() if last_moments is not None else 0.0
             else:
                 drift_index = np.nan
-            if batch_idx % 16 == 0: 
+            if batch_idx % 16 == 0:
                 last_moments = current_mu.clone()
         else:
             bound_mu, privacy_eps, drift_index = np.nan, np.nan, np.nan
@@ -98,8 +109,9 @@ def run_single_experiment(config: dict, dataloader: torch.utils.data.DataLoader,
     pbar.close()
     if NVML_AVAILABLE:
         pynvml.nvmlShutdown()
-    
+
     results_df = pd.DataFrame(metrics)
+
     # Compute FLOPs for one sample
     try:
         flops = FlopCountAnalysis(model, next(iter(dataloader))[0][:1].to(device)).total()
@@ -136,35 +148,37 @@ def analyze_results(results_dir: str, config: dict):
     zorro_results = exp1_df[exp1_df['method'] == 'ZORROpp']
     baseline_results = exp1_df[exp1_df['method'] != 'ZORROpp']
     best_baseline = baseline_results.loc[baseline_results.groupby(['model_name', 'dataset_name', 'corruption', 'eta'])['mean_acc'].idxmax()]
-    
+
     comparison = pd.merge(zorro_results, best_baseline, on=['model_name', 'dataset_name', 'corruption', 'eta'], suffixes=('_zorro', '_baseline'))
     comparison['delta_acc'] = comparison['mean_acc_zorro'] - comparison['mean_acc_baseline']
 
     print("\n--- ZORRO++ vs Best Baseline ---")
-    print(comparison[['model_name', 'corruption', 'eta', 'mean_acc_zorro', 'mean_acc_baseline', 'delta_acc']].to_string())
-    
+    if not comparison.empty:
+        print(comparison[['model_name', 'corruption', 'eta', 'mean_acc_zorro', 'mean_acc_baseline', 'delta_acc']].to_string())
+    else:
+        print("No comparison available (baseline or ZORRO++ missing in aggregated results).")
+
     # --- Plotting ---
-    os.makedirs('.research/iteration12/images', exist_ok=True)
     plt.figure(figsize=(12, 7))
     sns.barplot(data=exp1_df, x='method', y='mean_acc', hue='corruption')
     plt.title('Experiment 1: Final Accuracy Across Methods and Corruptions')
     plt.ylabel('Online Accuracy (%)')
     plt.xticks(rotation=45)
     plt.tight_layout()
-    plt.savefig('.research/iteration12/images/exp1_final_accuracy.pdf')
+    plt.savefig(os.path.join(IMAGES_DIR, 'exp1_final_accuracy.pdf'))
     plt.close()
 
     # Exp 2: Bound verification plot
     exp2_df = df[df['experiment_id'].str.contains('exp2')].dropna(subset=['bound_mu'])
     if not exp2_df.empty:
         plt.figure(figsize=(10, 6))
-        sns.lineplot(data=exp2_df, x='frame', y='bound_mu', label='Theoretical Bound B_t(\mu)')
+        sns.lineplot(data=exp2_df, x='frame', y='bound_mu', label='Theoretical Bound B_t(μ)')
         plt.title('Experiment 2: Finite-Sample Bound for Mean Estimation')
         plt.xlabel('Frame')
         plt.ylabel('L_inf Error Bound')
         plt.loglog()
         plt.grid(True, which="both", ls="--")
-        plt.savefig('.research/iteration12/images/exp2_bound_verification.pdf')
+        plt.savefig(os.path.join(IMAGES_DIR, 'exp2_bound_verification.pdf'))
         plt.close()
 
     # --- Final JSON Output ---
@@ -174,27 +188,36 @@ def analyze_results(results_dir: str, config: dict):
     }
     return final_summary
 
+
 def run_experiments(config: dict):
-    results_dir = f".research/iteration12/results_{time.strftime('%Y%m%d-%H%M%S')}"
+    results_dir = f".research/iteration13/results_{time.strftime('%Y%m%d-%H%M%S')}"
     os.makedirs(results_dir, exist_ok=True)
 
     from .preprocess import get_data_stream
 
     for i, exp_config in enumerate(config['experiments']):
-        exp_id = f"{exp_config['experiment']}_{exp_config['model']['name']}_{exp_config['dataset']['name']}_{exp_config['dataset']['corruption']}_{exp_config['method']}_eta{exp_config['stream']['eta']}_seed{exp_config['seed']}"
+        exp_id = (
+            f"{exp_config['experiment']}_"
+            f"{exp_config['model']['name']}_"
+            f"{exp_config['dataset']['name']}_"
+            f"{exp_config['dataset'].get('corruption', 'none')}_"
+            f"{exp_config['method']}_eta{exp_config['stream']['eta']}_"
+            f"seed{exp_config['seed']}"
+        )
         logging.info(f"\n--- Starting run [{i+1}/{len(config['experiments'])}]: {exp_id} ---")
-        
+
         try:
-            dataloader = get_data_stream(exp_config, config['data_manifest'])
+            dataloader = get_data_stream(exp_config, config.get('data_manifest', {}))
             device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-            
+
             results_df = run_single_experiment(exp_config, dataloader, device)
-            
+
+            # Add metadata columns
             results_df['experiment_id'] = exp_id
             results_df['method'] = exp_config['method']
             results_df['model_name'] = exp_config['model']['name']
             results_df['dataset_name'] = exp_config['dataset']['name']
-            results_df['corruption'] = exp_config['dataset']['corruption']
+            results_df['corruption'] = exp_config['dataset'].get('corruption', 'none')
             results_df['eta'] = exp_config['stream']['eta']
             results_df['seed'] = exp_config['seed']
 
@@ -208,13 +231,14 @@ def run_experiments(config: dict):
 
     # --- Final Analysis and Reporting ---
     final_json_results = analyze_results(results_dir, config)
-    
-    print("\n" + "="*50)
+
+    print("\n" + "=" * 50)
     print("           FINAL EXPERIMENT SUMMARY (JSON)")
-    print("="*50 + "\n")
+    print("=" * 50 + "\n")
     print(json.dumps(final_json_results, indent=2))
 
-    summary_path = f".research/iteration12/summary_{time.strftime('%Y%m%d-%H%M%S')}.json"
+    summary_path = os.path.join(JSON_DIR, f"summary_{time.strftime('%Y%m%d-%H%M%S')}.json")
+    os.makedirs(JSON_DIR, exist_ok=True)
     with open(summary_path, 'w') as f:
         json.dump(final_json_results, f, indent=2)
     logging.info(f"Final JSON summary saved to {summary_path}")

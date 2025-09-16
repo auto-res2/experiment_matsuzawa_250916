@@ -10,14 +10,22 @@ import numpy as np
 from src.preprocess import prepare_all_data
 from src.evaluate import run_experiments
 
+# -----------------------------------------------------------------------------
+# Global constants for mandatory save locations (iteration13)
+# -----------------------------------------------------------------------------
+BASE_RESEARCH_DIR = ".research/iteration13"
+IMAGES_DIR = os.path.join(BASE_RESEARCH_DIR, "images")
+RESULTS_DIR = os.path.join(BASE_RESEARCH_DIR, "results")
+LOGS_DIR = os.path.join(BASE_RESEARCH_DIR, "logs")
+JSON_DIR = BASE_RESEARCH_DIR  # JSON summaries are saved directly here
+
 # Setup logging
 logging.basicConfig(
-    level=logging.INFO, 
+    level=logging.INFO,
     format='%(asctime)s [%(levelname)s] %(message)s',
-    handlers=[
-        logging.StreamHandler()
-    ]
+    handlers=[logging.StreamHandler()]
 )
+
 
 def set_seed(seed):
     random.seed(seed)
@@ -29,12 +37,14 @@ def set_seed(seed):
         torch.backends.cudnn.benchmark = False
     logging.info(f"Global random seed set to {seed}")
 
+
 def load_config(path: str) -> dict:
     logging.info(f"Loading configuration from: {path}")
     if not os.path.exists(path):
         raise FileNotFoundError(f"Configuration file not found at {path}")
     with open(path, 'r') as f:
         return yaml.safe_load(f)
+
 
 def main():
     parser = argparse.ArgumentParser(description="Run ZORRO++ experiments.")
@@ -55,17 +65,17 @@ def main():
     set_seed(config['globals']['seed'])
 
     # Create output directories
-    base_dir = f".research/iteration12/{datetime.now().strftime('%Y%m%d_%H%M%S')}"
-    os.makedirs(os.path.join(base_dir, 'images'), exist_ok=True)
-    os.makedirs(os.path.join(base_dir, 'results'), exist_ok=True)
-    os.makedirs(os.path.join(base_dir, 'logs'), exist_ok=True)
-    config['globals']['base_dir'] = base_dir
-    logging.info(f"Results will be saved in: {base_dir}")
+    os.makedirs(IMAGES_DIR, exist_ok=True)
+    os.makedirs(RESULTS_DIR, exist_ok=True)
+    os.makedirs(LOGS_DIR, exist_ok=True)
+
+    config['globals']['base_dir'] = BASE_RESEARCH_DIR
+    logging.info(f"Results will be saved in: {BASE_RESEARCH_DIR}")
 
     # Phase 1: Data Preparation
     logging.info("--- Phase 1: Data Preparation ---")
     try:
-        prepare_all_data(config['data_manifest'])
+        prepare_all_data(config.get('data_manifest', {}))
         logging.info("All data assets are verified and ready.")
     except (FileNotFoundError, ValueError) as e:
         logging.error(f"Data preparation failed: {e}")
@@ -80,6 +90,7 @@ def main():
     except Exception as e:
         logging.error(f"An unhandled error occurred during experiment execution: {e}", exc_info=True)
         logging.error("Experiment run aborted.")
+
 
 if __name__ == '__main__':
     main()

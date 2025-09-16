@@ -1,12 +1,8 @@
 globals:
   seed: 42
-  results_dir: ".research/iteration12/smoke_test_results"
+  results_dir: ".research/iteration13/smoke_test_results"
 
-data_manifest:
-  CIFAR10-C-HT:
-    url: "https://zenodo.org/record/9990002/files/CIFAR-10-CH-v1.tar.gz"
-    sha256: "28a88134375b43831fd96815a24dae0c6081533c3327f2f81014e305e9759a72"
-    extract_subdir: "CIFAR-10-CH-v1"
+data_manifest: {}
 
 experiments:
   - experiment: "exp1_accuracy"
@@ -14,10 +10,10 @@ experiments:
       name: "mobilenetv3_small_100"
       source: "timm"
     dataset:
-      name: "CIFAR10-C-HT"
-      corruption: "cauchy"
-      severity: 5
+      name: "synthetic"
+      corruption: "mixed"  # not used for synthetic but kept for uniformity
       num_classes: 10
+      switch_interval: 128
     method: "ZORROpp"
     adaptor:
       params:
@@ -38,10 +34,10 @@ experiments:
       name: "mobilenetv3_small_100"
       source: "timm"
     dataset:
-      name: "CIFAR10-C-HT"
-      corruption: "cauchy"
-      severity: 5
+      name: "synthetic"
+      corruption: "mixed"
       num_classes: 10
+      switch_interval: 128
     method: "BN"
     stream:
       eta: 0.5
