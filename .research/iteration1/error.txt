@@ -1,0 +1,26 @@
+warning: Failed to parse `pyproject.toml` during settings discovery:
+  TOML parse error at line 17, column 2
+     |
+  17 | [project]
+     |  ^^^^^^^
+  duplicate key
+
+error: Failed to parse: `pyproject.toml`
+  Caused by: TOML parse error at line 17, column 2
+   |
+17 | [project]
+   |  ^^^^^^^
+duplicate key
+warning: Failed to parse `pyproject.toml` during settings discovery:
+  TOML parse error at line 17, column 2
+     |
+  17 | [project]
+     |  ^^^^^^^
+  duplicate key
+
+error: Failed to parse: `pyproject.toml`
+  Caused by: TOML parse error at line 17, column 2
+   |
+17 | [project]
+   |  ^^^^^^^
+duplicate key
