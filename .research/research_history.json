@@ -6,5 +6,82 @@
     "rehearsal buffer compression",
     "sparse experience replay",
     "continual learning quantization"
+  ],
+  "research_study_list": [
+    {
+      "title": "Continual Learning in Low-rank Orthogonal Subspaces"
+    },
+    {
+      "title": "Contextual Transformation Networks for Online Continual Learning"
+    },
+    {
+      "title": "SparCL: Sparse Continual Learning on the Edge"
+    },
+    {
+      "title": "MECTA: Memory-Economic Continual Test-Time Model Adaptation"
+    },
+    {
+      "title": "Improving Task-free Continual Learning by Distributionally Robust Memory Evolution"
+    },
+    {
+      "title": "SparCL: Sparse Continual Learning on the Edge"
+    },
+    {
+      "title": "Online Learned Continual Compression with Adaptive Quantization Modules"
+    },
+    {
+      "title": "Towards Backward-Compatible Continual Learning of Image Compression"
+    },
+    {
+      "title": "Forget-free Continual Learning with Winning Subnetworks"
+    },
+    {
+      "title": "Forget-free Continual Learning with Winning Subnetworks"
+    },
+    {
+      "title": "Impossibility Results for Grammar-Compressed Linear Algebra"
+    },
+    {
+      "title": "Online Learned Continual Compression with Adaptive Quantization Modules"
+    },
+    {
+      "title": "Analysis of Stochastic Processes through Replay Buffers"
+    },
+    {
+      "title": "Analysis of Stochastic Processes through Replay Buffers"
+    },
+    {
+      "title": "On Efficient Constructions of Checkpoints"
+    },
+    {
+      "title": "The State of Sparse Training in Deep Reinforcement Learning"
+    },
+    {
+      "title": "The State of Sparse Training in Deep Reinforcement Learning"
+    },
+    {
+      "title": "Memory Based Trajectory-conditioned Policies for Learning from Sparse Rewards"
+    },
+    {
+      "title": "Replay Memory as An Empirical MDP: Combining Conservative Estimation with Experience Replay"
+    },
+    {
+      "title": "Fuzzy Tiling Activations: A Simple Approach to Learning Sparse Representations Online"
+    },
+    {
+      "title": "Online Learned Continual Compression with Adaptive Quantization Modules"
+    },
+    {
+      "title": "Vector Quantization Prompting for Continual Learning"
+    },
+    {
+      "title": "Mitigating Forgetting in Online Continual Learning with  Neuron Calibration"
+    },
+    {
+      "title": "Uncertainty-guided Continual Learning with Bayesian Neural Networks"
+    },
+    {
+      "title": "Lifelong Domain Adaptation via Consolidated Internal Distribution"
+    }
   ]
 }
