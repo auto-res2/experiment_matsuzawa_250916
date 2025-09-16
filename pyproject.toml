@@ -11,6 +11,9 @@ authors = [{name = "AI Researcher", email = "researcher@example.com"}]
 dependencies = [
     "torch>=2.1.0",
     "torch-geometric>=2.5.0",
+    # GraphSAINT depends internally on SparseTensor which lives in the torch-sparse
+    # package.  Add it explicitly so the loader can be built without runtime errors.
+    "torch-sparse>=0.6.18",
     "ogb>=1.3.6",
     "transformers>=4.36.0",
     "scikit-learn>=1.3.0",
