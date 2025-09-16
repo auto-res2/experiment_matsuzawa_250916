@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools>=61.0", "torch"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -11,8 +11,7 @@ authors = [{name = "AI Researcher", email = "researcher@example.com"}]
 dependencies = [
     "torch>=2.1.0",
     "torch-geometric>=2.5.0",
-    # GraphSAINT depends internally on SparseTensor which lives in the torch-sparse
-    # package.  Add it explicitly so the loader can be built without runtime errors.
+    # GraphSAINT relies on torch-sparse/SparseTensor.
     "torch-sparse>=0.6.18",
     "ogb>=1.3.6",
     "transformers>=4.36.0",
@@ -26,3 +25,17 @@ dependencies = [
     "tqdm>=4.66.0",
     "requests>=2.31.0"
 ]
+
+# -----------------------------------------------------------------------------
+#  uv-specific section
+# -----------------------------------------------------------------------------
+# `torch-sparse`'s setup script imports `torch` during build, but it does **not**
+# declare it as a build-time requirement.  When uv (or PEP-517 front-ends that
+# perform isolated builds) tries to build the wheel, the import fails and the
+# installation aborts.  The following stanza instructs uv to inject `torch`
+# into the build environment **before** compiling `torch-sparse`, thereby
+# preventing the missing-dependency error and allowing us to use the official
+# pre-built wheels when available.
+
+[tool.uv.extra-build-dependencies]
+"torch-sparse" = ["torch"]
