@@ -1,6 +1,6 @@
 globals:
   seed: 42
-  results_dir: ".research/iteration13/smoke_test_results"
+  results_dir: ".research/iteration15/smoke_test_results"
 
 data_manifest: {}
 

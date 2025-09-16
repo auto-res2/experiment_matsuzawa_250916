@@ -1,14 +1,6 @@
 globals:
   seed: 42
-  results_dir: ".research/iteration14/full_experiment_results"
-
-# -----------------------------------------------------------------------------
-# NOTE
-# -----
-# Large real-world datasets cannot be downloaded in the execution sandbox.
-# Therefore the *full* experiment YAML is mapped to synthetic streams that
-# exercise the exact same code-paths without any external data dependency.
-# -----------------------------------------------------------------------------
+  results_dir: ".research/iteration15/full_experiment_results"
 
 data_manifest: {}
 
@@ -52,6 +44,7 @@ experiments:
     experiment: "exp3_edge"
     model: {name: "mobilenetv3_small_100", source: "timm"}
     dataset: {name: "synthetic", corruption: "drift", num_classes: 10, switch_interval: 32}
+    method: "BN"            # baseline entry now explicitly defines a method
     stream: {eta: 1.0, frames: 1500}
     dataloader: {batch_size: 256}
     seed: 42

@@ -21,12 +21,11 @@ except ImportError:
 from .train import load_model_and_adaptor
 
 # -----------------------------------------------------------------------------
-# NOTE:  All save paths ***must*** point to .research/iteration14 according to
-#        the mandatory rules.
+#  Save paths MUST point to .research/iteration15 according to mandatory rules.
 # -----------------------------------------------------------------------------
-
-IMAGES_DIR = ".research/iteration14/images"
-JSON_DIR   = ".research/iteration14"
+BASE_RESEARCH_DIR = ".research/iteration15"
+IMAGES_DIR = os.path.join(BASE_RESEARCH_DIR, "images")
+JSON_DIR = BASE_RESEARCH_DIR
 os.makedirs(IMAGES_DIR, exist_ok=True)
 
 
@@ -53,6 +52,7 @@ def run_single_experiment(config: dict, dataloader: torch.utils.data.DataLoader,
         inputs, labels = inputs.to(device), labels.to(device)
         batch_size = inputs.size(0)
 
+        # Timing (GPU-aware)
         start_time = time.perf_counter()
         if torch.cuda.is_available():
             start_event = torch.cuda.Event(enable_timing=True)
@@ -193,12 +193,16 @@ def analyze_results(results_dir: str, config: dict):
 
 def run_experiments(config: dict):
     """Run the list of experiments specified in *config* and perform final analysis."""
-    results_dir = f".research/iteration14/results_{time.strftime('%Y%m%d-%H%M%S')}"
+    results_dir = os.path.join(BASE_RESEARCH_DIR, f"results_{time.strftime('%Y%m%d-%H%M%S')}")
     os.makedirs(results_dir, exist_ok=True)
 
     from .preprocess import get_data_stream
 
     for i, exp_config in enumerate(config['experiments']):
+        # Fail-fast check for mandatory keys
+        if 'method' not in exp_config:
+            raise KeyError("Each experiment entry must define a 'method' field.")
+
         exp_id = (
             f"{exp_config['experiment']}_"
             f"{exp_config['model']['name']}_"

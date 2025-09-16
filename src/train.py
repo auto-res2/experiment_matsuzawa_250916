@@ -56,17 +56,18 @@ class ZORROppAdaptor(nn.Module):
 
     def get_feature_dim(self, model):
         # A simple heuristic to get feature dimension
-        if hasattr(model, 'num_features'):
+        if hasattr(model, 'num_features') and isinstance(model.num_features, int):
             return model.num_features
         if hasattr(model, 'classifier'):
-            if isinstance(model.classifier, nn.Linear):
-                return model.classifier.in_features
-            if isinstance(model.classifier, nn.Sequential) and isinstance(model.classifier[-1], nn.Linear):
-                return model.classifier[-1].in_features
-        if hasattr(model, 'fc'):
+            cls = model.classifier
+            if isinstance(cls, nn.Linear):
+                return cls.in_features
+            if isinstance(cls, nn.Sequential) and isinstance(cls[-1], nn.Linear):
+                return cls[-1].in_features
+        if hasattr(model, 'fc') and isinstance(model.fc, nn.Linear):
             return model.fc.in_features
         # Fallback for models like wav2vec
-        if 'wav2vec' in model.name_or_path:
+        if hasattr(model, 'name_or_path') and 'wav2vec' in model.name_or_path:
             return model.config.hidden_size
         
         # Last resort: run a dummy forward pass
@@ -74,6 +75,8 @@ class ZORROppAdaptor(nn.Module):
             with torch.no_grad():
                 dummy_input = torch.randn(1, 3, 224, 224).to(next(model.parameters()).device)
                 features = model.forward_features(dummy_input)
+                if features.ndim > 2:
+                    features = model.forward_head(features, pre_logits=True)
                 return features.shape[-1]
         except Exception:
             raise ValueError("Could not determine feature dimension for the model.")
@@ -130,7 +133,7 @@ class ZORROppAdaptor(nn.Module):
         # De-skew and De-kurtose using Chebyshev polynomials
         order = self.chebyshev_order_dyn if self.energy_aware else self.chebyshev_order
         if order >= 2:
-            # P2(x) = 2x^2 - 1, we use a simplified version for de-skewing
+            # P2(x) = 2x^2 - 1, simplified for de-skewing
             skew_factor = torch.reciprocal(torch.sqrt(torch.abs(skew) + 1e-6))
             x = torch.sign(x) * (torch.pow(torch.abs(x), skew_factor))
         if order >= 3:
@@ -142,21 +145,42 @@ class ZORROppAdaptor(nn.Module):
         transformed_features = x * torch.sqrt(self.source_var + 1e-6) + self.source_mu
         return transformed_features
 
+    def _apply_classifier(self, features: torch.Tensor) -> torch.Tensor:
+        """Apply the last classification layer of *self.model* to *features* in a
+        model-agnostic way. Works across timm CNNs, ViTs and custom models."""
+        # Common cases (timm CNNs)
+        if hasattr(self.model, 'fc') and isinstance(self.model.fc, nn.Linear):
+            return self.model.fc(features)
+        if hasattr(self.model, 'classifier'):
+            return self.model.classifier(features)
+        # ViT from timm usually has .head as Linear
+        if hasattr(self.model, 'head') and isinstance(self.model.head, nn.Linear):
+            return self.model.head(features)
+        # Some models wrap the Linear in a Sequential held in .head.fc
+        if hasattr(self.model, 'head') and hasattr(self.model.head, 'fc') and isinstance(self.model.head.fc, nn.Linear):
+            return self.model.head.fc(features)
+
+        raise AttributeError("Could not find a suitable classifier head for the model.")
+
     def forward(self, x):
-        if 'vit' in self.model.default_cfg['architecture']:
+        arch = self.model.default_cfg.get('architecture', '') if hasattr(self.model, 'default_cfg') else ''
+        if 'vit' in arch:
             features = self.model.forward_features(x)
             if isinstance(features, list):
                 features = features[-1]
             if features.ndim == 3:
-                 features = features[:, 0] # CLS token
+                features = features[:, 0]  # CLS token
         else:
             features = self.model.forward_features(x)
             if features.ndim > 2:
                 features = self.model.forward_head(features, pre_logits=True)
 
+        # Update internal moment sketches
         self.update(features.detach())
         transformed_features = self.transform(features)
-        return self.model.head.fc(transformed_features)
+
+        # Obtain logits via the model's classifier
+        return self._apply_classifier(transformed_features)
 
     def bound_mu(self):
         return np.sqrt(np.log(self.feature_dim) / self.t) if self.t > 0 else float('inf')
@@ -173,7 +197,7 @@ class PIDController:
         self._integral = 0
         self._prev_error = 0
         self.history = deque(maxlen=window)
-        self.setpoint = 0.0 # Target error is 0
+        self.setpoint = 0.0  # Target error is 0
 
     def __call__(self, error):
         self.history.append(error)
@@ -184,10 +208,8 @@ class PIDController:
         output_adjustment = self.Kp * smoothed_error + self.Ki * self._integral + self.Kd * derivative
         self._prev_error = smoothed_error
         
-        # PID adjusts current rank. We assume a starting rank.
-        # A negative output means we need to reduce complexity.
-        current_output = self.output_limits[1] # Start with max
-        new_output = current_output - output_adjustment 
+        current_output = self.output_limits[1]  # Start with max
+        new_output = current_output - output_adjustment
         return int(np.clip(new_output, self.output_limits[0], self.output_limits[1]))
 
 def load_model_and_adaptor(config: dict, device: torch.device):
@@ -196,10 +218,13 @@ def load_model_and_adaptor(config: dict, device: torch.device):
     method = config['method']
     logging.info(f"Loading model: {model_name}")
 
+    # ------------------------------------------------------------------
+    # Backbone loading (CNN / ViT via timm, wav2vec via HF)
+    # ------------------------------------------------------------------
     if 'wav2vec' in model_name:
         model = Wav2Vec2Model.from_pretrained(model_name).to(device)
         model.classifier = nn.Linear(model.config.hidden_size, num_classes).to(device)
-        # A bit of a hack to make it compatible with timm's structure
+        # Make compatible with timm-like API
         model.forward_features = lambda x: model(x).last_hidden_state.mean(dim=1)
         model.head = nn.Identity()
         model.num_features = model.config.hidden_size
@@ -207,15 +232,15 @@ def load_model_and_adaptor(config: dict, device: torch.device):
     else:
         model = timm.create_model(model_name, pretrained=True, num_classes=num_classes).to(device)
 
-    # Freeze all model weights
+    # Freeze weights (test-time adaptation only manipulates statistics)
     for param in model.parameters():
         param.requires_grad = False
     
-    # All baselines are simplified for this experiment and only ZORRO++ is fully implemented
+    # Choose adaptor
     if method == 'ZORROpp':
         adaptor = ZORROppAdaptor(model, config)
-    else: # Fallback to a simple BatchNorm based adaptor for baselines
-        model.train() # BN needs to be in training mode to update stats
-        adaptor = model 
+    else:  # Baseline methods fall back to vanilla model forward (e.g. BN)
+        model.train()  # Enable BN stat updates for BN baseline
+        adaptor = model
 
     return model.to(device), adaptor.to(device)
