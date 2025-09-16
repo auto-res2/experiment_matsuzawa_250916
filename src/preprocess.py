@@ -21,14 +21,56 @@ def _tokenise(example: Dict[str, Any], tokenizer) -> Dict[str, Any]:
     return example
 
 
-def build_dataloaders(cfg: Dict[str, Any]):
-    """Returns train / val dataloaders according to the YAML config."""
+def _load_hf_dataset(cfg: Dict[str, Any]):
+    """Robust wrapper around `datasets.load_dataset` handling config names.
 
-    name, split = cfg["data"]["dataset"], cfg["data"].get("split", "train")
+    The YAML may specify either
+      data:
+        dataset: wikitext
+        split: wikitext-2-raw-v1   # (legacy key – actually the *config* name)
+
+    or the newer explicit form
+      data:
+        dataset: wikitext
+        config: wikitext-2-raw-v1  # ✅ clear intent
+        hf_split: train            # optional, defaults to "train"
+    """
+    name = cfg["data"]["dataset"]
+    config_name = cfg["data"].get("config")
+    # `hf_split` == HuggingFace split name (train/validation/test)
+    hf_split = cfg["data"].get("hf_split", "train")
 
     # Use the HF_TOKEN env-var for gated sets (if necessary)
     auth_token = os.getenv("HF_TOKEN")
-    ds = datasets.load_dataset(name, split=split, token=auth_token)
+
+    # ------------------------------------------------------------------
+    # Fast-path – config explicitly provided in YAML
+    # ------------------------------------------------------------------
+    if config_name is not None:
+        return datasets.load_dataset(name, config_name, split=hf_split, token=auth_token)
+
+    # ------------------------------------------------------------------
+    # Legacy path – try loading without a config; if the dataset *requires*
+    # a config (e.g. wikitext) we inspect the raised ValueError and retry
+    # with cfg["data"]["split"] being treated as the config name.
+    # ------------------------------------------------------------------
+    try:
+        return datasets.load_dataset(name, split=hf_split, token=auth_token)
+    except ValueError as err:
+        if "Config name is missing" in str(err):
+            # Fall back to legacy behaviour where `split` actually holds the
+            # HF *config* (e.g. "wikitext-2-raw-v1")
+            legacy_cfg_name = cfg["data"].get("split")
+            if legacy_cfg_name is None:
+                raise  # re-throw – nothing we can do.
+            return datasets.load_dataset(name, legacy_cfg_name, split=hf_split, token=auth_token)
+        raise  # genuine error – bubble up.
+
+
+def build_dataloaders(cfg: Dict[str, Any]):
+    """Returns a single train DataLoader according to the YAML config."""
+
+    ds = _load_hf_dataset(cfg)
 
     # Bare-bones WordPiece tokeniser from 🤗 – small & fast to load.
     from transformers import AutoTokenizer

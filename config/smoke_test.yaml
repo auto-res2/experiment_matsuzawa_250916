@@ -10,6 +10,6 @@ training:
   batch_size: 8
 
 data:
-  dataset: "wikitext"
-  split: "wikitext-2-raw-v1"
+  dataset: "wikitext"  # HF dataset name
+  split: "wikitext-2-raw-v1"  # legacy key – treated as HF *config* automatically
   tokenizer: "bert-base-uncased"

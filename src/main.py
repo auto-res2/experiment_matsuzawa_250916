@@ -7,7 +7,6 @@ uv run python -m src.main --full-experiment
 """
 import argparse
 import json
-import os
 from pathlib import Path
 from typing import Any, Dict
 
@@ -16,7 +15,7 @@ import yaml
 from . import preprocess, train, evaluate
 
 _REPO_ROOT = Path(__file__).resolve().parent.parent
-_ARTIFACT_DIR = _REPO_ROOT / ".research" / "iteration7"
+_ARTIFACT_DIR = _REPO_ROOT / ".research" / "iteration8"
 _ARTIFACT_DIR.mkdir(parents=True, exist_ok=True)
 
 
@@ -45,6 +44,7 @@ def _run(cfg: Dict[str, Any], tag: str):
     out_file = _ARTIFACT_DIR / f"{tag}.json"
     with open(out_file, "w", encoding="utf-8") as f:
         json.dump(result, f, indent=2)
+    # Print for CI visibility
     print(json.dumps(result, indent=2))
 
 

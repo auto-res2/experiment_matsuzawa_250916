@@ -41,7 +41,7 @@ def train_model(train_loader: DataLoader, vocab_size: int, cfg: Dict[str, Any]) 
 
     model.train()
     total_loss, n_tokens = 0.0, 0
-    for epoch in range(cfg["training"]["epochs"]):
+    for _ in range(cfg["training"]["epochs"]):
         for batch in train_loader:
             optimiser.zero_grad()
             x = batch["input_ids"].to(device)
