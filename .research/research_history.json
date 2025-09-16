@@ -6,5 +6,82 @@
     "learning rate adaptation TTA",
     "entropy minimization TTA",
     "meta-learning test-time adaptation"
+  ],
+  "research_study_list": [
+    {
+      "title": "Test Time Adaptation With Regularized Loss for Weakly Supervised Salient Object Detection"
+    },
+    {
+      "title": "Robust Test-Time Adaptation in Dynamic Scenarios"
+    },
+    {
+      "title": "DELTA: DEGRADATION-FREE FULLY TEST-TIME ADAPTATION"
+    },
+    {
+      "title": "Towards Stable Test-time Adaptation in Dynamic Wild World"
+    },
+    {
+      "title": "Towards Stable Test-time Adaptation in Dynamic Wild World"
+    },
+    {
+      "title": "Test Time Adaptation With Regularized Loss for Weakly Supervised Salient Object Detection"
+    },
+    {
+      "title": "Tent: Fully Test-Time Adaptation by Entropy Minimization"
+    },
+    {
+      "title": "What How and When Should Object Detectors Update in Continually Changing Test Domains?"
+    },
+    {
+      "title": "DELTA: DEGRADATION-FREE FULLY TEST-TIME ADAPTATION"
+    },
+    {
+      "title": "Test-Time Training with Self-Supervision for Generalization under Distribution Shifts"
+    },
+    {
+      "title": "Improved Test-Time Adaptation for Domain Generalization"
+    },
+    {
+      "title": "Active Test-Time Adaptation: Theoretical Analyses and An Algorithm"
+    },
+    {
+      "title": "Test Time Adaptation via Conjugate Pseudo-labels"
+    },
+    {
+      "title": "AETTA: Label-Free Accuracy Estimation for Test-Time Adaptation"
+    },
+    {
+      "title": "Persistent Test-time Adaptation in Recurring Testing Scenarios"
+    },
+    {
+      "title": "Test Time Adaptation via Conjugate Pseudo-labels"
+    },
+    {
+      "title": "Active Test-Time Adaptation: Theoretical Analyses and An Algorithm"
+    },
+    {
+      "title": "Unified Entropy Optimization for Open-Set Test-Time Adaptation"
+    },
+    {
+      "title": "Towards Stable Test-time Adaptation in Dynamic Wild World"
+    },
+    {
+      "title": "Towards Stable Test-time Adaptation in Dynamic Wild World"
+    },
+    {
+      "title": "Test Time Adaptation via Conjugate Pseudo-labels"
+    },
+    {
+      "title": "Active Test-Time Adaptation: Theoretical Analyses and An Algorithm"
+    },
+    {
+      "title": "EcoTTA: Memory-Efficient Continual Test-Time Adaptation via Self-Distilled Regularization"
+    },
+    {
+      "title": "Robust Test-Time Adaptation in Dynamic Scenarios"
+    },
+    {
+      "title": "Improved Test-Time Adaptation for Domain Generalization"
+    }
   ]
 }
