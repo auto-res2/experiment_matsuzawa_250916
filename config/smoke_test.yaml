@@ -1,40 +1,51 @@
-wandb:
-  enabled: false
-  project: "ZORROPP-ICML24-smoke-test"
+globals:
+  seed: 42
+  results_dir: ".research/iteration12/smoke_test_results"
+
+data_manifest:
+  CIFAR10-C-HT:
+    url: "https://zenodo.org/record/9990002/files/CIFAR-10-CH-v1.tar.gz"
+    sha256: "28a88134375b43831fd96815a24dae0c6081533c3327f2f81014e305e9759a72"
+    extract_subdir: "CIFAR-10-CH-v1"
 
 experiments:
-  - exp_name: 'exp1'
+  - experiment: "exp1_accuracy"
     model:
-      name: 'resnet50'
+      name: "mobilenetv3_small_100"
+      source: "timm"
     dataset:
-      name: 'cifar10-c'
-      corruption: 'shot_noise'
+      name: "CIFAR10-C-HT"
+      corruption: "cauchy"
       severity: 5
       num_classes: 10
-    method: 'ZorroPP'
-    adaptor_params:
-      m: 16
-      tau: 500
-      d: 2
+    method: "ZORROpp"
+    adaptor:
+      params:
+        m: 8
+        tau: 250
+        chebyshev_order: 2
+        dp_sigma: 0.0
+        energy_aware: false
     stream:
-      eta: 1.0
-      frames: 200
+      eta: 0.5
+      frames: 100
     dataloader:
       batch_size: 32
     seed: 42
-  
-  - exp_name: 'exp1'
+
+  - experiment: "exp1_accuracy"
     model:
-      name: 'resnet50'
+      name: "mobilenetv3_small_100"
+      source: "timm"
     dataset:
-      name: 'cifar10-c'
-      corruption: 'shot_noise'
+      name: "CIFAR10-C-HT"
+      corruption: "cauchy"
       severity: 5
       num_classes: 10
-    method: 'Tent'
+    method: "BN"
     stream:
-      eta: 1.0
-      frames: 200
+      eta: 0.5
+      frames: 100
     dataloader:
       batch_size: 32
     seed: 42

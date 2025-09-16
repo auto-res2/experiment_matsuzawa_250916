@@ -4,17 +4,20 @@ import yaml
 import logging
 from datetime import datetime
 import torch
-import wandb
 import random
 import numpy as np
 
-from .preprocess import get_dataloaders
-from .train import run_experiment, make_run_name
-from .evaluate import generate_report
+from src.preprocess import prepare_all_data
+from src.evaluate import run_experiments
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
-
+# Setup logging
+logging.basicConfig(
+    level=logging.INFO, 
+    format='%(asctime)s [%(levelname)s] %(message)s',
+    handlers=[
+        logging.StreamHandler()
+    ]
+)
 
 def set_seed(seed):
     random.seed(seed)
@@ -22,73 +25,61 @@ def set_seed(seed):
     torch.manual_seed(seed)
     if torch.cuda.is_available():
         torch.cuda.manual_seed_all(seed)
-    torch.backends.cudnn.deterministic = True
-    torch.backends.cudnn.benchmark = False
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
+    logging.info(f"Global random seed set to {seed}")
 
-
-def load_config(path):
-    logger.info(f"Loading config {path}")
-    with open(path, 'r') as fh:
-        return yaml.safe_load(fh)
-
+def load_config(path: str) -> dict:
+    logging.info(f"Loading configuration from: {path}")
+    if not os.path.exists(path):
+        raise FileNotFoundError(f"Configuration file not found at {path}")
+    with open(path, 'r') as f:
+        return yaml.safe_load(f)
 
 def main():
-    ap = argparse.ArgumentParser()
-    group = ap.add_mutually_exclusive_group(required=True)
-    group.add_argument('--smoke-test', action='store_true')
-    group.add_argument('--full-experiment', action='store_true')
-    args = ap.parse_args()
+    parser = argparse.ArgumentParser(description="Run ZORRO++ experiments.")
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument('--smoke-test', action='store_true', help='Run a small-scale smoke test.')
+    group.add_argument('--full-experiment', action='store_true', help='Run the full experiment suite.')
+    args = parser.parse_args()
 
-    cfg_path = 'config/smoke_test.yaml' if args.smoke_test else 'config/full_experiment.yaml'
-    config = load_config(cfg_path)
+    if args.smoke_test:
+        config_path = 'config/smoke_test.yaml'
+        logging.info("Executing in SMOKE TEST mode.")
+    else:
+        config_path = 'config/full_experiment.yaml'
+        logging.info("Executing in FULL EXPERIMENT mode.")
 
-    ts = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-    # Updated to iteration11 directory structure (spec requirement)
-    results_dir = os.path.join('.research', 'iteration11', f'results_{ts}')
-    os.makedirs(results_dir, exist_ok=True)
-    config['results_dir'] = results_dir
+    # Load configuration
+    config = load_config(config_path)
+    set_seed(config['globals']['seed'])
 
-    if config.get('wandb', {}).get('enabled'):
-        try:
-            wandb.init(project=config['wandb']['project'], entity=config['wandb'].get('entity'), config=config)
-        except Exception as e:
-            logger.warning(f"wandb initialisation failed: {e}. Disabling.")
-            config['wandb']['enabled'] = False
+    # Create output directories
+    base_dir = f".research/iteration12/{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    os.makedirs(os.path.join(base_dir, 'images'), exist_ok=True)
+    os.makedirs(os.path.join(base_dir, 'results'), exist_ok=True)
+    os.makedirs(os.path.join(base_dir, 'logs'), exist_ok=True)
+    config['globals']['base_dir'] = base_dir
+    logging.info(f"Results will be saved in: {base_dir}")
 
-    device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    logger.info(f"Using device {device}")
+    # Phase 1: Data Preparation
+    logging.info("--- Phase 1: Data Preparation ---")
+    try:
+        prepare_all_data(config['data_manifest'])
+        logging.info("All data assets are verified and ready.")
+    except (FileNotFoundError, ValueError) as e:
+        logging.error(f"Data preparation failed: {e}")
+        logging.error("Aborting experiment. Please check data URLs, checksums, and network connection.")
+        return
 
-    logger.info("Preparing dataloaders …")
-    dataloaders = get_dataloaders(config)
-
-    logger.info("Launching experiments …")
-    for exp_cfg in config['experiments']:
-        # skip template configs
-        if 'corruption' not in exp_cfg['dataset']:
-            continue
-        try:
-            run_name = make_run_name(exp_cfg)
-        except ValueError:
-            logger.debug("Template encountered inside loop – skipping.")
-            continue
-        if run_name not in dataloaders:
-            logger.warning(f"No dataloader for {run_name}. Skipping run.")
-            continue
-        logger.info(f"---- Running {run_name} ----")
-        set_seed(exp_cfg['seed'])
-        exp_cfg = {**config, **exp_cfg, 'results_dir': results_dir}  # merge
-        try:
-            run_experiment(exp_cfg, dataloaders[run_name], device)
-        except Exception as e:
-            logger.error(f"Run {run_name} failed: {e}", exc_info=True)
-
-    logger.info("All runs complete. Generating report …")
-    generate_report(results_dir)
-
-    if config.get('wandb', {}).get('enabled'):
-        wandb.finish()
-
-    logger.info("Workflow finished.")
+    # Phase 2: Experiment Execution and Evaluation
+    logging.info("--- Phase 2: Running Experiments ---")
+    try:
+        run_experiments(config)
+        logging.info("Experiment suite finished successfully.")
+    except Exception as e:
+        logging.error(f"An unhandled error occurred during experiment execution: {e}", exc_info=True)
+        logging.error("Experiment run aborted.")
 
 if __name__ == '__main__':
     main()

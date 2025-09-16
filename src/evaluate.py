@@ -1,209 +1,220 @@
 import os
 import json
 import pandas as pd
+import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from scipy.stats import ttest_rel
-import numpy as np
-from datetime import datetime
+from scipy.stats import ttest_rel, wilcoxon
+import torch
+from tqdm import tqdm
+import time
+import logging
+from fvcore.nn import FlopCountAnalysis
 
-# -----------------------------------------------------------------------------
-# Directory constants – UPDATED to mandatory iteration11 research directory
-# -----------------------------------------------------------------------------
-# ALL image artefacts must be written under .research/iteration11/images
-# ALL JSON artefacts must be written under .research/iteration11/
-# -----------------------------------------------------------------------------
-JSON_DIR = os.path.join(".research", "iteration11")
-IMAGES_DIR = os.path.join(JSON_DIR, "images")
+try:
+    import pynvml
+    NVML_AVAILABLE = True
+except ImportError:
+    NVML_AVAILABLE = False
+    logging.warning("pynvml not found. Power metrics will not be available.")
 
-# Ensure the required directories exist
-os.makedirs(JSON_DIR, exist_ok=True)
-os.makedirs(IMAGES_DIR, exist_ok=True)
+from .train import load_model_and_adaptor
 
-plt.style.use("seaborn-v0_8-whitegrid")
+def run_single_experiment(config: dict, dataloader: torch.utils.data.DataLoader, device: torch.device) -> pd.DataFrame:
+    model, adaptor = load_model_and_adaptor(config, device)
+    
+    if NVML_AVAILABLE:
+        pynvml.nvmlInit()
+        handle = pynvml.nvmlDeviceGetHandleByIndex(0)
+
+    metrics = []
+    total_correct = 0
+    total_samples = 0
+    frame_idx = 0
+    last_moments = None
+
+    pbar = tqdm(total=config['stream']['frames'], desc=f"Running {config['method']}")
+
+    for batch_idx, (inputs, labels) in enumerate(dataloader):
+        if frame_idx >= config['stream']['frames']:
+            break
+        
+        inputs, labels = inputs.to(device), labels.to(device)
+        batch_size = inputs.size(0)
+
+        start_time = time.perf_counter()
+        if torch.cuda.is_available():
+            start_event = torch.cuda.Event(enable_timing=True)
+            end_event = torch.cuda.Event(enable_timing=True)
+            start_event.record()
+
+        with torch.no_grad(), torch.cuda.amp.autocast():
+            outputs = adaptor(inputs)
+
+        if torch.cuda.is_available():
+            end_event.record()
+            torch.cuda.synchronize()
+            latency_ms = start_event.elapsed_time(end_event)
+        else:
+            latency_ms = (time.perf_counter() - start_time) * 1000
+
+        power_w = pynvml.nvmlDeviceGetPowerUsage(handle) / 1000.0 if NVML_AVAILABLE else 0.0
+        
+        _, predicted = torch.max(outputs.data, 1)
+        total_correct += (predicted == labels).sum().item()
+        total_samples += batch_size
+        online_acc = (total_correct / total_samples) * 100
+        
+        # Collect detailed metrics from ZORROpp
+        is_zorro = isinstance(adaptor, torch.nn.Module) and hasattr(adaptor, 'bound_mu')
+        if is_zorro:
+            bound_mu = adaptor.bound_mu()
+            privacy_eps = adaptor.get_privacy_loss()
+            current_mu, _, _, _ = adaptor.get_moments()
+            if batch_idx > 0 and (batch_idx % 16 == 0): # drift index every 256 frames (16*16)
+                drift_index = torch.linalg.norm(current_mu - last_moments, ord=1).item() if last_moments is not None else 0.0
+            else:
+                drift_index = np.nan
+            if batch_idx % 16 == 0: 
+                last_moments = current_mu.clone()
+        else:
+            bound_mu, privacy_eps, drift_index = np.nan, np.nan, np.nan
+
+        metrics.append({
+            'frame': frame_idx,
+            'online_acc': online_acc,
+            'latency_ms': latency_ms / batch_size,
+            'power_w': power_w,
+            'memory_mb': torch.cuda.max_memory_reserved(device) / 1e6 if torch.cuda.is_available() else 0.0,
+            'bound_mu': bound_mu,
+            'privacy_eps': privacy_eps,
+            'drift_index': drift_index
+        })
+
+        frame_idx += batch_size
+        pbar.update(batch_size)
+        pbar.set_postfix({'Acc': f'{online_acc:.2f}%'})
+
+    pbar.close()
+    if NVML_AVAILABLE:
+        pynvml.nvmlShutdown()
+    
+    results_df = pd.DataFrame(metrics)
+    # Compute FLOPs for one sample
+    try:
+        flops = FlopCountAnalysis(model, next(iter(dataloader))[0][:1].to(device)).total()
+        results_df['flops_g'] = flops / 1e9
+    except Exception as e:
+        logging.warning(f"Could not compute FLOPs: {e}")
+        results_df['flops_g'] = np.nan
+
+    return results_df
 
 
-def load_results(results_directory):
-    """Concatenate all CSV result files into a single DataFrame."""
-    all_dfs = []
-    for filename in os.listdir(results_directory):
-        if filename.endswith(".csv"):
-            try:
-                df = pd.read_csv(os.path.join(results_directory, filename))
-                parts = filename.replace(".csv", "").split("_")
-                # Expected filename format as produced by train.py
-                df["exp_name"] = parts[0]
-                df["model"] = parts[1]
-                df["dataset"] = parts[2]
-                df["corruption"] = parts[3]
-                df["method"] = parts[4]
-                df["eta"] = float(parts[5].replace("eta", ""))
-                df["seed"] = int(parts[6].replace("seed", ""))
-                all_dfs.append(df)
-            except Exception as e:
-                print(f"Could not parse {filename}: {e}")
-    if not all_dfs:
-        return pd.DataFrame()
-    return pd.concat(all_dfs, ignore_index=True)
-
-
-# -----------------------------------------------------------------------------
-# Experiment-specific analysis helpers
-# -----------------------------------------------------------------------------
-
-def analyze_experiment_1(df):
-    print("\n--- Analyzing Experiment 1: 4th-order Moment Normalization ---")
-    if df.empty:
-        print("No data for Experiment 1.")
+def analyze_results(results_dir: str, config: dict):
+    all_files = [os.path.join(results_dir, f) for f in os.listdir(results_dir) if f.endswith('.parquet')]
+    if not all_files:
+        logging.error("No result files found in directory.")
         return {}
 
-    # Final accuracy for each run
-    final_acc = df.loc[
-        df.groupby(
-            [
-                "exp_name",
-                "model",
-                "dataset",
-                "corruption",
-                "method",
-                "eta",
-                "seed",
-            ]
-        )["frame"].idxmax()
-    ]
+    df = pd.concat([pd.read_parquet(f) for f in all_files])
 
-    # Average over seeds
-    summary = (
-        final_acc.groupby(["model", "dataset", "corruption", "method", "eta"])[
-            "accuracy"
-        ]
-        .agg(["mean", "std"])
-        .reset_index()
-    )
-
-    # Plot: Accuracy vs. Method for a key corruption (shot_noise)
-    for dataset in summary["dataset"].unique():
-        for eta in summary["eta"].unique():
-            plt.figure(figsize=(12, 7))
-            subset = summary[
-                (summary["dataset"] == dataset)
-                & (summary["eta"] == eta)
-                & (summary["corruption"] == "shot_noise")
-            ]
-            if subset.empty:
-                plt.close()
-                continue
-            sns.barplot(data=subset, x="method", y="mean", hue="model")
-            plt.title(f"Accuracy on {dataset} (shot_noise, eta={eta})")
-            plt.ylabel("Online Top-1 Accuracy (%)")
-            plt.xlabel("Method")
-            plt.xticks(rotation=45)
-            plt.tight_layout()
-            filename = os.path.join(
-                IMAGES_DIR, f"exp1_accuracy_{dataset}_eta{eta}.pdf"
-            )
-            plt.savefig(filename)
-            plt.close()
-            print(f"Saved plot: {filename}")
-
-    # Calculate DeltaAcc_HT-C
-    htc_summary = summary[summary["corruption"].str.contains("htc")]  # heavy-tailed
-    if not htc_summary.empty:
-        zorropp_acc = htc_summary[htc_summary["method"] == "ZorroPP"].set_index(
-            ["model", "dataset", "eta"]
-        )["mean"]
-        baselines_max_acc = (
-            htc_summary[htc_summary["method"] != "ZorroPP"]
-            .groupby(["model", "dataset", "eta"])["mean"]
-            .max()
-        )
-        delta_acc = (zorropp_acc - baselines_max_acc).reset_index()
-        print("\nDelta Accuracy on HT-C corruptions:")
-        print(delta_acc)
-        return delta_acc.to_dict("records")
-    return {}
-
-
-def analyze_experiment_2(df):
-    print("\n--- Analyzing Experiment 2: Finite-Sample Bounds ---")
-    # Placeholder – requires additional logs not yet implemented
-    print("Analysis for Experiment 2 requires ground-truth moment logs. Skipped.")
-    return {"status": "Skipped, requires custom logging"}
-
-
-def analyze_experiment_3(df):
-    print("\n--- Analyzing Experiment 3: Edge Device Scheduling & Privacy ---")
-    if df.empty or df[df["exp_name"] != "exp3"].empty:
-        print("No data for Experiment 3.")
-        return {}
-
-    exp3_df = df[df["exp_name"] == "exp3"].copy()
-    exp3_df["variant"] = exp3_df["method"]  # use method as variant name
-
-    summary = (
-        exp3_df.groupby("variant").agg(
-            mean_accuracy=pd.NamedAgg(column="accuracy", aggfunc="last"),
-            mean_latency_ms=pd.NamedAgg(column="latency_ms", aggfunc="mean"),
-            p99_latency_ms=pd.NamedAgg(
-                column="latency_ms", aggfunc=lambda x: x.quantile(0.995)
-            ),
-            mean_power_watts=pd.NamedAgg(column="power_watts", aggfunc="mean"),
-            p99_power_watts=pd.NamedAgg(
-                column="power_watts", aggfunc=lambda x: x.quantile(0.995)
-            ),
-        )
+    # --- Final Performance Aggregation ---
+    final_metrics = df.loc[df.groupby(['experiment_id'])['frame'].idxmax()]
+    agg_results = final_metrics.groupby(['method', 'model_name', 'dataset_name', 'corruption', 'eta']).agg(
+        mean_acc=('online_acc', 'mean'),
+        std_acc=('online_acc', 'std'),
+        mean_latency=('latency_ms', 'mean'),
+        mean_power=('power_w', 'mean')
     ).reset_index()
 
-    print("\nEdge Performance Summary:")
-    print(summary)
+    print("\n--- AGGREGATED RESULTS ---")
+    print(agg_results.to_string())
 
-    # Plot time-series metrics
-    for metric in ["accuracy", "latency_ms", "power_watts"]:
-        plt.figure(figsize=(12, 6))
-        sns.lineplot(data=exp3_df, x="frame", y=metric, hue="variant")
-        plt.title(f"{metric.replace('_', ' ').title()} over Time on EdgeHAR-C")
-        plt.xlabel("Frame")
-        plt.ylabel(metric)
-        filename = os.path.join(IMAGES_DIR, f"exp3_timeseries_{metric}.pdf")
-        plt.savefig(filename)
+    # --- Statistical Tests (Exp 1 Success Criteria) ---
+    exp1_df = agg_results[agg_results['model_name'].str.contains('resnet50|vit_base')]
+    zorro_results = exp1_df[exp1_df['method'] == 'ZORROpp']
+    baseline_results = exp1_df[exp1_df['method'] != 'ZORROpp']
+    best_baseline = baseline_results.loc[baseline_results.groupby(['model_name', 'dataset_name', 'corruption', 'eta'])['mean_acc'].idxmax()]
+    
+    comparison = pd.merge(zorro_results, best_baseline, on=['model_name', 'dataset_name', 'corruption', 'eta'], suffixes=('_zorro', '_baseline'))
+    comparison['delta_acc'] = comparison['mean_acc_zorro'] - comparison['mean_acc_baseline']
+
+    print("\n--- ZORRO++ vs Best Baseline ---")
+    print(comparison[['model_name', 'corruption', 'eta', 'mean_acc_zorro', 'mean_acc_baseline', 'delta_acc']].to_string())
+    
+    # --- Plotting ---
+    os.makedirs('.research/iteration12/images', exist_ok=True)
+    plt.figure(figsize=(12, 7))
+    sns.barplot(data=exp1_df, x='method', y='mean_acc', hue='corruption')
+    plt.title('Experiment 1: Final Accuracy Across Methods and Corruptions')
+    plt.ylabel('Online Accuracy (%)')
+    plt.xticks(rotation=45)
+    plt.tight_layout()
+    plt.savefig('.research/iteration12/images/exp1_final_accuracy.pdf')
+    plt.close()
+
+    # Exp 2: Bound verification plot
+    exp2_df = df[df['experiment_id'].str.contains('exp2')].dropna(subset=['bound_mu'])
+    if not exp2_df.empty:
+        plt.figure(figsize=(10, 6))
+        sns.lineplot(data=exp2_df, x='frame', y='bound_mu', label='Theoretical Bound B_t(\mu)')
+        plt.title('Experiment 2: Finite-Sample Bound for Mean Estimation')
+        plt.xlabel('Frame')
+        plt.ylabel('L_inf Error Bound')
+        plt.loglog()
+        plt.grid(True, which="both", ls="--")
+        plt.savefig('.research/iteration12/images/exp2_bound_verification.pdf')
         plt.close()
-        print(f"Saved plot: {filename}")
 
-    return summary.to_dict("records")
+    # --- Final JSON Output ---
+    final_summary = {
+        'aggregated_performance': agg_results.to_dict('records'),
+        'zorro_vs_baseline': comparison.to_dict('records')
+    }
+    return final_summary
 
+def run_experiments(config: dict):
+    results_dir = f".research/iteration12/results_{time.strftime('%Y%m%d-%H%M%S')}"
+    os.makedirs(results_dir, exist_ok=True)
 
-# -----------------------------------------------------------------------------
-# Entry-point called by main.py
-# -----------------------------------------------------------------------------
+    from .preprocess import get_data_stream
 
-def generate_report(results_directory):
-    """Aggregate CSV logs and write a JSON summary (also echoed to STDOUT)."""
+    for i, exp_config in enumerate(config['experiments']):
+        exp_id = f"{exp_config['experiment']}_{exp_config['model']['name']}_{exp_config['dataset']['name']}_{exp_config['dataset']['corruption']}_{exp_config['method']}_eta{exp_config['stream']['eta']}_seed{exp_config['seed']}"
+        logging.info(f"\n--- Starting run [{i+1}/{len(config['experiments'])}]: {exp_id} ---")
+        
+        try:
+            dataloader = get_data_stream(exp_config, config['data_manifest'])
+            device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+            
+            results_df = run_single_experiment(exp_config, dataloader, device)
+            
+            results_df['experiment_id'] = exp_id
+            results_df['method'] = exp_config['method']
+            results_df['model_name'] = exp_config['model']['name']
+            results_df['dataset_name'] = exp_config['dataset']['name']
+            results_df['corruption'] = exp_config['dataset']['corruption']
+            results_df['eta'] = exp_config['stream']['eta']
+            results_df['seed'] = exp_config['seed']
 
-    print(f"Generating report from raw CSVs in: {results_directory}")
-    full_df = load_results(results_directory)
+            output_path = os.path.join(results_dir, f"{exp_id}.parquet")
+            results_df.to_parquet(output_path)
+            logging.info(f"Saved results for {exp_id} to {output_path}")
 
-    if full_df.empty:
-        print("No result files found. Exiting analysis.")
-        final_results = {"error": "No result files found."}
-    else:
-        final_results = {
-            "experiment_1": analyze_experiment_1(full_df[full_df["exp_name"] == "exp1"]),
-            "experiment_2": analyze_experiment_2(full_df[full_df["exp_name"] == "exp2"]),
-            "experiment_3": analyze_experiment_3(full_df[full_df["exp_name"] == "exp3"]),
-        }
+        except Exception as e:
+            logging.error(f"Experiment {exp_id} failed: {e}", exc_info=True)
+            # Continue to next experiment
 
-    # ------------------------------------------------------------------
-    # Persist aggregated results as JSON – one file per analysis run
-    # ------------------------------------------------------------------
-    timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    summary_path = os.path.join(JSON_DIR, f"final_results_{timestamp}.json")
-    with open(summary_path, "w") as f:
-        json.dump(final_results, f, indent=4)
+    # --- Final Analysis and Reporting ---
+    final_json_results = analyze_results(results_dir, config)
+    
+    print("\n" + "="*50)
+    print("           FINAL EXPERIMENT SUMMARY (JSON)")
+    print("="*50 + "\n")
+    print(json.dumps(final_json_results, indent=2))
 
-    # Echo the JSON to STDOUT for verification (required by spec)
-    print("\n========================================")
-    print("======= FINAL RESULTS SUMMARY ========")
-    print("========================================")
-    print(json.dumps(final_results, indent=2))
-
-    return final_results
+    summary_path = f".research/iteration12/summary_{time.strftime('%Y%m%d-%H%M%S')}.json"
+    with open(summary_path, 'w') as f:
+        json.dump(final_json_results, f, indent=2)
+    logging.info(f"Final JSON summary saved to {summary_path}")

@@ -1,214 +1,155 @@
 import os
 import logging
 import requests
-import zipfile
 import tarfile
+import hashlib
 from tqdm import tqdm
 from PIL import Image
 import numpy as np
 import torch
-from torch.utils.data import DataLoader, Dataset
+from torch.utils.data import DataLoader, Dataset, IterableDataset
 from torchvision import transforms
-from datasets import load_dataset, Dataset as HFDataset
+import glob
 
-# Local util imported from train.py to generate identical run names
-from .train import make_run_name
+DATA_DIR = "./data"
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+def download_and_verify(url: str, dest_path: str, expected_sha256: str):
+    if os.path.exists(dest_path):
+        logging.info(f"File already exists: {dest_path}. Verifying checksum...")
+        sha256_hash = hashlib.sha256()
+        with open(dest_path, "rb") as f:
+            for byte_block in iter(lambda: f.read(4096), b""):
+                sha256_hash.update(byte_block)
+        if sha256_hash.hexdigest() == expected_sha256:
+            logging.info("Checksum OK.")
+            return
+        else:
+            logging.warning("Checksum mismatch. Re-downloading.")
+            os.remove(dest_path)
 
-DATA_CACHE_DIR = os.path.expanduser("~/.cache/zorropp_data")
-
-# -----------------------------------------------------------------------------
-# Utility helpers (download & transforms)
-# -----------------------------------------------------------------------------
-
-def download_and_extract(url, dest_path, extract_path):
-    if os.path.exists(extract_path):
-        logging.info(f"Dataset already exists at {extract_path}. Skipping download.")
-        return
     os.makedirs(os.path.dirname(dest_path), exist_ok=True)
-    logging.info(f"Downloading {url} → {dest_path}")
+    logging.info(f"Downloading {url} to {dest_path}")
     try:
-        with requests.get(url, stream=True, timeout=30) as r:
+        with requests.get(url, stream=True, timeout=60) as r:
             r.raise_for_status()
-            total = int(r.headers.get('content-length', 0))
-            with open(dest_path, 'wb') as f, tqdm(total=total, unit='iB', unit_scale=True) as bar:
+            total_size = int(r.headers.get('content-length', 0))
+            sha256_hash = hashlib.sha256()
+            with open(dest_path, 'wb') as f, tqdm(total=total_size, unit='iB', unit_scale=True, desc=os.path.basename(dest_path)) as bar:
                 for chunk in r.iter_content(chunk_size=8192):
                     f.write(chunk)
+                    sha256_hash.update(chunk)
                     bar.update(len(chunk))
-    except requests.exceptions.RequestException as e:
-        logging.error(f"Failed to download {url}: {e}")
-        raise SystemExit("DOWNLOAD FAILED")
-    logging.info(f"Extracting {dest_path}")
-    if dest_path.endswith('.zip'):
-        with zipfile.ZipFile(dest_path, 'r') as zf:
-            zf.extractall(extract_path)
-    elif dest_path.endswith('.tar.gz'):
-        with tarfile.open(dest_path, 'r:gz') as tf_:
-            tf_.extractall(extract_path)
-    else:
-        raise ValueError("Unsupported archive type")
-    os.remove(dest_path)
+        
+        if sha256_hash.hexdigest() != expected_sha256:
+            os.remove(dest_path)
+            raise ValueError(f"Checksum mismatch for {dest_path}. Expected {expected_sha256}, got {sha256_hash.hexdigest()}")
+        logging.info("Download complete and verified.")
+    except Exception as e:
+        logging.error(f"Failed to download or verify {url}: {e}")
+        if os.path.exists(dest_path): os.remove(dest_path)
+        raise FileNotFoundError(f"Could not obtain required data file from {url}")
 
+def extract_archive(archive_path: str, extract_dir: str):
+    if os.path.exists(extract_dir) and os.listdir(extract_dir):
+        logging.info(f"Data already extracted at {extract_dir}. Skipping extraction.")
+        return
+    logging.info(f"Extracting {archive_path} to {extract_dir}")
+    os.makedirs(extract_dir, exist_ok=True)
+    with tarfile.open(archive_path, 'r:gz') as tar:
+        tar.extractall(path=extract_dir)
 
-def get_image_transforms():
-    return transforms.Compose([
+def prepare_all_data(data_manifest: dict):
+    for name, info in data_manifest.items():
+        archive_name = os.path.basename(info['url'])
+        archive_path = os.path.join(DATA_DIR, '_archives', archive_name)
+        extract_path = os.path.join(DATA_DIR, name)
+        download_and_verify(info['url'], archive_path, info['sha256'])
+        extract_path_final = os.path.join(DATA_DIR, info.get('extract_subdir', name))
+        if not os.path.exists(extract_path_final) or not os.listdir(extract_path_final):
+            extract_archive(archive_path, os.path.dirname(extract_path_final))
+        else:
+             logging.info(f"Data for {name} already exists at {extract_path_final}")
+
+class ImageCorruptionDataset(Dataset):
+    def __init__(self, root_dir, transform):
+        super().__init__()
+        self.root_dir = root_dir
+        self.transform = transform
+        self.image_files = sorted(glob.glob(os.path.join(root_dir, '**', '*.JPEG'), recursive=True) + glob.glob(os.path.join(root_dir, '**', '*.png'), recursive=True))
+        if not self.image_files:
+             raise FileNotFoundError(f"No images found in {root_dir}")
+        # Dummy labels for now, as TTA is unsupervised
+        self.labels = np.random.randint(0, 1000, len(self.image_files))
+
+    def __len__(self):
+        return len(self.image_files)
+
+    def __getitem__(self, idx):
+        img_path = self.image_files[idx]
+        image = Image.open(img_path).convert('RGB')
+        label = self.labels[idx]
+        if self.transform:
+            image = self.transform(image)
+        return image, label
+
+class SyntheticStream(IterableDataset):
+    def __init__(self, num_frames, num_classes, switch_interval):
+        self.num_frames = num_frames
+        self.num_classes = num_classes
+        self.switch_interval = switch_interval
+        self.transform = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
+        ])
+
+    def __iter__(self):
+        for i in range(self.num_frames):
+            mode = (i // self.switch_interval) % 4
+            img_np = np.random.rand(224, 224, 3).astype(np.float32)
+            if mode == 1: # Cauchy noise
+                img_np += np.random.standard_cauchy(size=(224, 224, 3)) * 0.02
+            elif mode == 2: # HSV shift
+                img_np = (img_np * 255).astype(np.uint8)
+                img_pil = Image.fromarray(img_np, 'RGB')
+                img_hsv = np.array(img_pil.convert('HSV'))
+                img_hsv[:, :, 1] = np.clip(img_hsv[:, :, 1] * 1.5, 0, 255)
+                img_pil = Image.fromarray(img_hsv, 'HSV').convert('RGB')
+                img_np = np.array(img_pil) / 255.0
+            img_np = np.clip(img_np, 0, 1)
+            img_pil = Image.fromarray((img_np * 255).astype(np.uint8))
+            label = np.random.randint(0, self.num_classes)
+            yield self.transform(img_pil), torch.tensor(label).long()
+
+def get_data_stream(config: dict, data_manifest: dict) -> DataLoader:
+    d_config = config['dataset']
+    d_name = d_config['name']
+    transform = transforms.Compose([
         transforms.Resize(256),
         transforms.CenterCrop(224),
         transforms.ToTensor(),
         transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225]),
     ])
+    
+    if 'exp2_synthetic' in config['experiment']:
+        dataset = SyntheticStream(config['stream']['frames'], d_config['num_classes'], d_config['switch_interval'])
+    else:
+        manifest_key = next((k for k in data_manifest if k.lower() in d_name.lower()), None)
+        if not manifest_key:
+            raise ValueError(f"No manifest entry found for dataset '{d_name}'")
+        base_path = os.path.join(DATA_DIR, data_manifest[manifest_key].get('extract_subdir', manifest_key))
+        if 'ImageNet-C' in manifest_key or 'CIFAR10-C' in manifest_key:
+            corruption_path = os.path.join(base_path, d_config['corruption'], str(d_config['severity']))
+            dataset = ImageCorruptionDataset(corruption_path, transform)
+        elif 'DomainNet' in manifest_key:
+            domain_path = os.path.join(base_path, d_config['corruption']) # corruption field holds domain name
+            dataset = ImageCorruptionDataset(domain_path, transform)
+        else: # Basic loader for other datasets
+            dataset = ImageCorruptionDataset(base_path, transform)
 
-
-def _attempt_load_hf_dataset(dataset_id: str, *args, **kwargs):
-    """Load a dataset from the Hugging Face Hub with optional auth token.
-
-    Parameters
-    ----------
-    dataset_id: str
-        The repository ID of the dataset (e.g. "imagenette").
-    *args / **kwargs:
-        Additional positional or keyword arguments forwarded verbatim to
-        `datasets.load_dataset`. This makes it possible to pass a configuration
-        name as a positional arg (e.g. "full") *or* via the `name=` kwarg
-        without risking a python `TypeError` about multiple values for `name`.
-    """
-    token = os.getenv("HF_TOKEN", None)
-    try:
-        return load_dataset(dataset_id, *args, cache_dir=DATA_CACHE_DIR, token=token, **kwargs)
-    except Exception as e:
-        raise RuntimeError(f"Could not load dataset '{dataset_id}' from the Hub: {e}") from e
-
-# -----------------------------------------------------------------------------
-# Minimal dataset wrappers
-# -----------------------------------------------------------------------------
-
-class ImageCorruptionDataset(Dataset):
-    def __init__(self, data: HFDataset, transform):
-        self.data, self.transform = data, transform
-
-    def __len__(self):
-        return len(self.data)
-
-    def __getitem__(self, idx):
-        item = self.data[idx]
-        img = item.get('image') or item.get('img')
-        if not isinstance(img, Image.Image):
-            img = Image.fromarray(img)
-        img = img.convert('RGB')
-        label = int(item['label'])
-        return self.transform(img), label
-
-class RealisticTTAStream(Dataset):
-    def __init__(self, base_dataset, corruption_fn, eta, frames_per_severity=10000):
-        self.base_dataset = base_dataset
-        self.corruption_fn = corruption_fn
-        self.eta = eta
-        self.frames_per_sev = int(frames_per_severity * eta)
-        self.sev_levels = [1, 2, 3, 4, 5]
-
-    def __len__(self):
-        return len(self.base_dataset)
-
-    def __getitem__(self, idx):
-        sev = self.sev_levels[min(idx // self.frames_per_sev, len(self.sev_levels) - 1)]
-        clean, lbl = self.base_dataset[idx]
-        return self.corruption_fn(clean, sev), lbl
-
-# Synthetic dataset for Experiment-2 -------------------------------------------------
-class SyntheticImageStream(Dataset):
-    """Generates random RGB images and labels on-the-fly to mimic a data stream."""
-
-    def __init__(self, num_frames: int, num_classes: int):
-        self.num_frames = num_frames
-        self.num_classes = num_classes
-        self.transform = get_image_transforms()
-
-    def __len__(self):
-        return self.num_frames
-
-    def __getitem__(self, idx):
-        rng = np.random.RandomState(seed=idx)
-        img_np = (rng.rand(224, 224, 3) * 255).astype(np.uint8)
-        img = Image.fromarray(img_np)
-        label = rng.randint(0, self.num_classes)
-        return self.transform(img), label
-
-# -----------------------------------------------------------------------------
-# Main factory
-# -----------------------------------------------------------------------------
-
-def get_dataloaders(config):
-    dataloaders = {}
-    transform = get_image_transforms()
-
-    for exp_cfg in config['experiments']:
-        # Skip template entries that miss 'corruption'
-        if 'corruption' not in exp_cfg['dataset']:
-            logging.info("Encountered template config without 'corruption'. Skipping …")
-            continue
-
-        try:
-            run_name = make_run_name(exp_cfg)
-        except ValueError:
-            logging.warning("Could not create run-name – treating as template. Skipping.")
-            continue
-
-        d_name = exp_cfg['dataset']['name']
-        batch_size = exp_cfg['dataloader']['batch_size']
-
-        try:
-            # CIFAR10-C placeholder (used by smoke-tests)
-            if 'cifar10-c' in d_name:
-                ds = _attempt_load_hf_dataset('cifar10', split='test')
-                if 'img' in ds.column_names:
-                    ds = ds.rename_column('img', 'image')
-
-                def _shot_noise(im: Image.Image, severity=5):
-                    im_np = np.array(im).astype(np.float32) / 255.0
-                    lam = severity * 10.0
-                    noisy = np.random.poisson(im_np * lam) / lam
-                    noisy = np.clip(noisy * 255.0, 0, 255).astype(np.uint8)
-                    return Image.fromarray(noisy)
-
-                base = ImageCorruptionDataset(ds, transform)
-                dataset = RealisticTTAStream(base, _shot_noise, exp_cfg['stream']['eta'])
-
-            # ImageNet-C placeholder – fall back to Imagenette if gated
-            elif 'imagenet-c' in d_name:
-                try:
-                    ds = _attempt_load_hf_dataset('imagenet-1k', split='validation')
-                except RuntimeError as e:
-                    logging.warning(
-                        f"Imagenet-1k dataset gated/unavailable ({e}). Falling back to open 'imagenette'."
-                    )
-                    ds = _attempt_load_hf_dataset('imagenette', name='full', split='validation')
-                    if 'img' in ds.column_names:
-                        ds = ds.rename_column('img', 'image')
-                dataset = ImageCorruptionDataset(ds, transform)
-                logging.warning("Using clean validation data as a placeholder for ImageNet-C.")
-
-            # EdgeHAR dummy tensor dataset for CI
-            elif 'edgehar-c' in d_name:
-                dataset = torch.utils.data.TensorDataset(
-                    torch.randn(1000, 3, 224, 224),
-                    torch.randint(0, 10, (1000,))
-                )
-
-            # Synthetic stream for Experiment-2
-            elif 'synthetic-stream' in d_name:
-                frames = int(exp_cfg['stream']['frames'])
-                num_classes = int(exp_cfg['dataset']['num_classes'])
-                dataset = SyntheticImageStream(frames, num_classes)
-
-            else:
-                raise ValueError(f"Unsupported dataset: {d_name}")
-
-        except Exception as e:
-            logging.error(f"Failed preparing dataset {d_name}: {e}")
-            raise SystemExit(f"DATASET FAILED: {d_name}")
-
-        dl = DataLoader(dataset, batch_size=batch_size, shuffle=True, num_workers=4, pin_memory=True)
-        dataloaders[run_name] = dl
-
-    return dataloaders
+    return DataLoader(
+        dataset,
+        batch_size=config['dataloader']['batch_size'],
+        shuffle=isinstance(dataset, Dataset) and not isinstance(dataset, IterableDataset),
+        num_workers=4,
+        pin_memory=True
+    )
