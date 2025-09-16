@@ -1,0 +1,35 @@
+global_seed: 42
+
+preprocess:
+  output_dir: 'data/processed'
+  datasets:
+    - name: 'cora_smoke_test' # Using a dummy dataset for smoke testing
+      type: 'generic'
+      path: 'data/raw/cora_smoke_test.csv'
+      feature_model: 'distilbert-base-uncased'
+
+training:
+  ddp: false
+  monitor_power: true # Set to true to test pynvml integration
+
+experiments:
+  exp1_throughput:
+    dataset:
+      name: 'cora_smoke_test'
+      path: 'data/processed/cora_smoke_test.pt'
+    models: ['vanilla', 'meta-leap']
+    model_params:
+      num_layers: 2
+      hidden_channels: 32
+      heads: 2
+      dropout: 0.1
+    sampler:
+      walk_length: 2
+      budget: 1000
+    training:
+      epochs: 2
+      steps_per_epoch: 10
+      lr: 0.005
+      weight_decay: 0.0005
+      lr_warmup_steps: 5
+    seeds: [13]

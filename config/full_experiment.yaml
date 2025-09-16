@@ -1,0 +1,94 @@
+global_seed: 42
+
+preprocess:
+  output_dir: 'data/processed'
+  datasets:
+    - name: 'ogbn-papers100M'
+      type: 'ogb'
+    - name: 'twitter-2024'
+      type: 'generic'
+      path: 'data/raw/twitter-2024.csv' # User must provide this file
+      feature_model: 'roberta-base'
+    - name: 'osm-2024'
+      type: 'generic'
+      path: 'data/raw/osm-2024.csv' # User must provide this file
+      # Feature engineering for OSM is simplified to dummy in generic processor
+    - name: 'reddit-2023'
+      type: 'generic'
+      path: 'data/raw/reddit-2023.csv' # User must provide this file
+      feature_model: 'distilbert-base-uncased'
+    - name: 'youtube-u2g'
+      type: 'generic'
+      path: 'data/raw/youtube-u2g.csv' # User must provide this file
+
+training:
+  ddp: true
+  monitor_power: true
+
+experiments:
+  exp1_throughput:
+    dataset:
+      name: 'ogbn-papers100M'
+      path: 'data/processed/ogbn-papers100M.pt'
+    models: ['vanilla', 'leap', 'meta-leap']
+    model_params:
+      num_layers: 8
+      hidden_channels: 256
+      heads: 16
+      dropout: 0.2
+    sampler:
+      walk_length: 2
+      budget: 7500000 # ~7.5M edges per GPU
+    training:
+      epochs: 30
+      steps_per_epoch: 4000
+      lr: 0.0025
+      weight_decay: 0.0001
+      lr_warmup_steps: 5000
+    seeds: [13, 17, 19, 23, 29]
+
+  exp2_transfer:
+    dataset:
+      # This experiment will be run for each transfer dataset
+      # The logic in train.py and evaluate.py will handle this.
+      # For config simplicity, we point to one, but the code should be generic.
+      name: 'twitter-2024' 
+      path: 'data/processed/twitter-2024.pt' # Also runs for osm & reddit
+    models: ['leap', 'meta-leap']
+    model_params:
+      num_layers: 8
+      hidden_channels: 256
+      heads: 16
+      dropout: 0.2
+    sampler:
+      walk_length: 2
+      budget: 5000000
+    training:
+      epochs: 10
+      steps_per_epoch: 1000
+      lr: 0.0025
+      weight_decay: 0.0001
+      lr_warmup_steps: 500
+    seeds: [7, 11, 13]
+
+  exp3_temporal_variance:
+    dataset:
+      name: 'youtube-u2g'
+      path: 'data/processed/youtube-u2g.pt'
+    models: ['leap', 'meta-leap', 'meta-leap-no-ar1'] # Special run configurations
+    control_variate: 'ar1' # Default for meta-leap, will be disabled for the ablation
+    model_params:
+      num_layers: 8
+      hidden_channels: 256
+      heads: 16
+      dropout: 0.2
+    sampler:
+      walk_length: 2
+      budget: 10000 # Streaming batch size
+    training:
+      epochs: 1 # Represents the 5-hour stream
+      steps_per_epoch: 18000
+      lr: 0.0025
+      weight_decay: 0.0001
+      lr_warmup_steps: 1000
+    seeds: [42] # One long run is sufficient
