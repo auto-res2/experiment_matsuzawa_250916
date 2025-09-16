@@ -154,18 +154,39 @@ def scrape_sec_edgar_10k_risk_factors(config, output_dir):
 
 
 def download_hf_dataset(name, path, split, col, task_name):
+    """Download a dataset from the Hugging Face Hub.
+
+    The function sets `trust_remote_code=True` so that datasets providing a
+    custom loading script (like `super_natural_instructions`) can be imported
+    without raising a `DatasetModuleNotFoundError`.  We deliberately *fail
+    fast* with a clear error message if the download cannot be completed so
+    that upstream pipeline stages do not proceed with incomplete data.
+    """
     print(f"Downloading Hugging Face dataset: {name}")
     try:
-        # Attempt authenticated download if HF_TOKEN is available.
         hf_token = os.getenv("HF_TOKEN")
-        if hf_token:
-            dataset = load_dataset(path, split=split, token=hf_token)
+        ds_kwargs = {
+            "path": path,
+            "split": split,
+            "token": hf_token,
+            "trust_remote_code": True,  # crucial for datasets with custom loaders
+        }
+        # For very large datasets we prefer streaming to avoid memory issues.
+        if not os.getenv("DISABLE_STREAMING"):
+            ds_kwargs["streaming"] = True
+        dataset = load_dataset(**ds_kwargs)
+
+        # When using streaming, convert to pandas via limited head if length unknown.
+        if hasattr(dataset, "take"):
+            dataset_iter = dataset.take(2000)  # cap to 2k rows for lightweight runs
+            df = pd.DataFrame(list(dataset_iter))
         else:
-            dataset = load_dataset(path, split=split)
-        df = dataset.to_pandas()
+            df = dataset.to_pandas()
+
         if col not in df.columns:
             raise KeyError(
-                f"Expected column '{col}' not found in dataset '{path}'. Available columns: {list(df.columns)}"
+                f"Expected column '{col}' not found in dataset '{path}'. "
+                f"Available columns: {list(df.columns)}"
             )
         df = df.rename(columns={col: 'prompt'})
         df['task'] = task_name
@@ -197,11 +218,11 @@ def run_preprocessing(config):
             all_tasks_df = pd.concat([all_tasks_df, df_sec], ignore_index=True)
 
     elif exp_id == 2:
-        # Fixed dataset path (remove deprecated 'allenai/' prefix)
+        # Using Super-Natural-Instructions dataset (public, requires remote code).
         all_tasks_df = download_hf_dataset(
             'Super-NI',
-            'super_natural_instructions',  # Correct HF dataset ID
-            'train[:5%]',
+            'super_natural_instructions',
+            'train[:2%]',  # keep it lightweight
             'definition',
             'Super-NI'
         )
@@ -209,7 +230,7 @@ def run_preprocessing(config):
     elif exp_id == 3:
         df_gsm8k = download_hf_dataset('GSM8K', 'openai/gsm8k', 'train', 'question', 'GSM8K')
         df_creative = download_hf_dataset(
-            'BIG-bench', 'google/bigbench', 'reasoning_about_colored_objects', 'inputs', 'creative_story'
+            'BIG-bench', 'google/bigbench', 'reasoning_about_colored_objects', 'question', 'creative_story'
         )
         all_tasks_df = pd.concat([df_gsm8k, df_creative], ignore_index=True)
 
