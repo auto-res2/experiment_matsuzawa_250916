@@ -6,5 +6,82 @@
     "Test-time adaptation acceleration",
     "TTA convergence rate",
     "Online adaptation speed"
+  ],
+  "research_study_list": [
+    {
+      "title": "TTT++: When Does Self-Supervised Test-Time Training Fail or Thrive?"
+    },
+    {
+      "title": "Persistent Test-time Adaptation in Recurring Testing Scenarios"
+    },
+    {
+      "title": "Active Test-Time Adaptation: Theoretical Analyses and An Algorithm"
+    },
+    {
+      "title": "Test Time Adaptation via Conjugate Pseudo-labels"
+    },
+    {
+      "title": "Improved Test-Time Adaptation for Domain Generalization"
+    },
+    {
+      "title": "Test Time Adaptation With Regularized Loss for Weakly Supervised Salient Object Detection"
+    },
+    {
+      "title": "Tent: Fully Test-Time Adaptation by Entropy Minimization"
+    },
+    {
+      "title": "What How and When Should Object Detectors Update in Continually Changing Test Domains?"
+    },
+    {
+      "title": "DELTA: DEGRADATION-FREE FULLY TEST-TIME ADAPTATION"
+    },
+    {
+      "title": "Test-Time Training with Self-Supervision for Generalization under Distribution Shifts"
+    },
+    {
+      "title": "Evaluation of Test-Time Adaptation Under Computational Time Constraints"
+    },
+    {
+      "title": "Towards Stable Test-time Adaptation in Dynamic Wild World"
+    },
+    {
+      "title": "Towards Stable Test-time Adaptation in Dynamic Wild World"
+    },
+    {
+      "title": "Leveraging Proxy of Training Data for Test-Time Adaptation"
+    },
+    {
+      "title": "Robust Test-Time Adaptation in Dynamic Scenarios"
+    },
+    {
+      "title": "Active Test-Time Adaptation: Theoretical Analyses and An Algorithm"
+    },
+    {
+      "title": "Improved Test-Time Adaptation for Domain Generalization"
+    },
+    {
+      "title": "AETTA: Label-Free Accuracy Estimation for Test-Time Adaptation"
+    },
+    {
+      "title": "Finite-Sample Analysis of Contractive Stochastic Approximation Using Smooth Convex Envelopes"
+    },
+    {
+      "title": "Robust Test-Time Adaptation in Dynamic Scenarios"
+    },
+    {
+      "title": "Evaluation of Test-Time Adaptation Under Computational Time Constraints"
+    },
+    {
+      "title": "Provably Efficient Model-based Policy Adaptation"
+    },
+    {
+      "title": "Real-Time Optimisation for Online Learning in Auctions"
+    },
+    {
+      "title": "Efficient Non-stationary Online Learning by Wavelets with Applications to Online Distribution Shift Adaptation"
+    },
+    {
+      "title": "Understanding Adam Optimizer via Online Learning of Updates: Adam is FTRL in Disguise"
+    }
   ]
 }
