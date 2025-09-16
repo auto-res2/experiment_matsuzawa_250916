@@ -1,0 +1,13 @@
+=== [PHASE 2/2] Full experiment start Tue Sep 16 04:37:33 AM UTC 2025 ===
+{
+  "bleu_true": 29.25363409605127,
+  "bleu_cert": 15.773925808917344,
+  "nfe": 21,
+  "lat_ms": 56.844150782285624,
+  "energy_mJ": 8.728000717642175
+}
+
+=== SUMMARY ===
+Training metrics: {'train_wall_s': 0.30022501945495605, 'train_samples': 1000}
+Evaluation metrics: {'bleu_true': 29.25363409605127, 'bleu_cert': 15.773925808917344, 'nfe': 21, 'lat_ms': 56.844150782285624, 'energy_mJ': 8.728000717642175}
+=== [PHASE 2/2] Full experiment end Tue Sep 16 04:37:33 AM UTC 2025 ===
