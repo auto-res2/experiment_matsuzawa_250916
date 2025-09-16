@@ -16,7 +16,7 @@ import torch  # noqa: F401
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
-from transformers import AutoModel, AutoTokenizer  # noqa: F401 – may be useful in extended analyses
+from transformers import AutoModel, AutoTokenizer  # noqa: F401  may be useful in extended analyses
 
 warnings.filterwarnings("ignore", category=UserWarning)
 
@@ -309,9 +309,9 @@ def run(config: dict):
     exp_id = config["experiment_id"]
     run_dir = Path(config["paths"]["training_output_path"])
 
-    # Mandatory output directories per spec (iteration26)
-    json_dir = Path(".research/iteration26/")
-    img_dir = Path(".research/iteration26/images/")
+    # Mandatory output directories per spec (iteration27)
+    json_dir = Path(".research/iteration27/")
+    img_dir = Path(".research/iteration27/images/")
     json_dir.mkdir(parents=True, exist_ok=True)
     img_dir.mkdir(parents=True, exist_ok=True)
 

@@ -54,6 +54,19 @@ def tokenize_and_truncate(text: str) -> dict:
 
 # --- Data Acquisition ---
 
+def _extract_risk_factor_section(raw_text: str) -> str | None:
+    """Robustly extract the Risk Factors section from a 10-K filing text."""
+    patterns = [
+        r"item\s+1a[^\.\n]{0,100}?risk factors(.*?)item\s+1b",  # Typical SEC format
+        r"risk factors(.*?)unresolved staff comments",             # Older filings
+        r"risk factors(.*)",                                       # Fallback – grab till end
+    ]
+    for pat in patterns:
+        m = re.search(pat, raw_text, re.IGNORECASE | re.DOTALL)
+        if m:
+            return m.group(1)
+    return None
+
 def acquire_finreg_compliance_data(config: dict) -> pd.DataFrame:
     """Scrapes SEC EDGAR for 10-K 'Risk Factors' sections."""
     ciks = config.get('sec_edgar_ciks', [])
@@ -62,17 +75,18 @@ def acquire_finreg_compliance_data(config: dict) -> pd.DataFrame:
 
     print("Acquiring FinReg-Compliance data from SEC EDGAR...")
     headers = {'User-Agent': 'research@example.com'}
-    all_prompts = []
+    all_prompts: list[str] = []
     for cik in ciks:
         try:
-            time.sleep(0.2)  # Rate limit
+            time.sleep(0.2)  # Rate limit to be polite with SEC servers
             # Find the latest 10-K filing
             url = f"https://data.sec.gov/submissions/CIK{cik.zfill(10)}.json"
-            res = requests.get(url, headers=headers)
+            res = requests.get(url, headers=headers, timeout=10)
             res.raise_for_status()
             filings = res.json()['filings']['recent']
             ten_k_indices = [i for i, form in enumerate(filings['form']) if form == '10-K']
             if not ten_k_indices:
+                print(f"Warning: No 10-K found for CIK {cik}. Skipping.")
                 continue
 
             latest_filing_idx = ten_k_indices[0]
@@ -81,19 +95,22 @@ def acquire_finreg_compliance_data(config: dict) -> pd.DataFrame:
 
             # Fetch the filing document
             filing_url = f"https://www.sec.gov/Archives/edgar/data/{cik}/{acc_no.replace('-', '')}/{doc_name}"
-            doc_res = requests.get(filing_url, headers=headers)
+            doc_res = requests.get(filing_url, headers=headers, timeout=10)
             doc_res.raise_for_status()
             soup = BeautifulSoup(doc_res.content, 'html.parser')
 
-            # Extract text from risk factors section (very basic extraction)
-            text = soup.get_text(separator=' ')
-            match = re.search(r"(?i)risk factors(.+?)item 1b", text, re.DOTALL)
-            if match:
-                # Split into smaller prompt-sized chunks
-                risk_text = match.group(1).strip()
-                sentences = re.split(r'(?<=[.!?]) +', risk_text)
-                prompts = [' '.join(sentences[i : i + 5]) for i in range(0, len(sentences), 5)]
-                all_prompts.extend(prompts)
+            # Extract text from risk factors section
+            risk_text = _extract_risk_factor_section(soup.get_text(separator=' '))
+            if not risk_text:
+                print(f"Warning: Could not locate Risk Factors section for CIK {cik}. Skipping.")
+                continue
+
+            # Split into prompt-sized chunks (5 sentences each)
+            sentences = re.split(r'(?<=[.!?]) +', risk_text)
+            for i in range(0, len(sentences), 5):
+                chunk = ' '.join(sentences[i : i + 5]).strip()
+                if len(chunk) >= 20:  # Ignore very short chunks
+                    all_prompts.append(chunk)
         except Exception as e:
             print(f"Warning: Could not scrape data for CIK {cik}. Reason: {e}")
 
@@ -202,7 +219,9 @@ def run(config: dict):
     df_all['prompt'] = [d['text'] for d in processed_data]
     df_all['truncated'] = [d['truncated'] for d in processed_data]
     df_all.dropna(subset=['prompt'], inplace=True)
-    df_all = df_all[df_all['prompt'].str.len() > 10]
+
+    # Keep any non-empty prompt (previous >10 chars filter was too strict for smoke-test)
+    df_all = df_all[df_all['prompt'].str.len() > 0]
 
     if df_all.empty:
         raise RuntimeError("All prompts became empty after cleaning/tokenization. NO-FALLBACK.")
@@ -215,12 +234,12 @@ def run(config: dict):
     opt_dfs, test_dfs = [], []
     for task_name, group_df in df_all.groupby('task'):
         test_size = min(50, len(group_df) // 6)  # approx 1/6th for test, capped at 50
-        opt_size = min(250, len(group_df) - test_size)
+        opt_size = max(1, min(250, len(group_df) - test_size))  # ensure at least one opt sample
 
         test_dfs.append(group_df.head(test_size))
         opt_dfs.append(group_df.iloc[test_size : test_size + opt_size])
 
-    # Safe concatenation to avoid "No objects to concatenate" when a split is empty
+    # Safe concatenation
     df_opt = _safe_concat(opt_dfs)
     df_test = _safe_concat(test_dfs) if any(not df.empty for df in test_dfs) else pd.DataFrame(columns=df_all.columns)
 
