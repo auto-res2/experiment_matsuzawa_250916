@@ -1,0 +1,9 @@
+2025-09-16 12:00:47,202 [INFO] Executing in FULL EXPERIMENT mode.
+2025-09-16 12:00:47,202 [INFO] Loading configuration from: config/full_experiment.yaml
+2025-09-16 12:00:47,405 [INFO] Global random seed set to 42
+2025-09-16 12:00:47,406 [INFO] Results will be saved in: .research/iteration12/20250916_120047
+2025-09-16 12:00:47,406 [INFO] --- Phase 1: Data Preparation ---
+2025-09-16 12:00:47,406 [INFO] Downloading https://zenodo.org/record/9990001/files/ImageNet-C-HT.tar.gz to ./data/_archives/ImageNet-C-HT.tar.gz
+2025-09-16 12:00:48,494 [ERROR] Failed to download or verify https://zenodo.org/record/9990001/files/ImageNet-C-HT.tar.gz: 404 Client Error: NOT FOUND for url: https://zenodo.org/records/9990001/files/ImageNet-C-HT.tar.gz
+2025-09-16 12:00:48,494 [ERROR] Data preparation failed: Could not obtain required data file from https://zenodo.org/record/9990001/files/ImageNet-C-HT.tar.gz
+2025-09-16 12:00:48,495 [ERROR] Aborting experiment. Please check data URLs, checksums, and network connection.
