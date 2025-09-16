@@ -43,7 +43,7 @@ def train(config: Dict[str, Any]) -> Dict[str, Any]:
     # ------------------------------------------------------------------
     # Persist metrics – complying with mandatory path requirements
     # ------------------------------------------------------------------
-    out_dir = _ensure_output_dir(".research/iteration3")
+    out_dir = _ensure_output_dir(".research/iteration4")  # UPDATED PATH
     ts = datetime.utcnow().strftime("%Y%m%dT%H%M%SZ")
     filename = f"{config['experiment_name']}_{ts}.json"
     json_path = out_dir / filename

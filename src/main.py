@@ -7,6 +7,7 @@ configuration.
 from __future__ import annotations
 
 import argparse
+import importlib
 import sys
 from pathlib import Path
 from typing import Dict, Any
@@ -18,11 +19,23 @@ ROOT_DIR = Path(__file__).resolve().parent.parent
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-# Now local (top-level) modules can be imported without packaging gymnastics
+# -----------------------------------------------------------------------------
+# Local imports (deferred to ensure path fix above is in effect)
+# -----------------------------------------------------------------------------
 import yaml  # noqa: E402  pylint: disable=wrong-import-position
-from preprocess_py import preprocess  # noqa: E402  pylint: disable=wrong-import-position
-from train_py import train            # noqa: E402  pylint: disable=wrong-import-position
-from evaluate_py import evaluate      # noqa: E402  pylint: disable=wrong-import-position
+
+# We import the lightweight modules via ``importlib`` inside a helper to avoid
+# import-time side-effects before CLI parsing is finished.
+
+def _lazy_import(name: str):
+    return importlib.import_module(name)
+
+
+def _load_pipeline_modules():
+    global preprocess, train, evaluate  # pylint: disable=global-statement
+    preprocess = _lazy_import("preprocess_py").preprocess
+    train = _lazy_import("train_py").train
+    evaluate = _lazy_import("evaluate_py").evaluate
 
 
 CONFIG_DIR = ROOT_DIR / "config"
@@ -56,6 +69,9 @@ def main() -> None:  # pragma: no cover
     args = _parse_args()
 
     cfg = _load_yaml("smoke_test.yaml" if args.smoke_test else "full_experiment.yaml")
+
+    # Import pipeline modules only after CLI args & config were loaded
+    _load_pipeline_modules()
 
     # -------------------- pipeline stages --------------------
     preprocess(cfg)

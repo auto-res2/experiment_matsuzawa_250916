@@ -1,6 +1,6 @@
 [project]
 name = "scarf-experiment"
-version = "0.1.0"
+version = "0.1.1"
 description = "Minimal scaffolding for SCARF research pipeline smoke-tests."
 authors = [
     { name = "OpenAI AutoFix", email = "noreply@example.com" }
@@ -13,3 +13,12 @@ dependencies = [
 [build-system]
 requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+# Ensure the single-file modules are included in the wheel so they can be
+# imported when the package is installed into the sandbox.
+py-modules = [
+    "preprocess_py",
+    "train_py",
+    "evaluate_py",
+]
