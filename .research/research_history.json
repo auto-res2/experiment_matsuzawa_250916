@@ -6,5 +6,82 @@
     "oversmoothing prevention GNN",
     "skip connections GNN",
     "DropEdge GNN oversmoothing"
+  ],
+  "research_study_list": [
+    {
+      "title": "A Non-Asymptotic Analysis of Oversmoothing in Graph Neural Networks"
+    },
+    {
+      "title": "Towards Deeper Graph Neural Networks with Differentiable Group Normalization"
+    },
+    {
+      "title": "Demystifying Oversmoothing in Attention-Based Graph Neural Networks"
+    },
+    {
+      "title": "Graph Neural Networks Do Not Always Oversmooth"
+    },
+    {
+      "title": "Revisiting Over-smoothing and Over-squashing Using Ollivier-Ricci Curvature"
+    },
+    {
+      "title": "Towards Deeper Graph Neural Networks with Differentiable Group Normalization"
+    },
+    {
+      "title": "A Non-Asymptotic Analysis of Oversmoothing in Graph Neural Networks"
+    },
+    {
+      "title": "PairNorm: Tackling Oversmoothing in GNNs"
+    },
+    {
+      "title": "Node Dependent Local Smoothing for Scalable Graph Learning"
+    },
+    {
+      "title": "Node Dependent Local Smoothing for Scalable Graph Learning"
+    },
+    {
+      "title": "PairNorm: Tackling Oversmoothing in GNNs"
+    },
+    {
+      "title": "A Non-Asymptotic Analysis of Oversmoothing in Graph Neural Networks"
+    },
+    {
+      "title": "Towards Deeper Graph Neural Networks with Differentiable Group Normalization"
+    },
+    {
+      "title": "Node Dependent Local Smoothing for Scalable Graph Learning"
+    },
+    {
+      "title": "Node Dependent Local Smoothing for Scalable Graph Learning"
+    },
+    {
+      "title": "Old can be Gold: Better Gradient Flow can Make Vanilla-GCNs Great Again"
+    },
+    {
+      "title": "Optimization of Graph Neural Networks: Implicit Acceleration by Skip Connections and More Depth"
+    },
+    {
+      "title": "Improving Breadth-Wise Backpropagation in Graph Neural Networks Helps Learning Long-Range Dependencies."
+    },
+    {
+      "title": "DRew: Dynamically Rewired Message Passing with Delay"
+    },
+    {
+      "title": "Deep Graph Neural Networks via Posteriori-Sampling-based Node-Adaptative Residual Module"
+    },
+    {
+      "title": "DropEdge: Towards Deep Graph Convolutional Networks on Node Classification"
+    },
+    {
+      "title": "DropGNN: Random Dropouts Increase the Expressiveness of Graph Neural Networks"
+    },
+    {
+      "title": "DropGNN: Random Dropouts Increase the Expressiveness of Graph Neural Networks"
+    },
+    {
+      "title": "Towards Deeper Graph Neural Networks with Differentiable Group Normalization"
+    },
+    {
+      "title": "A Non-Asymptotic Analysis of Oversmoothing in Graph Neural Networks"
+    }
   ]
 }
