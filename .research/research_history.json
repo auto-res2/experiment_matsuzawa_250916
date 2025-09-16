@@ -6,5 +6,82 @@
     "low-bit attention cache",
     "quantization error reduction",
     "mixed-precision quantization"
+  ],
+  "research_study_list": [
+    {
+      "title": "KVQuant: Towards 10 Million Context Length LLM Inference with KV Cache Quantization"
+    },
+    {
+      "title": "KIVI: A Tuning-Free Asymmetric 2bit Quantization for KV Cache"
+    },
+    {
+      "title": "FrameQuant: Flexible Low-Bit Quantization for Transformers"
+    },
+    {
+      "title": "2DQuant: Low-bit Post-Training Quantization for Image Super-Resolution"
+    },
+    {
+      "title": "KV Cache is 1 Bit Per Channel: Efficient Large Language Model Inference with Coupled Quantization"
+    },
+    {
+      "title": "Towards Cheaper Inference in Deep Networks with Lower Bit-Width Accumulators"
+    },
+    {
+      "title": "Searching for Low-Bit Weights in Quantized Neural Networks"
+    },
+    {
+      "title": "PowerQuant: Automorphism Search for Non-Uniform Quantization"
+    },
+    {
+      "title": "Outlier-aware Slicing for Post-Training Quantization in Vision Transformer"
+    },
+    {
+      "title": "Bit-Shrinking: Limiting Instantaneous Sharpness for Improving Post-Training Quantization"
+    },
+    {
+      "title": "ZipCache: Accurate and Efficient KV Cache Quantization with Salient Token Identification"
+    },
+    {
+      "title": "MiniCache: KV Cache Compression in Depth Dimension for Large Language Models"
+    },
+    {
+      "title": "Bifurcated Attention for Single-Context Large-Batch Sampling"
+    },
+    {
+      "title": "KIVI: A Tuning-Free Asymmetric 2bit Quantization for KV Cache"
+    },
+    {
+      "title": "DeepCache: Accelerating Diffusion Models for Free"
+    },
+    {
+      "title": "ERQ: Error Reduction for Post-Training Quantization of Vision Transformers"
+    },
+    {
+      "title": "StepbaQ: Stepping backward as Correction for Quantized Diffusion Models"
+    },
+    {
+      "title": "Gradient $\\ell_1$ Regularization for Quantization Robustness"
+    },
+    {
+      "title": "Optimal and Approximate Adaptive Stochastic Quantization"
+    },
+    {
+      "title": "BitsFusion: 1.99 bits Weight Quantization of Diffusion Model"
+    },
+    {
+      "title": "Retraining-Free Model Quantization via One-Shot Weight-Coupling Learning"
+    },
+    {
+      "title": "Mixed Precision DNNs: All you need is a good parametrization"
+    },
+    {
+      "title": "BSQ: Exploring Bit-Level Sparsity for Mixed-Precision Neural Network Quantization"
+    },
+    {
+      "title": "SDQ: Stochastic Differentiable Quantization with Mixed Precision"
+    },
+    {
+      "title": "SDQ: Stochastic Differentiable Quantization with Mixed Precision"
+    }
   ]
 }
