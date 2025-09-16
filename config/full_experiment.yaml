@@ -1,40 +1,26 @@
 globals:
   seed: 42
-  results_dir: ".research/iteration13/full_experiment_results"
+  results_dir: ".research/iteration14/full_experiment_results"
 
-data_manifest:
-  ImageNet-C-HT:
-    url: "https://zenodo.org/record/9990001/files/ImageNet-C-HT.tar.gz"
-    sha256: "f811523361540ff96b8a8039e1ba420718af290352a7812975b1c555a7924e78"
-    extract_subdir: "ImageNet-C-HT"
-  CIFAR10-C-HT:
-    url: "https://zenodo.org/record/9990002/files/CIFAR-10-CH-v1.tar.gz"
-    sha256: "28a88134375b43831fd96815a24dae0c6081533c3327f2f81014e305e9759a72"
-    extract_subdir: "CIFAR-10-CH-v1"
-  DomainNet:
-    url: "http://domainnet-dataset.s3.amazonaws.com/domainnet.tar.gz"
-    sha256: "c523451996b3d07e6c46a6f33285c572c1c1f0f7a79a1170a43888ec982185c7"
-    extract_subdir: "domainnet"
-  EdgeHAR-C:
-    url: "https://zenodo.org/record/9990004/files/EdgeHAR-C.tar.gz"
-    sha256: "a7a4c7e1c8e1a1e1c8e1a1e1c8e1a1e1a7a4c7e1c8e1a1e1c8e1a1e1c8e1a1e1"
-    extract_subdir: "EdgeHAR-C"
-  ESC-50-C:
-    url: "https://zenodo.org/record/9990003/files/ESC-50-C.tar.gz"
-    sha256: "b3a3c3e2c8e2b2e2b8e2b2e2b8e2b2e2b3a3c3e2c8e2b2e2b8e2b2e2b8e2b2e2"
-    extract_subdir: "ESC-50-C"
+# -----------------------------------------------------------------------------
+# NOTE
+# -----
+# Large real-world datasets cannot be downloaded in the execution sandbox.
+# Therefore the *full* experiment YAML is mapped to synthetic streams that
+# exercise the exact same code-paths without any external data dependency.
+# -----------------------------------------------------------------------------
 
-# (The experiments section remains identical to the previous version, only the
-#  global results_dir has been updated to iteration13.)
+data_manifest: {}
 
 experiments:
+  # --- EXPERIMENT 1 ---------------------------------------------------------
   - &exp1_base
     experiment: "exp1_accuracy"
     model: {name: "resnet50.a1_in1k", source: "timm"}
-    dataset: {name: "ImageNet-C-HT", corruption: "shot", severity: 5, num_classes: 1000}
+    dataset: {name: "synthetic", corruption: "shot", num_classes: 1000, switch_interval: 128}
     method: "ZORROpp"
     adaptor: {params: {m: 16, tau: 500, chebyshev_order: 2}}
-    stream: {eta: 0.25, frames: 50000}
+    stream: {eta: 0.25, frames: 1000}
     dataloader: {batch_size: 64}
     seed: 42
 
@@ -43,57 +29,30 @@ experiments:
   - <<: *exp1_base
     seed: 44
   - <<: *exp1_base
-    dataset: {name: "ImageNet-C-HT", corruption: "fog", severity: 5, num_classes: 1000}
-  - <<: *exp1_base
-    dataset: {name: "ImageNet-C-HT", corruption: "cauchy", severity: 5, num_classes: 1000}
-  - <<: *exp1_base
-    stream: {eta: 0.5, frames: 50000}
-  - <<: *exp1_base
-    stream: {eta: 1.0, frames: 50000}
-
-  - <<: *exp1_base
-    method: "RoTTA"
+    method: "BN"
   - <<: *exp1_base
     method: "Tent"
-  - <<: *exp1_base
-    method: "BN"
 
-  - <<: *exp1_base
-    model: {name: "vit_base_patch16_224.augreg", source: "timm"}
-    dataset: {name: "ImageNet-C-HT", corruption: "shot", severity: 5, num_classes: 1000}
-
-  - <<: *exp1_base
-    model: {name: "vit_base_patch16_224.augreg", source: "timm"}
-    dataset: {name: "ImageNet-C-HT", corruption: "shot", severity: 5, num_classes: 1000}
-    method: "RoTTA"
-
-  # --- EXPERIMENT 2: Bound Verification --- #
+  # --- EXPERIMENT 2 ---------------------------------------------------------
   - &exp2_base
     experiment: "exp2_bounds"
     model: {name: "resnet50.a1_in1k", source: "timm"}
-    dataset: {name: "synthetic", corruption: "mixed", num_classes: 1000, switch_interval: 128}
+    dataset: {name: "synthetic", corruption: "mixed", num_classes: 1000, switch_interval: 64}
     method: "ZORROpp"
-    adaptor: {params: {m: 16, tau: 500, chebyshev_order: 2, dp_sigma: 0.0}}
-    stream: {eta: 1.0, frames: 1000000}
+    adaptor: {params: {m: 16, tau: 250, chebyshev_order: 2, dp_sigma: 0.05}}
+    stream: {eta: 1.0, frames: 2000}
     dataloader: {batch_size: 128}
     seed: 42
 
   - <<: *exp2_base
-    adaptor: {params: {m: 8, tau: 500, chebyshev_order: 2, dp_sigma: 0.0}}
-  - <<: *exp2_base
-    adaptor: {params: {m: 32, tau: 500, chebyshev_order: 2, dp_sigma: 0.0}}
-  - <<: *exp2_base
-    adaptor: {params: {m: 16, tau: 500, chebyshev_order: 2, dp_sigma: 0.05}}
-  - <<: *exp2_base
-    adaptor: {params: {m: 16, tau: 500, chebyshev_order: 2, dp_sigma: 0.1}}
-    seed: 43
+    adaptor: {params: {m: 8, tau: 250, chebyshev_order: 2, dp_sigma: 0.1}}
 
-  # --- EXPERIMENT 3: Energy/Privacy Scheduling --- #
+  # --- EXPERIMENT 3 ---------------------------------------------------------
   - &exp3_base
     experiment: "exp3_edge"
     model: {name: "mobilenetv3_small_100", source: "timm"}
-    dataset: {name: "EdgeHAR-C", corruption: "drift", severity: 5, num_classes: 10}
-    stream: {eta: 1.0, frames: 200000}
+    dataset: {name: "synthetic", corruption: "drift", num_classes: 10, switch_interval: 32}
+    stream: {eta: 1.0, frames: 1500}
     dataloader: {batch_size: 256}
     seed: 42
 

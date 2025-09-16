@@ -11,9 +11,9 @@ from src.preprocess import prepare_all_data
 from src.evaluate import run_experiments
 
 # -----------------------------------------------------------------------------
-# Global constants for mandatory save locations (iteration13)
+# Global constants for mandatory save locations (iteration14)
 # -----------------------------------------------------------------------------
-BASE_RESEARCH_DIR = ".research/iteration13"
+BASE_RESEARCH_DIR = ".research/iteration14"
 IMAGES_DIR = os.path.join(BASE_RESEARCH_DIR, "images")
 RESULTS_DIR = os.path.join(BASE_RESEARCH_DIR, "results")
 LOGS_DIR = os.path.join(BASE_RESEARCH_DIR, "logs")

@@ -21,20 +21,20 @@ except ImportError:
 from .train import load_model_and_adaptor
 
 # -----------------------------------------------------------------------------
-# NOTE:  All save paths ***must*** point to .research/iteration13 according to
-#        the mandatory rules.  All previous references to iteration12 have been
-#        updated accordingly.
+# NOTE:  All save paths ***must*** point to .research/iteration14 according to
+#        the mandatory rules.
 # -----------------------------------------------------------------------------
 
-IMAGES_DIR = ".research/iteration13/images"
-JSON_DIR   = ".research/iteration13"
+IMAGES_DIR = ".research/iteration14/images"
+JSON_DIR   = ".research/iteration14"
 os.makedirs(IMAGES_DIR, exist_ok=True)
 
 
 def run_single_experiment(config: dict, dataloader: torch.utils.data.DataLoader, device: torch.device) -> pd.DataFrame:
+    """Run a single experiment configuration and return a DataFrame of per-frame metrics."""
     model, adaptor = load_model_and_adaptor(config, device)
 
-    if NVML_AVAILABLE:
+    if NVML_AVAILABLE and torch.cuda.is_available():
         pynvml.nvmlInit()
         handle = pynvml.nvmlDeviceGetHandleByIndex(0)
 
@@ -59,7 +59,7 @@ def run_single_experiment(config: dict, dataloader: torch.utils.data.DataLoader,
             end_event = torch.cuda.Event(enable_timing=True)
             start_event.record()
 
-        with torch.no_grad(), torch.cuda.amp.autocast():
+        with torch.no_grad(), torch.cuda.amp.autocast(enabled=torch.cuda.is_available()):
             outputs = adaptor(inputs)
 
         if torch.cuda.is_available():
@@ -69,7 +69,7 @@ def run_single_experiment(config: dict, dataloader: torch.utils.data.DataLoader,
         else:
             latency_ms = (time.perf_counter() - start_time) * 1000
 
-        power_w = pynvml.nvmlDeviceGetPowerUsage(handle) / 1000.0 if NVML_AVAILABLE else 0.0
+        power_w = pynvml.nvmlDeviceGetPowerUsage(handle) / 1000.0 if (NVML_AVAILABLE and torch.cuda.is_available()) else 0.0
 
         _, predicted = torch.max(outputs.data, 1)
         total_correct += (predicted == labels).sum().item()
@@ -107,14 +107,15 @@ def run_single_experiment(config: dict, dataloader: torch.utils.data.DataLoader,
         pbar.set_postfix({'Acc': f'{online_acc:.2f}%'})
 
     pbar.close()
-    if NVML_AVAILABLE:
+    if NVML_AVAILABLE and torch.cuda.is_available():
         pynvml.nvmlShutdown()
 
     results_df = pd.DataFrame(metrics)
 
     # Compute FLOPs for one sample
     try:
-        flops = FlopCountAnalysis(model, next(iter(dataloader))[0][:1].to(device)).total()
+        example_input = next(iter(dataloader))[0][:1].to(device)
+        flops = FlopCountAnalysis(model, example_input).total()
         results_df['flops_g'] = flops / 1e9
     except Exception as e:
         logging.warning(f"Could not compute FLOPs: {e}")
@@ -124,6 +125,7 @@ def run_single_experiment(config: dict, dataloader: torch.utils.data.DataLoader,
 
 
 def analyze_results(results_dir: str, config: dict):
+    """Aggregate all parquet result files in *results_dir* and generate plots & JSON summary."""
     all_files = [os.path.join(results_dir, f) for f in os.listdir(results_dir) if f.endswith('.parquet')]
     if not all_files:
         logging.error("No result files found in directory.")
@@ -144,7 +146,7 @@ def analyze_results(results_dir: str, config: dict):
     print(agg_results.to_string())
 
     # --- Statistical Tests (Exp 1 Success Criteria) ---
-    exp1_df = agg_results[agg_results['model_name'].str.contains('resnet50|vit_base')]
+    exp1_df = agg_results[agg_results['model_name'].str.contains('resnet50|vit_base', regex=True)]
     zorro_results = exp1_df[exp1_df['method'] == 'ZORROpp']
     baseline_results = exp1_df[exp1_df['method'] != 'ZORROpp']
     best_baseline = baseline_results.loc[baseline_results.groupby(['model_name', 'dataset_name', 'corruption', 'eta'])['mean_acc'].idxmax()]
@@ -190,7 +192,8 @@ def analyze_results(results_dir: str, config: dict):
 
 
 def run_experiments(config: dict):
-    results_dir = f".research/iteration13/results_{time.strftime('%Y%m%d-%H%M%S')}"
+    """Run the list of experiments specified in *config* and perform final analysis."""
+    results_dir = f".research/iteration14/results_{time.strftime('%Y%m%d-%H%M%S')}"
     os.makedirs(results_dir, exist_ok=True)
 
     from .preprocess import get_data_stream
