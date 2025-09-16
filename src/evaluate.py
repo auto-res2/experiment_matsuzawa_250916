@@ -10,7 +10,7 @@ from datetime import datetime
 # -----------------------------------------------------------------------------
 # Directory constants – comply with mandatory research directory structure
 # -----------------------------------------------------------------------------
-JSON_DIR = os.path.join(".research", "iteration2")
+JSON_DIR = os.path.join(".research", "iteration3")
 IMAGES_DIR = os.path.join(JSON_DIR, "images")
 
 # Ensure the required directories exist

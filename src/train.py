@@ -58,13 +58,13 @@ class PIDController:
         self.history.append(process_variable)
         # Use moving average to smooth the process variable
         smoothed_pv = np.mean(self.history)
-        
+
         error = self.setpoint - smoothed_pv
         self._integral += error
         derivative = error - self._prev_error
 
         output = self.Kp * error + self.Ki * self._integral + self.Kd * derivative
-        
+
         self._prev_error = error
         return int(np.clip(output, self.output_limits[0], self.output_limits[1]))
 
@@ -78,7 +78,14 @@ class TTAMethod(nn.Module):
         self.config = config
         self.model_name = config['model']['name']
         self.feature_extractor = get_feature_extractor(self.model, self.model_name)
-        self.classifier = list(model.children())[-1] if 'resnet' in self.model_name or 'mobilenet' in self.model_name else model.head if 'vit' in self.model_name else model.classifier
+        if 'resnet' in self.model_name or 'mobilenet' in self.model_name:
+            self.classifier = list(model.children())[-1]
+        elif 'vit' in self.model_name:
+            self.classifier = model.head
+        elif 'wav2vec' in self.model_name:
+            self.classifier = model.classifier
+        else:
+            raise ValueError(f"Unknown model architecture for classifier: {self.model_name}")
         for param in self.model.parameters():
             param.requires_grad = False
 
@@ -88,7 +95,7 @@ class TTAMethod(nn.Module):
 
 class BN(TTAMethod):
     def forward(self, x):
-        self.model.eval() # Ensure BN stats are frozen
+        self.model.eval()  # Ensure BN stats are frozen
         return self.model(x)
 
 
@@ -97,10 +104,9 @@ class AdaBN(TTAMethod):
         super().__init__(model, config)
         # In AdaBN, we just need to run the model in train mode once per batch
         # to update the running stats.
-        pass
 
     def forward(self, x):
-        self.model.train() # This updates the running mean/var of BNs
+        self.model.train()  # This updates the running mean/var of BNs
         return self.model(x)
 
 
@@ -153,7 +159,7 @@ class RoTTA(TTAMethod):
 
         outputs = self.model(x)
         ema_outputs = self.ema_model(x)
-        
+
         loss_ent = Tent.entropy(outputs, prob=False).mean()
 
         loss_div = 0
@@ -197,14 +203,17 @@ class ZorroPP(TTAMethod):
 
         # Hashing for CountSketch
         self.h = torch.randint(0, self.m, (self.C,), device=self.device)
-        self.g = torch.choice(torch.tensor([-1.0, 1.0], device=self.device), (self.C,))
-        
+        # Generate random ±1 values for count sketch signs
+        self.g = torch.where(torch.rand(self.C, device=self.device) < 0.5,
+                             torch.full((self.C,), -1.0, device=self.device),
+                             torch.full((self.C,), 1.0, device=self.device))
+
         self.moments_accountant = MomentsAccountant()
         self.pid_controller = None
         if 'pid_gains' in config['adaptor_params']:
             gains = config['adaptor_params']['pid_gains']
             self.pid_controller = PIDController(gains['Kp'], gains['Ki'], gains['Kd'])
-            self.current_rank = 32 # Full rank initially
+            self.current_rank = 32  # Full rank initially
 
     def _extract_features(self, x):
         if 'vit' in self.model_name:
@@ -223,7 +232,7 @@ class ZorroPP(TTAMethod):
 
         # Huber-Kalman gain (simplified)
         kappa_t = 1.0 / self.t
-        
+
         for i in range(x.shape[0]):
             sample = x[i]
             g_s = self.g * sample
@@ -240,9 +249,9 @@ class ZorroPP(TTAMethod):
     def _get_moments(self):
         mu_hat = torch.mean(self.sketch_mu * self.g[:, None], dim=1)
         # In a full implementation, other moments would be decoded here
-        var_hat = torch.ones_like(mu_hat) # Placeholder
-        skew_hat = torch.zeros_like(mu_hat) # Placeholder
-        kurt_hat = torch.ones_like(mu_hat) * 3 # Placeholder (Gaussian kurtosis)
+        var_hat = torch.ones_like(mu_hat)  # Placeholder
+        skew_hat = torch.zeros_like(mu_hat)  # Placeholder
+        kurt_hat = torch.ones_like(mu_hat) * 3  # Placeholder (Gaussian kurtosis)
         return mu_hat, var_hat, skew_hat, kurt_hat
 
     def _chebyshev_normalize(self, x, mu, var, skew, kurt):
@@ -250,31 +259,30 @@ class ZorroPP(TTAMethod):
         x_norm = (x - mu) / (torch.sqrt(var) + 1e-6)
         # Higher order corrections (simplified)
         if self.d >= 2:
-            x_norm = x_norm - 0.5 * skew * (x_norm**2 - 1)
+            x_norm = x_norm - 0.5 * skew * (x_norm ** 2 - 1)
         if self.d >= 3:
-            x_norm = x_norm / (torch.sqrt(kurt/8 + 1e-6))
+            x_norm = x_norm / (torch.sqrt(kurt / 8 + 1e-6))
         return x_norm
 
     def forward(self, x):
         features = self._extract_features(x)
-        
-        if self.training: # Only adapt if in training mode
+
+        if self.training:  # Only adapt if in training mode
             self._update_sketch(features)
 
         mu_hat, var_hat, skew_hat, kurt_hat = self._get_moments()
-        
+
         norm_features = self._chebyshev_normalize(features, mu_hat, var_hat, skew_hat, kurt_hat)
 
         # Reshape back to feature map format if needed
         if 'resnet' in self.model_name or 'mobilenet' in self.model_name:
             norm_features = norm_features.view(norm_features.size(0), -1, 1, 1)
-        
+
         if 'vit' in self.model_name:
-             # This part is tricky as ViT expects a sequence. 
-             # For simplicity, we directly pass the modified CLS token to the head.
-             return self.model.head(norm_features)
+            # ViT expects sequence; for simplicity, we directly pass CLS token representation
+            return self.model.head(norm_features)
         else:
-             return self.classifier(norm_features)
+            return self.classifier(norm_features)
 
 # --- Main Experiment Runner ---
 
@@ -314,7 +322,7 @@ def run_experiment(config, dataloader, device):
         adaptor = BN(model, config)
 
     adaptor.to(device)
-    
+
     # IMPORTANT: Set to train() mode to enable adaptation logic (e.g., sketch updates)
     if method != 'BN':
         adaptor.train()
@@ -331,16 +339,20 @@ def run_experiment(config, dataloader, device):
 
         inputs, labels = inputs.to(device), labels.to(device)
 
-        # Performance measurement start
-        start_event = torch.cuda.Event(enable_timing=True)
-        end_event = torch.cuda.Event(enable_timing=True)
-        start_event.record()
+        # Performance measurement start (only if CUDA is available)
+        if torch.cuda.is_available():
+            start_event = torch.cuda.Event(enable_timing=True)
+            end_event = torch.cuda.Event(enable_timing=True)
+            start_event.record()
 
         outputs = adaptor(inputs)
 
-        end_event.record()
-        torch.cuda.synchronize()
-        latency_ms = start_event.elapsed_time(end_event)
+        if torch.cuda.is_available():
+            end_event.record()
+            torch.cuda.synchronize()
+            latency_ms = start_event.elapsed_time(end_event)
+        else:
+            latency_ms = (time.time() - start_time) * 1000  # rough estimate
 
         power_watts = 0
         if handle:
@@ -354,7 +366,10 @@ def run_experiment(config, dataloader, device):
 
         # Logging
         if i % 100 == 0:
-            logging.info(f"Frame {i*config['dataloader']['batch_size']}/{config['stream']['frames']} | Accuracy: {accuracy:.2f}% | Latency: {latency_ms:.2f}ms | Power: {power_watts:.2f}W")
+            logging.info(
+                f"Frame {i * config['dataloader']['batch_size']}/{config['stream']['frames']} | "
+                f"Accuracy: {accuracy:.2f}% | Latency: {latency_ms:.2f}ms | Power: {power_watts:.2f}W"
+            )
 
         results.append({
             'frame': i * config['dataloader']['batch_size'],
@@ -368,7 +383,11 @@ def run_experiment(config, dataloader, device):
 
     # Save results
     results_df = pd.DataFrame(results)
-    run_name = f"{config['exp_name']}_{config['model']['name']}_{config['dataset']['name']}_{config['dataset']['corruption']}_{config['method']}_eta{config['stream']['eta']}_seed{config['seed']}"
+    run_name = (
+        f"{config['exp_name']}_{config['model']['name']}" +
+        f"_{config['dataset']['name']}_{config['dataset']['corruption']}" +
+        f"_{config['method']}_eta{config['stream']['eta']}_seed{config['seed']}"
+    )
     output_path = os.path.join(config['results_dir'], f"{run_name}.csv")
     results_df.to_csv(output_path, index=False)
     logging.info(f"Results saved to {output_path}")
