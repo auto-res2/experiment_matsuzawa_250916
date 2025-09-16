@@ -1,0 +1,10 @@
+{
+  "research_topic": "Test-Time Adaptationを収束速度に関して改善したい",
+  "queries": [
+    "convergence test-time adaptation",
+    "fast test-time adaptation",
+    "learning rate adaptation TTA",
+    "entropy minimization TTA",
+    "meta-learning test-time adaptation"
+  ]
+}
