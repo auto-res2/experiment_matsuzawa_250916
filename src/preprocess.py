@@ -156,15 +156,25 @@ def scrape_sec_edgar_10k_risk_factors(config, output_dir):
 def download_hf_dataset(name, path, split, col, task_name):
     print(f"Downloading Hugging Face dataset: {name}")
     try:
-        dataset = load_dataset(path, split=split)
+        # Attempt authenticated download if HF_TOKEN is available.
+        hf_token = os.getenv("HF_TOKEN")
+        if hf_token:
+            dataset = load_dataset(path, split=split, token=hf_token)
+        else:
+            dataset = load_dataset(path, split=split)
         df = dataset.to_pandas()
+        if col not in df.columns:
+            raise KeyError(
+                f"Expected column '{col}' not found in dataset '{path}'. Available columns: {list(df.columns)}"
+            )
         df = df.rename(columns={col: 'prompt'})
         df['task'] = task_name
         return df[['prompt', 'task']]
     except Exception as e:
+        # Fail fast with explicit error message
         raise ConnectionError(
             f"FATAL: Could not download Hugging Face dataset '{path}'. Error: {e}"
-        )
+        ) from e
 
 
 # --- Main Preprocessing Script ---
