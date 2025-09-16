@@ -1,0 +1,10 @@
+{
+  "research_topic": "グラフニューラルネットワークの過平滑化に関して改善したい",
+  "queries": [
+    "GNN over-smoothing",
+    "GNN oversmoothing mitigation",
+    "oversmoothing prevention GNN",
+    "skip connections GNN",
+    "DropEdge GNN oversmoothing"
+  ]
+}
