@@ -35,6 +35,19 @@ def load_config(config_path):
         print(f"FATAL: Error parsing YAML file '{config_path}': {e}", file=sys.stderr)
         sys.exit(1)
 
+def _ensure_experiment_id_in_config(cfg):
+    """Utility to guarantee that `cfg['experiment_id']` exists.
+
+    Many helper functions assume the key is present. During smoke-tests we only
+    have `experiment_ids_to_run`, so we derive the first (and only) element
+    from that list unless already provided."""
+    if 'experiment_id' not in cfg or cfg['experiment_id'] is None:
+        ids = cfg.get('experiment_ids_to_run', [])
+        if not ids:
+            raise KeyError("Configuration is missing both 'experiment_id' and 'experiment_ids_to_run'.")
+        cfg['experiment_id'] = ids[0]
+
+
 def main():
     parser = argparse.ArgumentParser(description="Run REFLECT-BO experiments end-to-end.")
     group = parser.add_mutually_exclusive_group(required=True)
@@ -51,12 +64,13 @@ def main():
         print("Executing FULL EXPERIMENT...")
 
     config = load_config(config_path)
-    set_global_seeds(config['seeds'][0]) # Use first seed for global setup
-    
+    set_global_seeds(config['seeds'][0])  # Use first seed for global setup
+
     # Phase 1: Two-Phase Execution (Smoke Test then Full Experiment)
     if args.full_experiment:
         print("\nPHASE 1: Running smoke test first for validation...")
         smoke_config = load_config('config/smoke_test.yaml')
+        _ensure_experiment_id_in_config(smoke_config)
         set_global_seeds(smoke_config['seeds'][0])
         try:
             # A minimal run to validate the pipeline
@@ -70,15 +84,16 @@ def main():
             sys.exit(1)
 
     # Reset seed for the main experiment run
+    _ensure_experiment_id_in_config(config)  # ensures key exists before loops
     set_global_seeds(config['seeds'][0])
 
     # PHASE 2: Main Experiment Pipeline
     try:
         for exp_id in config['experiment_ids_to_run']:
-            print(f"\n=======================================================")
+            print("\n=======================================================")
             print(f"            STARTING EXPERIMENT {exp_id}")
-            print(f"=======================================================")
-            config['experiment_id'] = exp_id
+            print("=======================================================")
+            config['experiment_id'] = exp_id  # inject current id into config
 
             # 1. Data Preprocessing
             print("\n--- STAGE 1: DATA PREPROCESSING ---")
