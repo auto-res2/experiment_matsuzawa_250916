@@ -1,0 +1,17 @@
+=== uv sync start Tue Sep 16 11:11:26 AM UTC 2025 ===
+=== uv install end Tue Sep 16 11:17:31 AM UTC 2025 ===
+=== [PHASE 1/2] Smoke test start Tue Sep 16 11:17:32 AM UTC 2025 ===
+Loading configuration from: config/smoke_test.yaml
+Global seed set to 42
+
+--- Running Preprocessing Stage ---
+Generating dummy pre-trained hyper-network psi.pt
+Smoke test mode: generating dummy data for cora_smoke_test
+Processing cora_smoke_test...
+Computing structural features for cora_smoke_test...
+Saved processed data to data/processed/cora_smoke_test.pt
+--- Preprocessing Stage Complete ---
+
+--- Running Training Stage ---
+--- Starting Experiment: exp1_throughput ---
+  - Training Model: vanilla | Seed: 13
