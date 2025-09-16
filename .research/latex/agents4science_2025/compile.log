@@ -327,11 +327,8 @@ No file paper.aux.
 [Loading MPS to PDF converter (version 2006.09.02).]
 ) (/usr/share/texlive/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
 (/usr/share/texlive/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg))
-
-Package pgfplots Warning: running in backwards compatibility mode (unsuitable t
-ick labels; missing features). Consider writing \pgfplotsset{compat=1.18} into 
-your preamble.
- on input line 40.
+Package pgfplots notification 'compat/show suggested version=true': document ha
+s been generated with the most recent feature set (\pgfplotsset{compat=1.18}).
 
 (/usr/share/texlive/texmf-dist/tex/latex/microtype/mt-ptm.cfg)
 (/usr/share/texlive/texmf-dist/tex/latex/microtype/mt-cmr.cfg)
@@ -340,27 +337,32 @@ your preamble.
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/microtype/mt-msb.cfg)
 (/usr/share/texlive/texmf-dist/tex/latex/base/t1cmtt.fd)
-(/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1phv.fd)
-! Missing $ inserted.
-<inserted text> 
-                $
-l.49 ... into three retention tiers-short (\approx
-                                                   1-3 h), mid (\approx 1-7 ...
-
-
-LaTeX Warning: Command \textquoteright invalid in math mode on input line 49.
-
-! Missing $ inserted.
-<inserted text> 
-                $
-l.50 
-     
-[1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}{/usr/share/texlive/texmf-
-dist/fonts/enc/dvips/base/8r.enc}]
-(/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1phv.fd) [1{/var/lib/texmf/fon
+ts/map/pdftex/updmap/pdftex.map}{/usr/share/texlive/texmf-dist/fonts/enc/dvips/
+base/8r.enc}] (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd)
 
 Package natbib Warning: Citation `wang-2022-sparcl' on page 2 undefined on inpu
 t line 63.
+
+
+LaTeX Warning: Reference `sec:related' on page 2 undefined on input line 69.
+
+
+LaTeX Warning: Reference `sec:background' on page 2 undefined on input line 69.
+
+
+
+LaTeX Warning: Reference `sec:method' on page 2 undefined on input line 69.
+
+
+LaTeX Warning: Reference `sec:setup' on page 2 undefined on input line 69.
+
+
+LaTeX Warning: Reference `sec:results' on page 2 undefined on input line 69.
+
+
+LaTeX Warning: Reference `sec:conclusion' on page 2 undefined on input line 69.
+
 
 
 Package natbib Warning: Citation `wang-2022-sparcl' on page 2 undefined on inpu
@@ -386,11 +388,11 @@ n input line 76.
 Package natbib Warning: Citation `ebrahimi-2019-uncertainty' on page 2 undefine
 d on input line 79.
 
-[2]
 
-Package natbib Warning: Citation `caccia-2019-online' on page 3 undefined on in
+Package natbib Warning: Citation `caccia-2019-online' on page 2 undefined on in
 put line 82.
 
+[2]
 
 Package natbib Warning: Citation `kirkpatrick-2016-overcoming' on page 3 undefi
 ned on input line 97.
@@ -399,38 +401,13 @@ ned on input line 97.
 Underfull \vbox (badness 10000) has occurred while \output is active [4]
 
 Package natbib Warning: Citation `wang-2022-sparcl' on page 5 undefined on inpu
-t line 161.
+t line 163.
 
 
 Underfull \vbox (badness 10000) has occurred while \output is active [5]
-! Missing $ inserted.
-<inserted text> 
-                $
-l.177 ...et-18 on CIFAR-10 for 100 epochs (\approx
-                                                   7 min wall-clock). Best t...
 
-! Missing $ inserted.
-<inserted text> 
-                $
-l.178 
-      
+LaTeX Warning: Reference `tab:gap' on page 6 undefined on input line 181.
 
-Underfull \hbox (badness 10000) in paragraph at lines 177--178
-\T1/ptm/m/n/10 (+20) Only one pub-lic log is cur-rently avail-able: a single-GP
-U run that
-
-Underfull \hbox (badness 10000) in paragraph at lines 177--178
-\T1/ptm/m/n/10 (+20) trained ResNet-18 on CIFAR-10 for 100 epochs ($\OMS/cmsy/m
-/n/10 ^^Y \OT1/cmr/m/n/10 7\OML/cmm/m/it/10 minwall \OMS/cmsy/m/n/10 ^^@
-
-Overfull \hbox (222.78725pt too wide) in paragraph at lines 177--178
-\OML/cmm/m/it/10 clock\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 :Besttestaccuracyreache
-d\OT1/cmr/m/n/10 86\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 58%\OML/cmm/m/it/10 :Noene
-rgy; endurance; privacyorswarmmetricswererecorded\OT1/cmr/m/n/10 ; \OML/cmm/m/i
-t/10 noSYMPHONYcomponentwasactive:$ 
-
-Overfull \hbox (160.89943pt too wide) in paragraph at lines 181--194
-[]\T1/ptm/m/n/10 (-20) Table 1 - Logged ver-sus re-quired met-rics  [] 
 No file paper.bbl.
 
 Package natbib Warning: There were undefined citations.
@@ -493,6 +470,12 @@ Transcript written on ectt1000.log.
 mktexpk: /home/runner/.texlive2023/texmf-var/fonts/pk/ljfour/jknappen/ec/ectt1000.600pk: successfully generated.
 
 
+LaTeX Warning: There were undefined references.
+
+
+LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
+
+
 Package rerunfilecheck Warning: File `paper.out' has changed.
 (rerunfilecheck)                Rerun to get outlines right
 (rerunfilecheck)                or use package `bookmark'.
@@ -509,7 +492,7 @@ cm/cmsy10.pfb></usr/share/texlive/texmf-dist/fonts/type1/public/amsfonts/cm/cms
 y7.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb></usr
 /share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/
 texmf-dist/fonts/type1/urw/times/utmr8a.pfb>
-Output written on paper.pdf (6 pages, 149530 bytes).
+Output written on paper.pdf (6 pages, 147269 bytes).
 Transcript written on paper.log.
 This is BibTeX, Version 0.99d (TeX Live 2023/Debian)
 The top-level auxiliary file: paper.aux
@@ -852,11 +835,8 @@ Document Style - pseudocode environments for use with the `algorithmicx' style
 [Loading MPS to PDF converter (version 2006.09.02).]
 ) (/usr/share/texlive/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
 (/usr/share/texlive/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg))
-
-Package pgfplots Warning: running in backwards compatibility mode (unsuitable t
-ick labels; missing features). Consider writing \pgfplotsset{compat=1.18} into 
-your preamble.
- on input line 40.
+Package pgfplots notification 'compat/show suggested version=true': document ha
+s been generated with the most recent feature set (\pgfplotsset{compat=1.18}).
 
 (./paper.out) (./paper.out)
 (/usr/share/texlive/texmf-dist/tex/latex/microtype/mt-ptm.cfg)
@@ -866,24 +846,9 @@ your preamble.
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/microtype/mt-msb.cfg)
 (/usr/share/texlive/texmf-dist/tex/latex/base/t1cmtt.fd)
-(/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1phv.fd)
-! Missing $ inserted.
-<inserted text> 
-                $
-l.49 ... into three retention tiers-short (\approx
-                                                   1-3 h), mid (\approx 1-7 ...
-
-
-LaTeX Warning: Command \textquoteright invalid in math mode on input line 49.
-
-! Missing $ inserted.
-<inserted text> 
-                $
-l.50 
-     
-[1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}{/usr/share/texlive/texmf-
-dist/fonts/enc/dvips/base/8r.enc}]
-(/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd)
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1phv.fd) [1{/var/lib/texmf/fon
+ts/map/pdftex/updmap/pdftex.map}{/usr/share/texlive/texmf-dist/fonts/enc/dvips/
+base/8r.enc}] (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd)
 
 Package natbib Warning: Citation `wang-2022-sparcl' on page 2 undefined on inpu
 t line 63.
@@ -912,11 +877,11 @@ n input line 76.
 Package natbib Warning: Citation `ebrahimi-2019-uncertainty' on page 2 undefine
 d on input line 79.
 
-[2]
 
-Package natbib Warning: Citation `caccia-2019-online' on page 3 undefined on in
+Package natbib Warning: Citation `caccia-2019-online' on page 2 undefined on in
 put line 82.
 
+[2]
 
 Package natbib Warning: Citation `kirkpatrick-2016-overcoming' on page 3 undefi
 ned on input line 97.
@@ -925,38 +890,10 @@ ned on input line 97.
 Underfull \vbox (badness 10000) has occurred while \output is active [4]
 
 Package natbib Warning: Citation `wang-2022-sparcl' on page 5 undefined on inpu
-t line 161.
+t line 163.
 
 
 Underfull \vbox (badness 10000) has occurred while \output is active [5]
-! Missing $ inserted.
-<inserted text> 
-                $
-l.177 ...et-18 on CIFAR-10 for 100 epochs (\approx
-                                                   7 min wall-clock). Best t...
-
-! Missing $ inserted.
-<inserted text> 
-                $
-l.178 
-      
-
-Underfull \hbox (badness 10000) in paragraph at lines 177--178
-\T1/ptm/m/n/10 (+20) Only one pub-lic log is cur-rently avail-able: a single-GP
-U run that
-
-Underfull \hbox (badness 10000) in paragraph at lines 177--178
-\T1/ptm/m/n/10 (+20) trained ResNet-18 on CIFAR-10 for 100 epochs ($\OMS/cmsy/m
-/n/10 ^^Y \OT1/cmr/m/n/10 7\OML/cmm/m/it/10 minwall \OMS/cmsy/m/n/10 ^^@
-
-Overfull \hbox (222.78725pt too wide) in paragraph at lines 177--178
-\OML/cmm/m/it/10 clock\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 :Besttestaccuracyreache
-d\OT1/cmr/m/n/10 86\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 58%\OML/cmm/m/it/10 :Noene
-rgy; endurance; privacyorswarmmetricswererecorded\OT1/cmr/m/n/10 ; \OML/cmm/m/i
-t/10 noSYMPHONYcomponentwasactive:$ 
-
-Overfull \hbox (160.89943pt too wide) in paragraph at lines 181--194
-[]\T1/ptm/m/n/10 (-20) Table 1 - Logged ver-sus re-quired met-rics  [] 
 (./paper.bbl [6])
 
 Package natbib Warning: There were undefined citations.
@@ -979,7 +916,7 @@ y7.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb></usr
 /share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/
 texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/font
 s/type1/urw/times/utmri8a.pfb>
-Output written on paper.pdf (7 pages, 161022 bytes).
+Output written on paper.pdf (7 pages, 159045 bytes).
 Transcript written on paper.log.
 This is pdfTeX, Version 3.141592653-2.6-1.40.25 (TeX Live 2023/Debian) (preloaded format=pdflatex)
  restricted \write18 enabled.
@@ -1310,11 +1247,8 @@ Document Style - pseudocode environments for use with the `algorithmicx' style
 [Loading MPS to PDF converter (version 2006.09.02).]
 ) (/usr/share/texlive/texmf-dist/tex/latex/epstopdf-pkg/epstopdf-base.sty
 (/usr/share/texlive/texmf-dist/tex/latex/latexconfig/epstopdf-sys.cfg))
-
-Package pgfplots Warning: running in backwards compatibility mode (unsuitable t
-ick labels; missing features). Consider writing \pgfplotsset{compat=1.18} into 
-your preamble.
- on input line 40.
+Package pgfplots notification 'compat/show suggested version=true': document ha
+s been generated with the most recent feature set (\pgfplotsset{compat=1.18}).
 
 (./paper.out) (./paper.out)
 (/usr/share/texlive/texmf-dist/tex/latex/microtype/mt-ptm.cfg)
@@ -1324,54 +1258,12 @@ your preamble.
 (/usr/share/texlive/texmf-dist/tex/latex/amsfonts/umsb.fd)
 (/usr/share/texlive/texmf-dist/tex/latex/microtype/mt-msb.cfg)
 (/usr/share/texlive/texmf-dist/tex/latex/base/t1cmtt.fd)
-(/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1phv.fd)
-! Missing $ inserted.
-<inserted text> 
-                $
-l.49 ... into three retention tiers-short (\approx
-                                                   1-3 h), mid (\approx 1-7 ...
-
-
-LaTeX Warning: Command \textquoteright invalid in math mode on input line 49.
-
-! Missing $ inserted.
-<inserted text> 
-                $
-l.50 
-     
-[1{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}{/usr/share/texlive/texmf-
-dist/fonts/enc/dvips/base/8r.enc}]
-(/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd) [2] [3]
+(/usr/share/texlive/texmf-dist/tex/latex/psnfss/t1phv.fd) [1{/var/lib/texmf/fon
+ts/map/pdftex/updmap/pdftex.map}{/usr/share/texlive/texmf-dist/fonts/enc/dvips/
+base/8r.enc}] (/usr/share/texlive/texmf-dist/tex/latex/psnfss/ts1ptm.fd)
+[2] [3]
 Underfull \vbox (badness 10000) has occurred while \output is active [4]
 Underfull \vbox (badness 10000) has occurred while \output is active [5]
-! Missing $ inserted.
-<inserted text> 
-                $
-l.177 ...et-18 on CIFAR-10 for 100 epochs (\approx
-                                                   7 min wall-clock). Best t...
-
-! Missing $ inserted.
-<inserted text> 
-                $
-l.178 
-      
-
-Underfull \hbox (badness 10000) in paragraph at lines 177--178
-\T1/ptm/m/n/10 (+20) Only one pub-lic log is cur-rently avail-able: a single-GP
-U run that
-
-Underfull \hbox (badness 10000) in paragraph at lines 177--178
-\T1/ptm/m/n/10 (+20) trained ResNet-18 on CIFAR-10 for 100 epochs ($\OMS/cmsy/m
-/n/10 ^^Y \OT1/cmr/m/n/10 7\OML/cmm/m/it/10 minwall \OMS/cmsy/m/n/10 ^^@
-
-Overfull \hbox (222.78725pt too wide) in paragraph at lines 177--178
-\OML/cmm/m/it/10 clock\OT1/cmr/m/n/10 )\OML/cmm/m/it/10 :Besttestaccuracyreache
-d\OT1/cmr/m/n/10 86\OML/cmm/m/it/10 :\OT1/cmr/m/n/10 58%\OML/cmm/m/it/10 :Noene
-rgy; endurance; privacyorswarmmetricswererecorded\OT1/cmr/m/n/10 ; \OML/cmm/m/i
-t/10 noSYMPHONYcomponentwasactive:$ 
-
-Overfull \hbox (160.89943pt too wide) in paragraph at lines 181--194
-[]\T1/ptm/m/n/10 (-20) Table 1 - Logged ver-sus re-quired met-rics  [] 
 (./paper.bbl [6]) [7] (./paper.aux) )
 (see the transcript file for additional information) </home/runner/.texlive2023
 /texmf-var/fonts/pk/ljfour/jknappen/ec/ectt1000.600pk></usr/share/texlive/texmf
@@ -1385,5 +1277,5 @@ y7.pfb></usr/share/texlive/texmf-dist/fonts/type1/urw/helvetic/uhvr8a.pfb></usr
 /share/texlive/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/share/texlive/
 texmf-dist/fonts/type1/urw/times/utmr8a.pfb></usr/share/texlive/texmf-dist/font
 s/type1/urw/times/utmri8a.pfb>
-Output written on paper.pdf (7 pages, 161524 bytes).
+Output written on paper.pdf (7 pages, 159583 bytes).
 Transcript written on paper.log.
