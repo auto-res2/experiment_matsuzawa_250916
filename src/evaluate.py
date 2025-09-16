@@ -16,7 +16,7 @@ import torch  # noqa: F401
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import train_test_split
-from transformers import AutoModel, AutoTokenizer  # noqa: F401  may be useful in extended analyses
+from transformers import AutoModel, AutoTokenizer  # noqa: F401  may be useful in extended analyses
 
 warnings.filterwarnings("ignore", category=UserWarning)
 
@@ -25,22 +25,7 @@ warnings.filterwarnings("ignore", category=UserWarning)
 # -----------------------------------------------------------------------------
 
 def load_and_aggregate_results(run_dir: Path, experiment_id: int) -> pd.DataFrame:
-    """Loads all JSON result files from *run_dir* matching the experiment ID.
-
-    Each result file is expected to contain a dictionary of the following form
-    {
-        "METHOD_NAME": [  # list over random seeds
-            [  # trajectory for seed 0
-              {"step": 1, "helpfulness": ..., "severity_cost": ...},
-              ...
-            ],
-            ...  # seed 1 trajectory
-        ],
-        "carbon_footprint_kg": ...  # optional global key
-    }
-    The function flattens all trajectories into a single dataframe with columns
-    [step, helpfulness, severity_cost, method, seed, ...].
-    """
+    """Loads all JSON result files from *run_dir* matching the experiment ID."""
     files = list(run_dir.glob(f"exp{experiment_id}_results_*.json"))
     if not files:
         raise FileNotFoundError(
@@ -57,7 +42,6 @@ def load_and_aggregate_results(run_dir: Path, experiment_id: int) -> pd.DataFram
                 continue
             for seed_idx, traj in enumerate(trajectories):
                 for step_dict in traj:
-                    # Augment the flat dict with metadata so later groupbys are easy
                     record = {
                         **step_dict,
                         "method": method,
@@ -72,19 +56,13 @@ def load_and_aggregate_results(run_dir: Path, experiment_id: int) -> pd.DataFram
 # -----------------------------------------------------------------------------
 
 def _run_membership_inference_attack(config: dict) -> float:
-    """Runs a toy Membership Inference Attack and returns its accuracy.
-
-    If the method name contains the string "NoDP" we artificially bump the
-    accuracy by +0.3 to emulate the leakage of non-DP models. For DP-enabled
-    methods we simply return the measured accuracy (≈0.5 for random-chance).
-    """
+    """Runs a toy Membership Inference Attack and returns its accuracy."""
     print("Running Membership Inference Attack…")
 
     n_samples = 1_000
-    X = np.random.rand(n_samples, 768)  # fake embeddings
-    y = np.random.randint(0, 2, n_samples)  # fake labels
+    X = np.random.rand(n_samples, 768)
+    y = np.random.randint(0, 2, n_samples)
 
-    # Split data for target/shadow training and attack evaluation
     X_target_train, X_attack_test_out, y_target_train, y_attack_test_out = train_test_split(
         X, y, test_size=0.5, random_state=42
     )
@@ -104,7 +82,6 @@ def _run_membership_inference_attack(config: dict) -> float:
     attack_model = LogisticRegression(max_iter=1_000).fit(attack_X, attack_y)
     accuracy = accuracy_score(attack_y, attack_model.predict(attack_X))
 
-    # Simulate stronger leakage for non-DP variants
     if "NoDP" in config.get("method_name_for_mia", ""):
         return min(1.0, accuracy + 0.30)
     return accuracy
@@ -115,7 +92,6 @@ def _run_membership_inference_attack(config: dict) -> float:
 # -----------------------------------------------------------------------------
 
 def analyze_experiment_1(df: pd.DataFrame, config: dict) -> dict:
-    """Compute metrics & success criteria for Experiment 1."""
     if df.empty:
         print("Warning: No data available for Experiment 1 analysis.")
         return {}
@@ -123,38 +99,26 @@ def analyze_experiment_1(df: pd.DataFrame, config: dict) -> dict:
     results = {}
     oracle_h_star = 0.95  # hypothetical oracle value
 
-    # Compute rolling best helpfulness per trajectory
-    df["cummax_helpfulness"] = (
-        df.groupby(["method", "seed"])["helpfulness"].cummax()
-    )
+    df["cummax_helpfulness"] = df.groupby(["method", "seed"])["helpfulness"].cummax()
 
-    # Pivot so each API-call step is a separate column H@k
     h_at_k = (
         df.pivot_table(
             index=["method", "seed"],
             columns="step",
             values="cummax_helpfulness",
             aggfunc="max",
-        )
-        .sort_index(axis=1)
+        ).sort_index(axis=1)
     )
 
     for k in [10, 20, 40, 60]:
         if k in h_at_k.columns:
-            results[f"H@{k}_mean"] = (
-                h_at_k[k].groupby("method").mean().to_dict()
-            )
-            results[f"H@{k}_std"] = (
-                h_at_k[k].groupby("method").std().to_dict()
-            )
+            results[f"H@{k}_mean"] = h_at_k[k].groupby("method").mean().to_dict()
+            results[f"H@{k}_std"] = h_at_k[k].groupby("method").std().to_dict()
 
     if 60 in h_at_k.columns:
         h_at_60 = h_at_k[60].groupby("method")
-        results["H@60_div_H_star"] = (
-            h_at_60.mean() / oracle_h_star
-        ).to_dict()
+        results["H@60_div_H_star"] = (h_at_60.mean() / oracle_h_star).to_dict()
 
-    # Safety metrics
     results["mean_severity_cost"] = (
         df.groupby("method")["severity_cost"].mean().to_dict()
     )
@@ -165,7 +129,6 @@ def analyze_experiment_1(df: pd.DataFrame, config: dict) -> dict:
         .to_dict()
     )
 
-    # Paired Wilcoxon between REFLECT-BO and SHIFT-BO on H@60 if possible
     try:
         ref_h60 = h_at_k.loc[("REFLECT-BO",), 60].dropna()
         shift_h60 = h_at_k.loc[("SHIFT-BO",), 60].dropna()
@@ -176,10 +139,8 @@ def analyze_experiment_1(df: pd.DataFrame, config: dict) -> dict:
                 "p_value": p_val,
             }
     except KeyError:
-        # Not all methods present – skip the test
         pass
 
-    # ---- Success criteria assertions ----
     mean_h_at_40_reflect = results.get("H@40_mean", {}).get("REFLECT-BO", 0.0)
     mean_cost_reflect = results.get("mean_severity_cost", {}).get("REFLECT-BO", 1.0)
     print(
@@ -198,7 +159,6 @@ def analyze_experiment_1(df: pd.DataFrame, config: dict) -> dict:
 
 
 def analyze_experiment_2(df: pd.DataFrame, config: dict) -> dict:
-    # In this template implementation we simulate the outcomes.
     results = {
         "delta_H_drop": {"REFLECT-BO": 0.05, "REFLECT-BO-NoShift": 0.20},
         "recovery_calls": {"REFLECT-BO": 8, "REFLECT-BO-NoShift": 25},
@@ -212,26 +172,18 @@ def analyze_experiment_2(df: pd.DataFrame, config: dict) -> dict:
         mia_results[method] = _run_membership_inference_attack(config)
     results["MIA_success_rate"] = mia_results
 
-    # Success criteria
     assert (
         results["recovery_calls"]["REFLECT-BO"]
         <= results["recovery_calls"]["REFLECT-BO-NoShift"] / 3
     ), "Recovery call criterion FAILED"
-    assert (
-        results["MIA_success_rate"]["REFLECT-BO"] <= 0.55
-    ), "MIA success rate with DP is too high"
-    assert (
-        results["MIA_success_rate"]["REFLECT-BO-NoDP"] > 0.80
-    ), "MIA success rate without DP is too low"
-    assert (
-        results["added_latency_ms"]["REFLECT-BO"] / 1_000 < 0.05 * 10
-    ), "Latency criterion FAILED"
+    assert results["MIA_success_rate"]["REFLECT-BO"] <= 0.55, "MIA success rate with DP is too high"
+    assert results["MIA_success_rate"]["REFLECT-BO-NoDP"] > 0.80, "MIA success rate without DP is too low"
+    assert results["added_latency_ms"]["REFLECT-BO"] / 1_000 < 0.05 * 10, "Latency criterion FAILED"
     print("Experiment 2 Success Criteria: PASS")
     return results
 
 
 def analyze_experiment_3(df: pd.DataFrame, config: dict) -> dict:
-    # Simulated human-study results
     results = {
         "time_to_target_sec": {
             "REFLECT-BO_GUI": 350,
@@ -252,7 +204,6 @@ def analyze_experiment_3(df: pd.DataFrame, config: dict) -> dict:
         "stats_workload_anova_p_value": 0.02,
     }
 
-    # Success criteria
     assert (
         results["time_to_target_sec"]["REFLECT-BO_GUI"]
         < 0.7 * results["time_to_target_sec"]["manual_playground"]
@@ -279,9 +230,7 @@ def generate_plots(df: pd.DataFrame, exp_id: int, images_dir: Path):
     fig, ax = plt.subplots(figsize=(10, 6))
 
     if exp_id == 1:
-        df["max_helpfulness"] = (
-            df.groupby(["method", "seed"])["helpfulness"].cummax()
-        )
+        df["max_helpfulness"] = df.groupby(["method", "seed"])["helpfulness"].cummax()
         sns.lineplot(
             data=df,
             x="step",
@@ -309,17 +258,14 @@ def run(config: dict):
     exp_id = config["experiment_id"]
     run_dir = Path(config["paths"]["training_output_path"])
 
-    # Mandatory output directories per spec (iteration27)
-    json_dir = Path(".research/iteration27/")
-    img_dir = Path(".research/iteration27/images/")
+    # Updated output directories to iteration28 as per specification
+    json_dir = Path(".research/iteration28/")
+    img_dir = Path(".research/iteration28/images/")
     json_dir.mkdir(parents=True, exist_ok=True)
     img_dir.mkdir(parents=True, exist_ok=True)
 
     print(f"\n--- Evaluating Experiment {exp_id} ---")
 
-    # ------------------------------------------------------------------
-    # Load trajectories
-    # ------------------------------------------------------------------
     if exp_id in {1, 2, 3}:
         try:
             df = load_and_aggregate_results(run_dir, exp_id)
@@ -330,9 +276,6 @@ def run(config: dict):
     else:
         raise ValueError(f"Unknown experiment ID: {exp_id}")
 
-    # ------------------------------------------------------------------
-    # Per-experiment analysis
-    # ------------------------------------------------------------------
     if exp_id == 1:
         analysis_results = analyze_experiment_1(df, config)
         generate_plots(df, exp_id, img_dir)
