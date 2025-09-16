@@ -8,19 +8,23 @@ import numpy as np
 import torch
 import yaml
 
-# Use relative imports for sibling modules in the same package
-from . import preprocess, train, evaluate
+# Import sibling modules using absolute imports to avoid package discovery issues
+import preprocess
+import train
+import evaluate
+
 
 def setup_environment(config):
     """Creates directories and sets random seeds."""
     print("Setting up environment...")
+
     # Create directories
     for path in config['paths'].values():
-        if path: # Ensure path is not None or empty
+        if path:  # Ensure path is not None or empty
             Path(path).mkdir(parents=True, exist_ok=True)
-    
+
     # Set seeds for reproducibility
-    seed = config['seeds'][0] # Use the first seed for single runs
+    seed = config['seeds'][0]  # Use the first seed for single runs
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
@@ -30,8 +34,10 @@ def setup_environment(config):
     torch.backends.cudnn.benchmark = False
     print(f"Random seed set to {seed}")
 
+
 def main():
     """Main execution script for the experimental pipeline."""
+
     parser = argparse.ArgumentParser(description="Run REFLECT-BO experiments.")
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument('--smoke-test', action='store_true', help='Run a small-scale smoke test.')
@@ -41,6 +47,7 @@ def main():
 
     args = parser.parse_args()
 
+    # Select configuration file based on the flag provided
     if args.smoke_test:
         config_path = 'config/smoke_test.yaml'
     else:
@@ -51,24 +58,24 @@ def main():
         with open(config_path, 'r') as f:
             config = yaml.safe_load(f)
     except FileNotFoundError:
-        print(f"ERROR: Configuration file not found at '{config_path}'")
+        print(f"ERROR: Configuration file not found at '{config_path}'", file=sys.stderr)
         sys.exit(1)
-    
-    # Set which experiment to run
+
+    # Override experiment to run according to CLI argument
     config['experiment_to_run'] = args.experiment_id
     print(f"Selected to run Experiment {config['experiment_to_run']}")
 
-    # --- Pipeline Execution ---
+    # ---------------- Pipeline Execution ----------------
     try:
-        # 1. Setup Environment
+        # 1. Environment setup
         setup_environment(config)
 
-        # 2. Preprocessing
+        # 2. Data preprocessing
         print("\n--- STAGE 1: DATA PREPROCESSING ---")
         preprocessed_path = preprocess.run(config)
         print("--- PREPROCESSING COMPLETE ---")
 
-        # 3. Training / Optimization
+        # 3. Training / Optimisation
         print("\n--- STAGE 2: TRAINING / OPTIMIZATION ---")
         training_output_path = train.run(config, preprocessed_path)
         print("--- TRAINING COMPLETE ---")
@@ -79,11 +86,11 @@ def main():
         print("--- EVALUATION COMPLETE ---")
 
     except FileNotFoundError as e:
-        print(f"\nERROR: A required file was not found.", file=sys.stderr)
+        print("\nERROR: A required file was not found.", file=sys.stderr)
         print(str(e), file=sys.stderr)
         sys.exit(1)
     except ValueError as e:
-        print(f"\nERROR: A configuration or data value is invalid.", file=sys.stderr)
+        print("\nERROR: A configuration or data value is invalid.", file=sys.stderr)
         print(str(e), file=sys.stderr)
         sys.exit(1)
     except Exception as e:
@@ -92,6 +99,7 @@ def main():
         sys.exit(1)
 
     print("\nExperiment pipeline finished successfully.")
+
 
 if __name__ == '__main__':
     main()

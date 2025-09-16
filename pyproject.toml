@@ -4,6 +4,11 @@ version = "0.1.0"
 description = "Implementation of REFLECT-BO for research paper publication."
 authors = ["AI Researcher"]
 
+# Explicitly include the Python package so Poetry can build the wheel
+packages = [
+    { include = "reflect_bo_research" }
+]
+
 [tool.poetry.dependencies]
 python = ">=3.11,<3.12"
 torch = "2.1.0"
