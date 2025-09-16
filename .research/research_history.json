@@ -1,0 +1,10 @@
+{
+  "research_topic": "KVキャッシュ量子化 × 精度保持を改善したい（2bit域）",
+  "queries": [
+    "transformer KV cache quantization",
+    "2-bit transformer quantization",
+    "post-training 2-bit quantization",
+    "accuracy-preserving quantization",
+    "mixed-precision KV cache quantization"
+  ]
+}
