@@ -1,0 +1,38 @@
+/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/.venv/lib/python3.11/site-packages/torch/cuda/__init__.py:63: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[codecarbon WARNING @ 13:11:30] Multiple instances of codecarbon are allowed to run at the same time.
+[codecarbon INFO @ 13:11:30] [setup] RAM Tracking...
+[codecarbon INFO @ 13:11:30] [setup] CPU Tracking...
+[codecarbon WARNING @ 13:11:30] No CPU tracking mode found. Falling back on estimation based on TDP for CPU. 
+ Linux OS detected: Please ensure RAPL files exist at /sys/class/powercap/intel-rapl/subsystem to measure CPU
+
+[codecarbon INFO @ 13:11:30] CPU Model on constant consumption mode: AMD EPYC 7713 64-Core Processor
+[codecarbon WARNING @ 13:11:30] No CPU tracking mode found. Falling back on CPU load mode.
+[codecarbon INFO @ 13:11:30] [setup] GPU Tracking...
+[codecarbon INFO @ 13:11:30] Tracking Nvidia GPU via pynvml
+[codecarbon INFO @ 13:11:30] The below tracking methods have been set up:
+                RAM Tracking Method: RAM power estimation model
+                CPU Tracking Method: cpu_load
+                GPU Tracking Method: pynvml
+            
+[codecarbon INFO @ 13:11:30] >>> Tracker's metadata:
+[codecarbon INFO @ 13:11:30]   Platform system: Linux-5.15.0-119-generic-x86_64-with-glibc2.35
+[codecarbon INFO @ 13:11:30]   Python version: 3.11.13
+[codecarbon INFO @ 13:11:30]   CodeCarbon version: 3.0.4
+[codecarbon INFO @ 13:11:30]   Available RAM : 2003.901 GB
+[codecarbon INFO @ 13:11:30]   CPU count: 128 thread(s) in 2 physical CPU(s)
+[codecarbon INFO @ 13:11:30]   CPU model: AMD EPYC 7713 64-Core Processor
+[codecarbon INFO @ 13:11:30]   GPU count: 8
+[codecarbon INFO @ 13:11:30]   GPU model: 8 x NVIDIA A100-SXM4-80GB
+[codecarbon INFO @ 13:11:34] Emissions data (if any) will be saved to file /home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/.research/iteration12/training_smoke/emissions.csv
+[codecarbon INFO @ 13:11:34] Energy consumed for RAM : 0.000011 kWh. RAM Power : 70.0 W
+[codecarbon INFO @ 13:11:35] Delta energy consumed for CPU with cpu_load : 0.000007 kWh, power : 45.10126903500001 W
+[codecarbon INFO @ 13:11:35] Energy consumed for All CPU : 0.000007 kWh
+[codecarbon INFO @ 13:11:35] Energy consumed for all GPUs : 0.000412 kWh. Total GPU Power : 1422.9772371096165 W
+[codecarbon INFO @ 13:11:35] 0.000430 kWh of electricity used since the beginning.
+/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/.venv/lib/python3.11/site-packages/numpy/_core/_methods.py:222: RuntimeWarning: Degrees of freedom <= 0 for slice
+  ret = _var(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
+/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/.venv/lib/python3.11/site-packages/numpy/_core/_methods.py:214: RuntimeWarning: invalid value encountered in scalar divide
+  ret = ret.dtype.type(ret / rcount)
+
+FATAL ERROR in pipeline: FATAL: MIMIC-IV data not found at 'data/raw/mimic-iv-2.2/note/discharge.csv'. This experiment requires the 'discharge.csv' file from the MIMIC-IV 'note' module. Please download it from PhysioNet (https://physionet.org/content/mimiciv/2.2/) and place it in the directory specified by 'paths.mimic_iv_dir' in your config. NO-FALLBACK RULE: Cannot proceed without this real dataset.
