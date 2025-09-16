@@ -8,12 +8,12 @@ import numpy as np
 from datetime import datetime
 
 # -----------------------------------------------------------------------------
-# Directory constants – comply with mandatory research directory structure
+# Directory constants – updated to new mandatory research directory structure
 # -----------------------------------------------------------------------------
-# ALL image artefacts must be written under .research/iteration5/images
-# ALL JSON artefacts must be written under .research/iteration5/
+# ALL image artefacts must be written under .research/iteration8/images
+# ALL JSON artefacts must be written under .research/iteration8/
 # -----------------------------------------------------------------------------
-JSON_DIR = os.path.join(".research", "iteration5")
+JSON_DIR = os.path.join(".research", "iteration8")
 IMAGES_DIR = os.path.join(JSON_DIR, "images")
 
 # Ensure the required directories exist
@@ -46,6 +46,10 @@ def load_results(results_directory):
         return pd.DataFrame()
     return pd.concat(all_dfs, ignore_index=True)
 
+
+# -----------------------------------------------------------------------------
+# Experiment-specific analysis helpers
+# -----------------------------------------------------------------------------
 
 def analyze_experiment_1(df):
     print("\n--- Analyzing Experiment 1: 4th-order Moment Normalization ---")
@@ -168,8 +172,12 @@ def analyze_experiment_3(df):
     return summary.to_dict("records")
 
 
+# -----------------------------------------------------------------------------
+# Entry-point called by main.py
+# -----------------------------------------------------------------------------
+
 def generate_report(results_directory):
-    """Entry-point used by main.py after training finishes."""
+    """Aggregate CSV logs and write a JSON summary (also echoed to STDOUT)."""
 
     print(f"Generating report from raw CSVs in: {results_directory}")
     full_df = load_results(results_directory)

@@ -63,9 +63,8 @@ def _attempt_load_hf_dataset(name: str, **kwargs):
     except Exception as e:
         raise RuntimeError(f"Could not load dataset '{name}' from the Hub: {e}") from e
 
-
 # -----------------------------------------------------------------------------
-# Minimal dataset wrappers (unchanged)
+# Minimal dataset wrappers
 # -----------------------------------------------------------------------------
 
 class ImageCorruptionDataset(Dataset):
@@ -87,12 +86,29 @@ class RealisticTTAStream(Dataset):
         self.corruption_fn = corruption_fn
         self.eta = eta
         self.frames_per_sev = int(frames_per_severity * eta)
-        self.sev_levels = [1,2,3,4,5]
+        self.sev_levels = [1, 2, 3, 4, 5]
     def __len__(self): return len(self.base_dataset)
     def __getitem__(self, idx):
-        sev = self.sev_levels[min(idx // self.frames_per_sev, len(self.sev_levels)-1)]
+        sev = self.sev_levels[min(idx // self.frames_per_sev, len(self.sev_levels) - 1)]
         clean, lbl = self.base_dataset[idx]
         return self.corruption_fn(clean, sev), lbl
+
+# Synthetic dataset for Experiment-2 -------------------------------------------------
+class SyntheticImageStream(Dataset):
+    """Generates random RGB images and labels on-the-fly to mimic a data stream."""
+    def __init__(self, num_frames: int, num_classes: int):
+        self.num_frames = num_frames
+        self.num_classes = num_classes
+        self.transform = get_image_transforms()
+    def __len__(self):
+        return self.num_frames
+    def __getitem__(self, idx):
+        # Deterministic pseudorandom generation for reproducibility
+        rng = np.random.RandomState(seed=idx)
+        img_np = (rng.rand(224, 224, 3) * 255).astype(np.uint8)
+        img = Image.fromarray(img_np)
+        label = rng.randint(0, self.num_classes)
+        return self.transform(img), label
 
 # -----------------------------------------------------------------------------
 # Main factory
@@ -118,16 +134,16 @@ def get_dataloaders(config):
         batch_size = exp_cfg['dataloader']['batch_size']
 
         try:
-            # CIFAR10-C placeholder
+            # CIFAR10-C placeholder (for smoke-tests)
             if 'cifar10-c' in d_name:
                 ds = _attempt_load_hf_dataset('cifar10', split='test')
                 if 'img' in ds.column_names:
                     ds = ds.rename_column('img', 'image')
                 def _shot_noise(im: Image.Image, severity=5):
-                    im_np = np.array(im).astype(np.float32)/255.0
-                    lam = severity*10.0
-                    noisy = np.random.poisson(im_np*lam)/lam
-                    noisy = np.clip(noisy*255.0,0,255).astype(np.uint8)
+                    im_np = np.array(im).astype(np.float32) / 255.0
+                    lam = severity * 10.0
+                    noisy = np.random.poisson(im_np * lam) / lam
+                    noisy = np.clip(noisy * 255.0, 0, 255).astype(np.uint8)
                     return Image.fromarray(noisy)
                 base = ImageCorruptionDataset(ds, transform)
                 dataset = RealisticTTAStream(base, _shot_noise, exp_cfg['stream']['eta'])
@@ -136,9 +152,15 @@ def get_dataloaders(config):
                 ds = _attempt_load_hf_dataset('imagenet-1k', split='validation')
                 dataset = ImageCorruptionDataset(ds, transform)
                 logging.warning("Smoke-test: using clean ImageNet-val without additional corruptions.")
+            # EdgeHAR dummy tensor dataset for CI
             elif 'edgehar-c' in d_name:
-                # Dummy tensor dataset for CI
-                dataset = torch.utils.data.TensorDataset(torch.randn(1000,3,224,224), torch.randint(0,10,(1000,)))
+                dataset = torch.utils.data.TensorDataset(torch.randn(1000, 3, 224, 224),
+                                                         torch.randint(0, 10, (1000,)))
+            # Synthetic stream for Experiment-2 (finite-sample bound test)
+            elif 'synthetic-stream' in d_name:
+                frames = int(exp_cfg['stream']['frames'])
+                num_classes = int(exp_cfg['dataset']['num_classes'])
+                dataset = SyntheticImageStream(frames, num_classes)
             else:
                 raise ValueError(f"Unsupported dataset: {d_name}")
         except Exception as e:
