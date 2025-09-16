@@ -1,1 +1,16 @@
-# Cannot generate smoke_test.yaml because no experiment code was provided.
+# config/smoke_test.yaml
+# -----------------------------------------------------------------------------
+# A minimal, CPU-friendly configuration that executes in a few seconds.  It is
+# loaded when `main.py` is called with --smoke-test (or with no flags).
+# -----------------------------------------------------------------------------
+
+general:
+  experiment_name: smoke_test
+  seed: 42
+
+data:
+  num_samples: 10  # tiny!
+  seq_len: 8
+
+train:
+  epochs: 1
