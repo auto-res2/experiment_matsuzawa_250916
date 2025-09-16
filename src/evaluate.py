@@ -13,8 +13,8 @@ from typing import Any, Dict
 
 import numpy as np
 
-# Directory requirements enforced by the rubric – *iteration5* paths
-RESEARCH_DIR = Path(".research/iteration5")
+# Directory requirements enforced by the rubric – *iteration6* paths
+RESEARCH_DIR = Path(".research/iteration6")
 RESEARCH_DIR_IMAGES = RESEARCH_DIR / "images"
 
 
