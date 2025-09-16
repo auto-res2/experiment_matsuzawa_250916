@@ -6,5 +6,82 @@
     "online domain adaptation speed",
     "gradient-based test-time adaptation",
     "source-free adaptation acceleration"
+  ],
+  "research_study_list": [
+    {
+      "title": "TTT++: When Does Self-Supervised Test-Time Training Fail or Thrive?"
+    },
+    {
+      "title": "Persistent Test-time Adaptation in Recurring Testing Scenarios"
+    },
+    {
+      "title": "Active Test-Time Adaptation: Theoretical Analyses and An Algorithm"
+    },
+    {
+      "title": "Test Time Adaptation via Conjugate Pseudo-labels"
+    },
+    {
+      "title": "Improved Test-Time Adaptation for Domain Generalization"
+    },
+    {
+      "title": "Test Time Adaptation With Regularized Loss for Weakly Supervised Salient Object Detection"
+    },
+    {
+      "title": "Tent: Fully Test-Time Adaptation by Entropy Minimization"
+    },
+    {
+      "title": "What How and When Should Object Detectors Update in Continually Changing Test Domains?"
+    },
+    {
+      "title": "DELTA: DEGRADATION-FREE FULLY TEST-TIME ADAPTATION"
+    },
+    {
+      "title": "Test-Time Training with Self-Supervision for Generalization under Distribution Shifts"
+    },
+    {
+      "title": "Evaluation of Test-Time Adaptation Under Computational Time Constraints"
+    },
+    {
+      "title": "Learning to Adapt to Evolving Domains"
+    },
+    {
+      "title": "Test-Time Adaptation for Depth Completion"
+    },
+    {
+      "title": "Stationary Latent Weight Inference for Unreliable Observations from Online Test-Time Adaptation"
+    },
+    {
+      "title": "What How and When Should Object Detectors Update in Continually Changing Test Domains?"
+    },
+    {
+      "title": "Test-Time Training with Self-Supervision for Generalization under Distribution Shifts"
+    },
+    {
+      "title": "Towards Stable Test-time Adaptation in Dynamic Wild World"
+    },
+    {
+      "title": "Towards Stable Test-time Adaptation in Dynamic Wild World"
+    },
+    {
+      "title": "Improved Test-Time Adaptation for Domain Generalization"
+    },
+    {
+      "title": "TTN: A Domain-Shift Aware Batch Normalization in Test-Time Adaptation"
+    },
+    {
+      "title": "When Source-Free Domain Adaptation Meets Learning with Noisy Labels"
+    },
+    {
+      "title": "When Source-Free Domain Adaptation Meets Learning with Noisy Labels"
+    },
+    {
+      "title": "In Search for a Generalizable Method for Source Free Domain Adaptation"
+    },
+    {
+      "title": "Time- Memory- and Parameter-Efficient Visual Adaptation"
+    },
+    {
+      "title": "Guiding Pseudo-Labels With Uncertainty Estimation for Source-Free Unsupervised Domain Adaptation"
+    }
   ]
 }
