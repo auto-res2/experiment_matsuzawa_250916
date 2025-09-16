@@ -25,24 +25,46 @@ if str(ROOT_DIR) not in sys.path:
 import yaml  # noqa: E402  pylint: disable=wrong-import-position
 
 
-# We import the lightweight modules via ``importlib`` inside a helper to avoid
-# import-time side-effects before CLI parsing is finished.
+# -----------------------------------------------------------------------------
+# Robust dynamic import helper
+# -----------------------------------------------------------------------------
 
 def _lazy_import(name: str):
-    """Import *name* either as a top-level module or relative to this package."""
+    """Import *name* with multiple fallbacks.
+
+    1. Try as a top-level module (works for editable installs / source checkout).
+    2. Try relative to *__package__* (works when ``python -m ...`` is used).
+    3. Try relative to the *root* distribution package (works from the installed
+       wheel where modules are laid out as ``scarf_experiment.<module>``).
+    """
+    # (1) plain import first ---------------------------------------------------
     try:
         return importlib.import_module(name)
-    except ModuleNotFoundError as err:
-        # Fall back to relative import if available (e.g. when packaged).
+    except ModuleNotFoundError as first_err:  # keep original to re-raise later
+        # (2) relative to the current "package" ------------------------------
         if __package__:
             try:
                 return importlib.import_module(f"{__package__}.{name}")
             except ModuleNotFoundError:
-                pass  # Re-raise original below.
-        raise err
+                pass
+
+        # (3) relative to the *root* package ----------------------------------
+        root_pkg = __name__.split(".")[0]  # e.g. "scarf_experiment"
+        if root_pkg and root_pkg != name:
+            try:
+                return importlib.import_module(f"{root_pkg}.{name}")
+            except ModuleNotFoundError:
+                pass
+
+        # Nothing worked  re-raise the *original* error for clarity
+        raise first_err
 
 
-def _load_pipeline_modules() -> None:  # noqa: D401 – imperative mood
+# -----------------------------------------------------------------------------
+# Pipeline module loader
+# -----------------------------------------------------------------------------
+
+def _load_pipeline_modules() -> None:  # noqa: D401  imperative mood
     """Dynamically import the pipeline building blocks."""
     global preprocess, train, evaluate  # pylint: disable=global-statement
     preprocess = _lazy_import("preprocess_py").preprocess
