@@ -1,0 +1,140 @@
+=== [PHASE 2/2] Full experiment start Tue Sep 16 01:24:46 PM UTC 2025 ===
+Executing FULL EXPERIMENT...
+Global random seed set to 101
+
+PHASE 1: Running smoke test first for validation...
+Global random seed set to 42
+Starting preprocessing. Output will be saved to data/smoke_test
+Scraping SEC EDGAR 10-K filings for 'Risk Factors'...
+Warning: Unable to scrape risk factors from SEC EDGAR. Falling back to embedded public-domain excerpts.
+
+Cleaning and tokenizing text...
+  Splitting task: FinReg-Compliance (3 prompts)
+
+Preprocessing complete.
+  Optimization data: 0 samples saved to data/smoke_test/optimization.parquet
+  Test data: 3 samples saved to data/smoke_test/test.parquet
+Using device: cuda
+Carbon emissions for training: 0.00016796277673665076 kg CO2eq
+Training results saved to .research/iteration12/training_smoke/training_results_exp1_1758029100.json
+
+Evaluating results from: .research/iteration12/training_smoke/training_results_exp1_1758029100.json
+
+--- Evaluation Report Summary ---
+{
+    "experiment_id": 1,
+    "config_name": "smoke_test",
+    "results": {
+        "REFLECT-BO": {
+            "mean_best_helpfulness": 0.247,
+            "std_best_helpfulness": NaN,
+            "mean_auc_helpfulness": 0.23066666666666666
+        },
+        "SHIFT-BO": {
+            "mean_best_helpfulness": 0.287,
+            "std_best_helpfulness": NaN,
+            "mean_auc_helpfulness": 0.25
+        },
+        "MetaBO-Prompt": {
+            "mean_best_helpfulness": 0.254,
+            "std_best_helpfulness": NaN,
+            "mean_auc_helpfulness": 0.23650000000000002
+        },
+        "Random": {
+            "mean_best_helpfulness": 0.271,
+            "std_best_helpfulness": NaN,
+            "mean_auc_helpfulness": 0.24766666666666662
+        },
+        "aggregate": {
+            "overall_mean_best_helpfulness": 0.26475000000000004
+        }
+    },
+    "statistical_tests": {
+        "wilcoxon_REFLECT-BO_vs_SHIFT-BO": {
+            "statistic": 0.0,
+            "p_value": 1.0
+        }
+    }
+}
+
+Full report saved to: .research/iteration17/evaluation_report_exp1_1758029101.json
+Generated figures: ['.research/iteration17/images/exp1_performance_1758029100.png']
+
+Smoke test PASSED. Proceeding to full experiment.
+Global random seed set to 101
+
+=======================================================
+            STARTING EXPERIMENT 1
+=======================================================
+
+--- STAGE 1: DATA PREPROCESSING ---
+Starting preprocessing. Output will be saved to data/full_experiment
+Scraping SEC EDGAR 10-K filings for 'Risk Factors'...
+Warning: Unable to scrape risk factors from SEC EDGAR. Falling back to embedded public-domain excerpts.
+
+Cleaning and tokenizing text...
+  Splitting task: FinReg-Compliance (3 prompts)
+
+Preprocessing complete.
+  Optimization data: 0 samples saved to data/full_experiment/optimization.parquet
+  Test data: 3 samples saved to data/full_experiment/test.parquet
+--- PREPROCESSING COMPLETE ---
+
+--- STAGE 2: TRAINING / OPTIMIZATION ---
+Using device: cuda
+Carbon emissions for training: 0.00016900090150031463 kg CO2eq
+Training results saved to .research/iteration12/training_full/training_results_exp1_1758029114.json
+--- TRAINING COMPLETE ---
+
+--- STAGE 3: EVALUATION ---
+
+Evaluating results from: .research/iteration12/training_full/training_results_exp1_1758029114.json
+
+--- Evaluation Report Summary ---
+{
+    "experiment_id": 1,
+    "config_name": "full_experiment",
+    "results": {
+        "REFLECT-BO": {
+            "mean_best_helpfulness": 0.815,
+            "std_best_helpfulness": NaN,
+            "mean_auc_helpfulness": 0.5019166666666667
+        },
+        "SHIFT-BO": {
+            "mean_best_helpfulness": 0.825,
+            "std_best_helpfulness": NaN,
+            "mean_auc_helpfulness": 0.5330833333333334
+        },
+        "MetaBO-Prompt": {
+            "mean_best_helpfulness": 0.79,
+            "std_best_helpfulness": NaN,
+            "mean_auc_helpfulness": 0.5016166666666667
+        },
+        "Random": {
+            "mean_best_helpfulness": 0.809,
+            "std_best_helpfulness": NaN,
+            "mean_auc_helpfulness": 0.51215
+        },
+        "aggregate": {
+            "overall_mean_best_helpfulness": 0.80975
+        }
+    },
+    "statistical_tests": {
+        "wilcoxon_REFLECT-BO_vs_SHIFT-BO": {
+            "statistic": 0.0,
+            "p_value": 1.0
+        }
+    }
+}
+
+Full report saved to: .research/iteration17/evaluation_report_exp1_1758029115.json
+Generated figures: ['.research/iteration17/images/exp1_performance_1758029114.png']
+--- EVALUATION COMPLETE ---
+
+=======================================================
+            STARTING EXPERIMENT 2
+=======================================================
+
+--- STAGE 1: DATA PREPROCESSING ---
+Starting preprocessing. Output will be saved to data/full_experiment
+Downloading Hugging Face dataset: Super-NI
