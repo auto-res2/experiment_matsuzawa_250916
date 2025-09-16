@@ -34,15 +34,18 @@ def download_and_extract(url, dest_path, extract_path):
             total = int(r.headers.get('content-length', 0))
             with open(dest_path, 'wb') as f, tqdm(total=total, unit='iB', unit_scale=True) as bar:
                 for chunk in r.iter_content(chunk_size=8192):
-                    f.write(chunk); bar.update(len(chunk))
+                    f.write(chunk)
+                    bar.update(len(chunk))
     except requests.exceptions.RequestException as e:
         logging.error(f"Failed to download {url}: {e}")
         raise SystemExit("DOWNLOAD FAILED")
     logging.info(f"Extracting {dest_path}")
     if dest_path.endswith('.zip'):
-        with zipfile.ZipFile(dest_path, 'r') as zf: zf.extractall(extract_path)
+        with zipfile.ZipFile(dest_path, 'r') as zf:
+            zf.extractall(extract_path)
     elif dest_path.endswith('.tar.gz'):
-        with tarfile.open(dest_path, 'r:gz') as tf_: tf_.extractall(extract_path)
+        with tarfile.open(dest_path, 'r:gz') as tf_:
+            tf_.extractall(extract_path)
     else:
         raise ValueError("Unsupported archive type")
     os.remove(dest_path)
@@ -58,8 +61,10 @@ def get_image_transforms():
 
 
 def _attempt_load_hf_dataset(name: str, **kwargs):
+    """Load a dataset from the Hugging Face Hub, passing an auth token if available."""
+    token = os.getenv("HF_TOKEN", None)
     try:
-        return load_dataset(name, **kwargs, cache_dir=DATA_CACHE_DIR)
+        return load_dataset(name, **kwargs, cache_dir=DATA_CACHE_DIR, token=token)
     except Exception as e:
         raise RuntimeError(f"Could not load dataset '{name}' from the Hub: {e}") from e
 
@@ -70,7 +75,10 @@ def _attempt_load_hf_dataset(name: str, **kwargs):
 class ImageCorruptionDataset(Dataset):
     def __init__(self, data: HFDataset, transform):
         self.data, self.transform = data, transform
-    def __len__(self): return len(self.data)
+
+    def __len__(self):
+        return len(self.data)
+
     def __getitem__(self, idx):
         item = self.data[idx]
         img = item.get('image') or item.get('img')
@@ -87,7 +95,10 @@ class RealisticTTAStream(Dataset):
         self.eta = eta
         self.frames_per_sev = int(frames_per_severity * eta)
         self.sev_levels = [1, 2, 3, 4, 5]
-    def __len__(self): return len(self.base_dataset)
+
+    def __len__(self):
+        return len(self.base_dataset)
+
     def __getitem__(self, idx):
         sev = self.sev_levels[min(idx // self.frames_per_sev, len(self.sev_levels) - 1)]
         clean, lbl = self.base_dataset[idx]
@@ -96,14 +107,16 @@ class RealisticTTAStream(Dataset):
 # Synthetic dataset for Experiment-2 -------------------------------------------------
 class SyntheticImageStream(Dataset):
     """Generates random RGB images and labels on-the-fly to mimic a data stream."""
+
     def __init__(self, num_frames: int, num_classes: int):
         self.num_frames = num_frames
         self.num_classes = num_classes
         self.transform = get_image_transforms()
+
     def __len__(self):
         return self.num_frames
+
     def __getitem__(self, idx):
-        # Deterministic pseudorandom generation for reproducibility
         rng = np.random.RandomState(seed=idx)
         img_np = (rng.rand(224, 224, 3) * 255).astype(np.uint8)
         img = Image.fromarray(img_np)
@@ -139,30 +152,39 @@ def get_dataloaders(config):
                 ds = _attempt_load_hf_dataset('cifar10', split='test')
                 if 'img' in ds.column_names:
                     ds = ds.rename_column('img', 'image')
+
                 def _shot_noise(im: Image.Image, severity=5):
                     im_np = np.array(im).astype(np.float32) / 255.0
                     lam = severity * 10.0
                     noisy = np.random.poisson(im_np * lam) / lam
                     noisy = np.clip(noisy * 255.0, 0, 255).astype(np.uint8)
                     return Image.fromarray(noisy)
+
                 base = ImageCorruptionDataset(ds, transform)
                 dataset = RealisticTTAStream(base, _shot_noise, exp_cfg['stream']['eta'])
-            # ImageNet placeholder
+
+            # ImageNet-C placeholder – we load clean ImageNet validation as proxy
             elif 'imagenet-c' in d_name:
                 ds = _attempt_load_hf_dataset('imagenet-1k', split='validation')
                 dataset = ImageCorruptionDataset(ds, transform)
-                logging.warning("Smoke-test: using clean ImageNet-val without additional corruptions.")
+                logging.warning("Using clean ImageNet-val data as a placeholder for ImageNet-C.")
+
             # EdgeHAR dummy tensor dataset for CI
             elif 'edgehar-c' in d_name:
-                dataset = torch.utils.data.TensorDataset(torch.randn(1000, 3, 224, 224),
-                                                         torch.randint(0, 10, (1000,)))
-            # Synthetic stream for Experiment-2 (finite-sample bound test)
+                dataset = torch.utils.data.TensorDataset(
+                    torch.randn(1000, 3, 224, 224),
+                    torch.randint(0, 10, (1000,))
+                )
+
+            # Synthetic stream for Experiment-2
             elif 'synthetic-stream' in d_name:
                 frames = int(exp_cfg['stream']['frames'])
                 num_classes = int(exp_cfg['dataset']['num_classes'])
                 dataset = SyntheticImageStream(frames, num_classes)
+
             else:
                 raise ValueError(f"Unsupported dataset: {d_name}")
+
         except Exception as e:
             logging.error(f"Failed preparing dataset {d_name}: {e}")
             raise SystemExit(f"DATASET FAILED: {d_name}")

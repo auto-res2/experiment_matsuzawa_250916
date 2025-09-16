@@ -43,8 +43,8 @@ def main():
     config = load_config(cfg_path)
 
     ts = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-    # Updated to iteration8 directory structure (spec requirement)
-    results_dir = os.path.join('.research', 'iteration8', f'results_{ts}')
+    # Updated to iteration9 directory structure (spec requirement)
+    results_dir = os.path.join('.research', 'iteration9', f'results_{ts}')
     os.makedirs(results_dir, exist_ok=True)
     config['results_dir'] = results_dir
 

@@ -10,10 +10,10 @@ from datetime import datetime
 # -----------------------------------------------------------------------------
 # Directory constants – updated to new mandatory research directory structure
 # -----------------------------------------------------------------------------
-# ALL image artefacts must be written under .research/iteration8/images
-# ALL JSON artefacts must be written under .research/iteration8/
+# ALL image artefacts must be written under .research/iteration9/images
+# ALL JSON artefacts must be written under .research/iteration9/
 # -----------------------------------------------------------------------------
-JSON_DIR = os.path.join(".research", "iteration8")
+JSON_DIR = os.path.join(".research", "iteration9")
 IMAGES_DIR = os.path.join(JSON_DIR, "images")
 
 # Ensure the required directories exist
