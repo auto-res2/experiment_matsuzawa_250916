@@ -1,16 +1,14 @@
 name: 'full_experiment_config'
-experiment_to_run: 1 # Default to Exp 1, must be overridden by CLI
+experiment_to_run: 1
 
 paths:
-  # IMPORTANT: Set this to the real path on your secure cluster
-  secure_data_path: '/mnt/secure_cluster/data' 
+  secure_data_path: '/mnt/secure_cluster/data'
   processed_data_path: 'data/processed/full_experiment'
-  training_output_path: '.research/iteration1/training/full_experiment'
-  evaluation_output_path: '.research/iteration1/analysis/full_experiment'
+  training_output_path: '.research/iteration2/training/full_experiment'
+  evaluation_output_path: '.research/iteration2/analysis/full_experiment'
 
 api_details:
-  # API keys should be set as environment variables (e.g., OPENAI_API_KEY, HF_TOKEN)
-  provider: 'openai' # Use 'simulated' if you don't have keys
+  provider: 'openai'
 
 model_names:
   encoder: 'cambridgeltl/trans-encoder-bi-simcse-roberta-base'
@@ -21,28 +19,22 @@ model_names:
 
 seeds: [0, 1, 2, 3, 4]
 
-# --- Experiment-specific parameters ---
-
 experiment_1:
   datasets: ['HIPAA-MedTriage-5', 'FinReg-Compliance-5']
 
 experiment_2:
   methods: ['REFLECT-BO', 'REFLECT-BO-NoShift', 'REFLECT-BO-NoDP', 'SHIFT-BO']
-  total_prompts: 5000 # Number of prompts from Super-NI to use
+  total_prompts: 5000
 
 experiment_3:
   datasets: ['gsm8k', 'aqua_rat', 'cnn_dailymail']
-
-# --- Shared Parameters ---
 
 optimization_params:
   api_budget: 60
   bootstrap_budget: 10
 
 hyperparameters:
-  # Full grid for search. The main script runs one config at a time.
-  # A wrapper script would be needed for a full grid search.
-  learning_rate: [1.0e-4, 3.0e-4, 1.0e-3]
+  learning_rate: [0.0001, 0.0003, 0.001]
   bo_beta: [0.1, 0.25, 0.5]
   cvar_alpha: [0.9, 0.95]
 
@@ -53,9 +45,8 @@ federated_params:
 dp_params:
   epsilon: 1.0
   delta: 1.0e-6
-  noise_multiplier: 1.1 # Tuned for epsilon=1
+  noise_multiplier: 1.1
   max_grad_norm: 1.0
 
 kalman_params:
-  # Grid for search
   tau: [1.5, 2.5, 4.0]

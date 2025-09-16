@@ -1,40 +1,32 @@
 name: 'smoke_test_config'
-experiment_to_run: 1 # Default to Exp 1, can be overridden by CLI
+experiment_to_run: 1
 
 paths:
-  # For smoke test, we use public data, so secure_data_path is not needed
-  # and the preprocess script will not try to access it for Exp 3.
-  secure_data_path: None 
+  secure_data_path: null
   processed_data_path: 'data/processed/smoke_test'
-  training_output_path: '.research/iteration1/training/smoke_test'
-  evaluation_output_path: '.research/iteration1/analysis/smoke_test'
+  training_output_path: '.research/iteration2/training/smoke_test'
+  evaluation_output_path: '.research/iteration2/analysis/smoke_test'
 
 api_details:
-  # API keys should be set as environment variables (e.g., OPENAI_API_KEY)
   provider: 'simulated'
 
 model_names:
   encoder: 'cambridgeltl/trans-encoder-bi-simcse-roberta-base'
-  generator: 'gpt-3.5-0613' # For reference, not directly used by simulated client
-  scorer: 'gpt-4-0125' # For reference
-  paraphraser: 'lmsys/vicuna-13b-v1.5' # For reference
+  generator: 'gpt-3.5-0613'
+  scorer: 'gpt-4-0125'
+  paraphraser: 'lmsys/vicuna-13b-v1.5'
 
 seeds: [42]
 
-# --- Experiment-specific parameters ---
-
 experiment_1:
-  datasets: [] # Not used in smoke test, relies on public data from Exp 3 config
+  datasets: []
 
 experiment_2:
   methods: ['REFLECT-BO', 'REFLECT-BO-NoDP']
-  total_prompts: 100 # Smaller subset for faster preprocessing
+  total_prompts: 100
 
 experiment_3:
-  # Use a small public dataset for the smoke test
-  datasets: ['gsm8k'] 
-
-# --- Shared Parameters ---
+  datasets: ['gsm8k']
 
 optimization_params:
   api_budget: 5
@@ -52,7 +44,7 @@ federated_params:
 dp_params:
   epsilon: 1.0
   delta: 1.0e-6
-  noise_multiplier: 1.1 # Tuned for epsilon=1
+  noise_multiplier: 1.1
   max_grad_norm: 1.0
 
 kalman_params:
