@@ -1,77 +1,71 @@
-"""src/main.py
-Entry-point that orchestrates *preprocess → train → evaluate* according
-to a YAML configuration file.
-"""
-from __future__ import annotations
+"""Main entry-point – orchestrates preprocessing, training & evaluation.
 
+Usage
+-----
+uv run python -m src.main --smoke-test
+uv run python -m src.main --full-experiment
+"""
 import argparse
-import sys
+import json
+import os
 from pathlib import Path
 from typing import Any, Dict
 
-import yaml  # PyYAML – specified in pyproject.toml
+import yaml
 
-from preprocess import preprocess
-from train import train
-from evaluate import evaluate
+from . import preprocess, train, evaluate
 
-# ---------------------------------------------------------------------------
-# Configuration helpers
-# ---------------------------------------------------------------------------
-CONFIG_DIR = Path("config")
-SMOKE_CFG = CONFIG_DIR / "smoke_test.yaml"
-FULL_CFG = CONFIG_DIR / "full_experiment.yaml"
+_REPO_ROOT = Path(__file__).resolve().parent.parent
+_ARTIFACT_DIR = _REPO_ROOT / ".research" / "iteration7"
+_ARTIFACT_DIR.mkdir(parents=True, exist_ok=True)
 
 
-def _load_yaml(path: Path) -> Dict[str, Any]:
-    """Load a YAML file and return its contents as a dict."""
-    if not path.exists():
-        raise FileNotFoundError(f"Configuration file not found: {path}")
-    with path.open("r", encoding="utf-8") as fp:
-        return yaml.safe_load(fp)
+# -----------------------------------------------------------------------------
+# Helper functions
+# -----------------------------------------------------------------------------
+
+def _load_config(path: Path) -> Dict[str, Any]:
+    with open(path, "r", encoding="utf-8") as f:
+        return yaml.safe_load(f)
 
 
-# ---------------------------------------------------------------------------
-# Main CLI
-# ---------------------------------------------------------------------------
+def _run(cfg: Dict[str, Any], tag: str):
+    # 1. Data -----------------------------------------------------------------
+    loader, vocab = preprocess.build_dataloaders(cfg)
 
-def _parse_args(argv):
-    p = argparse.ArgumentParser(description="AURORA experiment harness")
-    g = p.add_mutually_exclusive_group()
-    g.add_argument(
-        "--smoke-test",
-        action="store_true",
-        help="Run the quick CPU-only validation using smoke_test.yaml",
-    )
-    g.add_argument(
-        "--full-experiment",
-        action="store_true",
-        help="Run the full GPU experiment using full_experiment.yaml",
-    )
-    return p.parse_args(argv)
+    # 2. Train ----------------------------------------------------------------
+    model, train_stats = train.train_model(loader, vocab, cfg)
 
+    # 3. Evaluate -------------------------------------------------------------
+    eval_stats = evaluate.evaluate_model(model, loader, cfg)
 
-def main(argv=None):  # noqa: D401 – short docstring style acceptable here
-    """CLI entry – dispatches according to flags."""
-    args = _parse_args(argv or sys.argv[1:])
+    result = {"config_tag": tag, **train_stats, **eval_stats}
 
-    if args.full_experiment:
-        cfg_path = FULL_CFG
-    else:  # default to smoke test so that `python -m src.main` just works
-        cfg_path = SMOKE_CFG
-
-    config = _load_yaml(cfg_path)
-
-    # Pipeline --------------------------------------------------------------
-    processed = preprocess(config)
-    model, train_metrics = train(config, processed)
-    eval_metrics = evaluate(config, model, processed)
-
-    # Summarise to stdout so that CI has something to grep.
-    print("\n=== SUMMARY ===")
-    print("Training metrics:", train_metrics)
-    print("Evaluation metrics:", eval_metrics)
+    # 4. Persist --------------------------------------------------------------
+    out_file = _ARTIFACT_DIR / f"{tag}.json"
+    with open(out_file, "w", encoding="utf-8") as f:
+        json.dump(result, f, indent=2)
+    print(json.dumps(result, indent=2))
 
 
-if __name__ == "__main__":
+# -----------------------------------------------------------------------------
+# CLI
+# -----------------------------------------------------------------------------
+
+def main():
+    parser = argparse.ArgumentParser()
+    mode = parser.add_mutually_exclusive_group(required=True)
+    mode.add_argument("--smoke-test", action="store_true", help="run quick validation pipeline")
+    mode.add_argument("--full-experiment", action="store_true", help="run full-scale experiment")
+    args = parser.parse_args()
+
+    if args.smoke_test:
+        cfg = _load_config(_REPO_ROOT / "config" / "smoke_test.yaml")
+        _run(cfg, "smoke_test")
+    else:  # full experiment – only executed if the quick test succeeds in CI.
+        cfg = _load_config(_REPO_ROOT / "config" / "full_experiment.yaml")
+        _run(cfg, "full_experiment")
+
+
+if __name__ == "__main__":  # pragma: no cover
     main()

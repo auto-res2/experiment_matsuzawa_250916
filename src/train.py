@@ -1,49 +1,57 @@
-"""train.py
-A minimal stub for training that complies with the interfaces expected by
-`main.py`.  It **does not** train a real model – the objective of this
-iteration is only to unblock the CI smoke-test so that the pipeline can
-proceed to later, resource-heavier stages where the full models will be
-plugged in.
+import json
+import os
+from pathlib import Path
+from typing import Any, Dict, Tuple
 
-The function must:
-  • run fast on CPU-only environments (<2 s)
-  • return a non-empty artefact (here: a dict containing random weights)
-  • produce at least one numeric metric strictly > 0 so that downstream
-    assertions in `evaluate.py` succeed.
-"""
-from __future__ import annotations
-
-import time
-from typing import Any, Dict
-
-import numpy as np
-from tqdm import tqdm  # noqa: F401  – installed via pyproject.toml
+import torch
+from torch.utils.data import DataLoader
 
 
-def train(config: Dict[str, Any], processed_data: Dict[str, Any]):
-    """Fake training loop that produces deterministic, non-zero metrics."""
-    start = time.time()
+class SimpleLanguageModel(torch.nn.Module):
+    """A minimal LSTM language-model to keep the example lightweight.
 
-    # Pretend to do some compute – keeps wall-clock non-zero.
-    for _ in range(3):
-        time.sleep(0.1)
+    The implementation purposefully stays *very* small so that a 1-epoch
+    smoke-test finishes in <30 s on CPU while still exercising the full
+    training/evaluation pipeline.  In the full experiment we merely crank
+    up the number of epochs/hidden units in the YAML config – no code
+    changes required.
+    """
 
-    wall_s = time.time() - start
+    def __init__(self, vocab_size: int, hidden_size: int = 64):
+        super().__init__()
+        self.embed = torch.nn.Embedding(vocab_size, hidden_size)
+        self.rnn = torch.nn.LSTM(hidden_size, hidden_size, batch_first=True)
+        self.head = torch.nn.Linear(hidden_size, vocab_size)
 
-    # Toy "model": random numpy arrays whose seed depends on the run id.
-    rng = np.random.default_rng(seed=config["general"]["seed"])
-    model = {
-        "weights": rng.standard_normal(size=(4, 4)).astype("float32"),
-        "bias": rng.standard_normal(size=(4,)).astype("float32"),
-    }
+    def forward(self, x: torch.Tensor) -> torch.Tensor:  # shape (B, T)
+        h = self.embed(x)
+        h, _ = self.rnn(h)
+        return self.head(h)
 
-    metrics = {
-        "train_wall_s": wall_s,
-        "train_samples": int(len(processed_data["input"])),
-    }
 
-    # Fail-fast: any non-positive metric is unacceptable.
-    if any(v <= 0 for v in metrics.values()):
-        raise ValueError("Training produced non-positive metric – aborting.")
+# -----------------------------------------------------------------------------
+# Public API
+# -----------------------------------------------------------------------------
 
-    return model, metrics
+def train_model(train_loader: DataLoader, vocab_size: int, cfg: Dict[str, Any]) -> Tuple[SimpleLanguageModel, Dict[str, float]]:
+    device = "cuda" if torch.cuda.is_available() else "cpu"
+    model = SimpleLanguageModel(vocab_size, hidden_size=cfg["model"]["hidden"]).to(device)
+    optimiser = torch.optim.AdamW(model.parameters(), lr=cfg["training"]["lr"])
+    criterion = torch.nn.CrossEntropyLoss()
+
+    model.train()
+    total_loss, n_tokens = 0.0, 0
+    for epoch in range(cfg["training"]["epochs"]):
+        for batch in train_loader:
+            optimiser.zero_grad()
+            x = batch["input_ids"].to(device)
+            y = batch["labels"].to(device)
+            logits = model(x)
+            loss = criterion(logits.view(-1, vocab_size), y.view(-1))
+            loss.backward()
+            optimiser.step()
+            total_loss += loss.item() * y.numel()
+            n_tokens += y.numel()
+
+    stats = {"train_loss_per_token": total_loss / max(1, n_tokens)}
+    return model, stats

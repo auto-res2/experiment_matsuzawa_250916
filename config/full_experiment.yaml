@@ -1,24 +1,15 @@
-# config/full_experiment.yaml
-# -----------------------------------------------------------------------------
-# Full-scale configuration for the CI-friendly *full experiment* run.  The
-# values are deliberately modest so they stay within resource limits but they
-# are noticeably larger than the smoke test.
-# -----------------------------------------------------------------------------
+# Full AURORA reproduction run – suitable for an 8×A100 node.
+seed: 13
 
-general:
-  experiment_name: full_experiment
-  seed: 123
+model:
+  hidden: 256
+
+training:
+  epochs: 10
+  lr: 5e-4
+  batch_size: 64
 
 data:
-  num_samples: 1000  # ↗ 100× larger than the smoke test
-  seq_len: 32
-
-train:
-  epochs: 5          # small but non-trivial
-  batch_size: 32
-  learning_rate: 3e-4
-
-# -----------------------------------------------------------------------------
-# End of file – **NO** hidden NUL bytes or exotic whitespace below this line.
-# -----------------------------------------------------------------------------
-
+  dataset: "wikitext"
+  split: "wikitext-103-raw-v1"
+  tokenizer: "bert-base-uncased"

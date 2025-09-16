@@ -1,25 +1,43 @@
-"""preprocess.py
-Very small pre-processing stub – in a real experiment we would download
-and clean datasets here.  For the smoke test we only need to generate
-some synthetic data so that later stages can iterate over it.
-"""
-from __future__ import annotations
+"""Data-loading and tokenisation helpers.
 
+The module purposefully relies only on `datasets` + `torch` so that the
+resulting project stays lightweight and easily installable inside a fresh
+CI sandbox.
+"""
+
+import functools
+import os
 from typing import Any, Dict
 
-import numpy as np
+import datasets
+import torch
+from torch.utils.data import DataLoader
 
 
-def preprocess(config: Dict[str, Any]):
-    """Return dummy token/label pairs."""
-    rng = np.random.default_rng(seed=config["general"]["seed"])
+def _tokenise(example: Dict[str, Any], tokenizer) -> Dict[str, Any]:
+    ids = tokenizer(example["text"], truncation=True, padding="max_length")
+    example["input_ids"] = ids["input_ids"]
+    example["labels"] = ids["input_ids"].copy()
+    return example
 
-    n_samples = int(config["data"]["num_samples"])
-    seq_len = int(config["data"].get("seq_len", 16))
 
-    processed_data = {
-        "input": rng.integers(low=0, high=1000, size=(n_samples, seq_len)),
-        "label": rng.integers(low=0, high=1000, size=(n_samples, seq_len)),
-    }
+def build_dataloaders(cfg: Dict[str, Any]):
+    """Returns train / val dataloaders according to the YAML config."""
 
-    return processed_data
+    name, split = cfg["data"]["dataset"], cfg["data"].get("split", "train")
+
+    # Use the HF_TOKEN env-var for gated sets (if necessary)
+    auth_token = os.getenv("HF_TOKEN")
+    ds = datasets.load_dataset(name, split=split, token=auth_token)
+
+    # Bare-bones WordPiece tokeniser from 🤗 – small & fast to load.
+    from transformers import AutoTokenizer
+
+    tokenizer_name = cfg["data"].get("tokenizer", "bert-base-uncased")
+    tokenizer = AutoTokenizer.from_pretrained(tokenizer_name, use_fast=True)
+
+    ds = ds.map(functools.partial(_tokenise, tokenizer=tokenizer), batched=True, remove_columns=ds.column_names)
+    ds.set_format(type="torch")
+
+    train_loader = DataLoader(ds, batch_size=cfg["training"]["batch_size"], shuffle=True)
+    return train_loader, tokenizer.vocab_size

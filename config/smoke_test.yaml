@@ -1,16 +1,15 @@
-# config/smoke_test.yaml
-# -----------------------------------------------------------------------------
-# A minimal, CPU-friendly configuration that executes in a few seconds.  It is
-# loaded when `main.py` is called with --smoke-test (or with no flags).
-# -----------------------------------------------------------------------------
+# Quick CI-style configuration – finishes in <1 min on CPU
+seed: 13
 
-general:
-  experiment_name: smoke_test
-  seed: 42
+model:
+  hidden: 32
+
+training:
+  epochs: 1
+  lr: 1e-3
+  batch_size: 8
 
 data:
-  num_samples: 10  # tiny!
-  seq_len: 8
-
-train:
-  epochs: 1
+  dataset: "wikitext"
+  split: "wikitext-2-raw-v1"
+  tokenizer: "bert-base-uncased"
