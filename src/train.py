@@ -11,14 +11,12 @@ from torchvision import datasets, transforms, models
 
 
 def _select_device() -> torch.device:
-    """Select GPU if available, else CPU."""
-    if torch.cuda.is_available():
-        return torch.device("cuda")
-    return torch.device("cpu")
+    """Select GPU if available, otherwise CPU."""
+    return torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
 def _build_model(num_classes: int = 10) -> nn.Module:
-    """Returns a ResNet-18 model with the classifier head adapted to *num_classes*."""
+    """Return a ResNet-18 with an adapted classifier head."""
     model = models.resnet18(weights=models.ResNet18_Weights.DEFAULT)
     model.fc = nn.Linear(model.fc.in_features, num_classes)
     return model
@@ -55,14 +53,32 @@ def train(config: Dict):
     test_set = datasets.CIFAR10(root, train=False, download=True, transform=test_tf)
 
     if config["subset"]:
-        # smoke-test mode – use a 5-k sample subset
-        train_set, _ = torch.utils.data.random_split(train_set, [5_000, len(train_set) - 5_000],
-                                                     generator=torch.Generator().manual_seed(0))
-        test_set, _ = torch.utils.data.random_split(test_set, [1_000, len(test_set) - 1_000],
-                                                    generator=torch.Generator().manual_seed(0))
+        # smoke-test mode – use a 5 k-sample subset
+        train_set, _ = torch.utils.data.random_split(
+            train_set,
+            [5_000, len(train_set) - 5_000],
+            generator=torch.Generator().manual_seed(0),
+        )
+        test_set, _ = torch.utils.data.random_split(
+            test_set,
+            [1_000, len(test_set) - 1_000],
+            generator=torch.Generator().manual_seed(0),
+        )
 
-    train_loader = DataLoader(train_set, batch_size=config["batch_size"], shuffle=True, num_workers=4, pin_memory=True)
-    test_loader = DataLoader(test_set, batch_size=config["batch_size"], shuffle=False, num_workers=4, pin_memory=True)
+    train_loader = DataLoader(
+        train_set,
+        batch_size=config["batch_size"],
+        shuffle=True,
+        num_workers=4,
+        pin_memory=True,
+    )
+    test_loader = DataLoader(
+        test_set,
+        batch_size=config["batch_size"],
+        shuffle=False,
+        num_workers=4,
+        pin_memory=True,
+    )
 
     # ---------------------------------------------------------------------
     # Model ---------------------------------------------------------------

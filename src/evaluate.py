@@ -12,12 +12,18 @@ from .train import evaluate, _select_device
 def run_evaluation(checkpoint_path: str, batch_size: int, results_dir: str):
     device = _select_device()
 
-    tf = transforms.Compose([
-        transforms.ToTensor(),
-        transforms.Normalize((0.4914, 0.4822, 0.4465), (0.247, 0.243, 0.261))
-    ])
-    test_set = datasets.CIFAR10(os.path.expanduser("~/.cache/data"), train=False, download=True, transform=tf)
-    dataloader = DataLoader(test_set, batch_size=batch_size, shuffle=False, num_workers=4, pin_memory=True)
+    tf = transforms.Compose(
+        [
+            transforms.ToTensor(),
+            transforms.Normalize((0.4914, 0.4822, 0.4465), (0.247, 0.243, 0.261)),
+        ]
+    )
+    test_set = datasets.CIFAR10(
+        os.path.expanduser("~/.cache/data"), train=False, download=True, transform=tf
+    )
+    dataloader = DataLoader(
+        test_set, batch_size=batch_size, shuffle=False, num_workers=4, pin_memory=True
+    )
 
     model = models.resnet18()
     model.fc = torch.nn.Linear(model.fc.in_features, 10)
@@ -31,4 +37,6 @@ def run_evaluation(checkpoint_path: str, batch_size: int, results_dir: str):
     out_path = os.path.join(results_dir, f"results_{stamp}.json")
     with open(out_path, "w", encoding="utf-8") as f:
         json.dump({"accuracy": acc}, f, indent=2)
+
+    # Also print for CI log capture
     print(json.dumps({"accuracy": acc}, indent=2))
