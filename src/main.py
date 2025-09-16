@@ -24,6 +24,7 @@ FULL_CFG = CONFIG_DIR / "full_experiment.yaml"
 
 
 def _load_yaml(path: Path) -> Dict[str, Any]:
+    """Load a YAML file and return its contents as a dict."""
     if not path.exists():
         raise FileNotFoundError(f"Configuration file not found: {path}")
     with path.open("r", encoding="utf-8") as fp:

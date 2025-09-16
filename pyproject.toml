@@ -9,12 +9,13 @@ description = "Minimal scaffolding to unblock CI for AURORA experiments"
 authors = [{name = "Research Team"}]
 requires-python = ">=3.8"
 dependencies = [
-  "PyYAML>=6.0",
-  "numpy>=1.21",
-  "datasets>=2.19.0",
-  "tqdm>=4.66",
+    "PyYAML>=6.0",
+    "numpy>=1.21",
+    "tqdm>=4.66",
 ]
 
 [tool.setuptools]
 package-dir = {"" = "src"}
-packages = [""]
+# Our code lives as single-file modules inside `src/`, therefore we list
+# them explicitly under *py-modules* instead of using *packages*.
+py-modules = ["main", "preprocess", "train", "evaluate"]

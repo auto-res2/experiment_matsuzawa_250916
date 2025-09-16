@@ -11,17 +11,11 @@ import numpy as np
 
 
 def preprocess(config: Dict[str, Any]):
-    """Return dummy token/label pairs.
-
-    Returns
-    -------
-    processed_data
-        Dict with keys "input" and "label" – both numpy arrays.
-    """
+    """Return dummy token/label pairs."""
     rng = np.random.default_rng(seed=config["general"]["seed"])
 
-    n_samples = config["data"]["num_samples"]
-    seq_len = config["data"].get("seq_len", 16)
+    n_samples = int(config["data"]["num_samples"])
+    seq_len = int(config["data"].get("seq_len", 16))
 
     processed_data = {
         "input": rng.integers(low=0, high=1000, size=(n_samples, seq_len)),
