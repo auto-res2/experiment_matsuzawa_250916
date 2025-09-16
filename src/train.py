@@ -14,6 +14,17 @@ from torch.optim.lr_scheduler import CosineAnnealingLR, LinearLR, SequentialLR
 from collections import deque
 import pynvml
 
+# -----------------------------------------------------------------------------
+# Utility: safe torch.load
+# -----------------------------------------------------------------------------
+
+def safe_torch_load(path: str, *, map_location=None):
+    """Wrapper around torch.load that always uses weights_only=False.
+    This restores the PyTorch <2.6 behaviour required for loading arbitrary
+    Python objects such as torch_geometric.data.Data.
+    """
+    return torch.load(path, map_location=map_location, weights_only=False)
+
 # --- Model Definitions ---
 
 class GraphSAINTGAT(nn.Module):
@@ -72,7 +83,9 @@ class MetaLEAPPredictor(nn.Module):
         self.control_variate_type = control_variate
 
         # A. Meta-Initialisation (Load pre-trained hyper-network)
-        self.psi = torch.load(meta_ckpt_path)
+        self.psi = safe_torch_load(meta_ckpt_path, map_location='cpu')
+        # psi is registered as submodule; will move to correct device when
+        # predictor.to(device) is called in the training script.
         self.psi.eval()  # Freeze Ψ
 
         # B. Online Δ-Predictor (per-layer, shared across heads)
@@ -256,7 +269,7 @@ def train(rank, world_size, config):
             print(f'--- Starting Experiment: {exp_name} ---')
 
         data_path = exp_config['dataset']['path']
-        data = torch.load(data_path)
+        data = safe_torch_load(data_path, map_location='cpu')
         data = data.to(device)
 
         for model_name in exp_config['models']:
