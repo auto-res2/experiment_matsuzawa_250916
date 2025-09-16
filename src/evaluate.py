@@ -9,7 +9,8 @@ from typing import Any, Dict
 
 import torch
 
-RESULT_DIR = Path(".research/iteration1")
+# All experimental artefacts for *iteration2* must live under this directory
+RESULT_DIR = Path(".research/iteration2")
 RESULT_DIR.mkdir(parents=True, exist_ok=True)
 
 __all__ = [

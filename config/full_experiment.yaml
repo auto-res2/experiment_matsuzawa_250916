@@ -28,4 +28,4 @@ misc:
     - gradientrouting-spar/mc9_badmed_naive_atd-safety_seed_1_epoch_1
   env_hf_token: "${HF_TOKEN}"
   device: auto
-  save_dir: .research/iteration1/artifacts
+  save_dir: .research/iteration2/artifacts

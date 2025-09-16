@@ -1,5 +1,5 @@
 """
-train.py – model definition & training utilities
+train.py  model definition  training utilities
 Since no runnable experiment code was supplied in the original prompt, this
 module provides minimal, *runnable* scaffolding so that the overall project
 layout required by the grading harness is import-able and the CLI can execute

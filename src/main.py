@@ -52,7 +52,7 @@ def main() -> None:  # noqa: D401
     print("[INFO] Training model …", flush=True)
     model = train_model(dataset, config)
 
-    artifact_dir = Path(".research/iteration1/artifacts")
+    artifact_dir = Path(".research/iteration2/artifacts")
     artifact_dir.mkdir(parents=True, exist_ok=True)
     save_model(model, artifact_dir / "model.pt")
 
