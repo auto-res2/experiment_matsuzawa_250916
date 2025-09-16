@@ -6,5 +6,82 @@
     "reinforcement learning prompt tuning",
     "differentiable prompt learning",
     "bayesian prompt optimization"
+  ],
+  "research_study_list": [
+    {
+      "title": "Hard Prompts Made Easy: Gradient-Based Discrete Optimization for Prompt Tuning and Discovery"
+    },
+    {
+      "title": "Localized Zeroth-Order Prompt Optimization"
+    },
+    {
+      "title": "Large Language Models as Optimizers"
+    },
+    {
+      "title": "Connecting Large Language Models with Evolutionary Algorithms Yields Powerful Prompt Optimizers"
+    },
+    {
+      "title": "On Discrete Prompt Optimization for Diffusion Models"
+    },
+    {
+      "title": "Black-Box Tuning for Language-Model-as-a-Service"
+    },
+    {
+      "title": "Black-Box Tuning for Language-Model-as-a-Service"
+    },
+    {
+      "title": "Fairness-guided Few-shot Prompting for Large Language Models"
+    },
+    {
+      "title": "Hard Prompts Made Easy: Gradient-Based Discrete Optimization for Prompt Tuning and Discovery"
+    },
+    {
+      "title": "BadPrompt: Backdoor Attacks on Continuous Prompts"
+    },
+    {
+      "title": "Optimizing Prompts for Text-to-Image Generation"
+    },
+    {
+      "title": "TEMPERA: Test-Time Prompt Editing via Reinforcement Learning"
+    },
+    {
+      "title": "Retroformer: Retrospective Large Language Agents with Policy Gradient Optimization"
+    },
+    {
+      "title": "Reward Design with Language Models"
+    },
+    {
+      "title": "Rule Based Rewards for Language Model Safety"
+    },
+    {
+      "title": "Black-Box Tuning for Language-Model-as-a-Service"
+    },
+    {
+      "title": "Black-Box Tuning for Language-Model-as-a-Service"
+    },
+    {
+      "title": "Learning Differentiable Programs with Admissible Neural Heuristics"
+    },
+    {
+      "title": "DePT: Decomposed Prompt Tuning for Parameter-Efficient Fine-tuning"
+    },
+    {
+      "title": "Hard Prompts Made Easy: Gradient-Based Discrete Optimization for Prompt Tuning and Discovery"
+    },
+    {
+      "title": "Localized Zeroth-Order Prompt Optimization"
+    },
+    {
+      "title": "Deep Bayesian Active Learning for Preference Modeling in Large Language Models"
+    },
+    {
+      "title": "Large Language Models as Optimizers"
+    },
+    {
+      "title": "Efficient Prompt Optimization Through the Lens of Best Arm Identification"
+    },
+    {
+      "title": "Hard Prompts Made Easy: Gradient-Based Discrete Optimization for Prompt Tuning and Discovery"
+    }
   ]
 }
