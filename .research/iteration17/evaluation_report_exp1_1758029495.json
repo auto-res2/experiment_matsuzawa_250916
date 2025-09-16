@@ -1,0 +1,35 @@
+{
+    "experiment_id": 1,
+    "config_name": "smoke_test",
+    "results": {
+        "REFLECT-BO": {
+            "mean_best_helpfulness": 0.247,
+            "std_best_helpfulness": NaN,
+            "mean_auc_helpfulness": 0.23066666666666666
+        },
+        "SHIFT-BO": {
+            "mean_best_helpfulness": 0.287,
+            "std_best_helpfulness": NaN,
+            "mean_auc_helpfulness": 0.25
+        },
+        "MetaBO-Prompt": {
+            "mean_best_helpfulness": 0.254,
+            "std_best_helpfulness": NaN,
+            "mean_auc_helpfulness": 0.23650000000000002
+        },
+        "Random": {
+            "mean_best_helpfulness": 0.271,
+            "std_best_helpfulness": NaN,
+            "mean_auc_helpfulness": 0.24766666666666662
+        },
+        "aggregate": {
+            "overall_mean_best_helpfulness": 0.26475000000000004
+        }
+    },
+    "statistical_tests": {
+        "wilcoxon_REFLECT-BO_vs_SHIFT-BO": {
+            "statistic": 0.0,
+            "p_value": 1.0
+        }
+    }
+}

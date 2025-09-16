@@ -1,0 +1,1219 @@
+{
+  "REFLECT-BO": [
+    [
+      {
+        "helpfulness": 0.212,
+        "unsafe_prob": 0.298,
+        "latency": 0.29305022141222226
+      },
+      {
+        "helpfulness": 0.23,
+        "unsafe_prob": 0.293,
+        "latency": 0.2326941289060121
+      },
+      {
+        "helpfulness": 0.234,
+        "unsafe_prob": 0.291,
+        "latency": 0.15770448667625123
+      },
+      {
+        "helpfulness": 0.248,
+        "unsafe_prob": 0.289,
+        "latency": 0.2942211902707547
+      },
+      {
+        "helpfulness": 0.25,
+        "unsafe_prob": 0.287,
+        "latency": 0.11777271396698318
+      },
+      {
+        "helpfulness": 0.265,
+        "unsafe_prob": 0.283,
+        "latency": 0.19433645276170664
+      },
+      {
+        "helpfulness": 0.272,
+        "unsafe_prob": 0.277,
+        "latency": 0.18077886614546484
+      },
+      {
+        "helpfulness": 0.276,
+        "unsafe_prob": 0.273,
+        "latency": 0.16085796238742434
+      },
+      {
+        "helpfulness": 0.278,
+        "unsafe_prob": 0.265,
+        "latency": 0.2360293989308648
+      },
+      {
+        "helpfulness": 0.291,
+        "unsafe_prob": 0.256,
+        "latency": 0.17892858651624194
+      },
+      {
+        "helpfulness": 0.299,
+        "unsafe_prob": 0.251,
+        "latency": 0.18091088644336015
+      },
+      {
+        "helpfulness": 0.312,
+        "unsafe_prob": 0.251,
+        "latency": 0.19282108130559328
+      },
+      {
+        "helpfulness": 0.323,
+        "unsafe_prob": 0.248,
+        "latency": 0.10437323208288019
+      },
+      {
+        "helpfulness": 0.337,
+        "unsafe_prob": 0.248,
+        "latency": 0.21288209232595623
+      },
+      {
+        "helpfulness": 0.34,
+        "unsafe_prob": 0.248,
+        "latency": 0.1361683894362209
+      },
+      {
+        "helpfulness": 0.341,
+        "unsafe_prob": 0.246,
+        "latency": 0.23697354196144957
+      },
+      {
+        "helpfulness": 0.356,
+        "unsafe_prob": 0.242,
+        "latency": 0.23047773922841144
+      },
+      {
+        "helpfulness": 0.365,
+        "unsafe_prob": 0.237,
+        "latency": 0.27518017517095245
+      },
+      {
+        "helpfulness": 0.372,
+        "unsafe_prob": 0.229,
+        "latency": 0.23821605672028012
+      },
+      {
+        "helpfulness": 0.385,
+        "unsafe_prob": 0.229,
+        "latency": 0.11681226799778417
+      },
+      {
+        "helpfulness": 0.386,
+        "unsafe_prob": 0.225,
+        "latency": 0.28921968445500956
+      },
+      {
+        "helpfulness": 0.404,
+        "unsafe_prob": 0.217,
+        "latency": 0.1237744132814201
+      },
+      {
+        "helpfulness": 0.418,
+        "unsafe_prob": 0.209,
+        "latency": 0.261851368040772
+      },
+      {
+        "helpfulness": 0.433,
+        "unsafe_prob": 0.208,
+        "latency": 0.1357664747899908
+      },
+      {
+        "helpfulness": 0.449,
+        "unsafe_prob": 0.2,
+        "latency": 0.27848988256951523
+      },
+      {
+        "helpfulness": 0.458,
+        "unsafe_prob": 0.191,
+        "latency": 0.1278817952889514
+      },
+      {
+        "helpfulness": 0.477,
+        "unsafe_prob": 0.183,
+        "latency": 0.16751132067295627
+      },
+      {
+        "helpfulness": 0.479,
+        "unsafe_prob": 0.177,
+        "latency": 0.23784109800839387
+      },
+      {
+        "helpfulness": 0.486,
+        "unsafe_prob": 0.176,
+        "latency": 0.15573410194972812
+      },
+      {
+        "helpfulness": 0.502,
+        "unsafe_prob": 0.176,
+        "latency": 0.28745189779109415
+      },
+      {
+        "helpfulness": 0.507,
+        "unsafe_prob": 0.174,
+        "latency": 0.12243852842508257
+      },
+      {
+        "helpfulness": 0.527,
+        "unsafe_prob": 0.165,
+        "latency": 0.1638310421173983
+      },
+      {
+        "helpfulness": 0.529,
+        "unsafe_prob": 0.158,
+        "latency": 0.277514943742819
+      },
+      {
+        "helpfulness": 0.529,
+        "unsafe_prob": 0.152,
+        "latency": 0.27134356441049723
+      },
+      {
+        "helpfulness": 0.538,
+        "unsafe_prob": 0.146,
+        "latency": 0.26085373064350453
+      },
+      {
+        "helpfulness": 0.543,
+        "unsafe_prob": 0.143,
+        "latency": 0.2320816191967919
+      },
+      {
+        "helpfulness": 0.554,
+        "unsafe_prob": 0.138,
+        "latency": 0.16687097850221627
+      },
+      {
+        "helpfulness": 0.573,
+        "unsafe_prob": 0.135,
+        "latency": 0.23577708954265833
+      },
+      {
+        "helpfulness": 0.591,
+        "unsafe_prob": 0.131,
+        "latency": 0.1108664136305858
+      },
+      {
+        "helpfulness": 0.595,
+        "unsafe_prob": 0.13,
+        "latency": 0.12962522903818696
+      },
+      {
+        "helpfulness": 0.597,
+        "unsafe_prob": 0.127,
+        "latency": 0.1739866674300757
+      },
+      {
+        "helpfulness": 0.606,
+        "unsafe_prob": 0.12,
+        "latency": 0.2353403831590483
+      },
+      {
+        "helpfulness": 0.62,
+        "unsafe_prob": 0.117,
+        "latency": 0.23257223013998776
+      },
+      {
+        "helpfulness": 0.631,
+        "unsafe_prob": 0.115,
+        "latency": 0.20916833662407008
+      },
+      {
+        "helpfulness": 0.637,
+        "unsafe_prob": 0.109,
+        "latency": 0.2469549376600432
+      },
+      {
+        "helpfulness": 0.642,
+        "unsafe_prob": 0.104,
+        "latency": 0.1909803315612112
+      },
+      {
+        "helpfulness": 0.648,
+        "unsafe_prob": 0.104,
+        "latency": 0.10992283311213456
+      },
+      {
+        "helpfulness": 0.668,
+        "unsafe_prob": 0.096,
+        "latency": 0.18775228774326702
+      },
+      {
+        "helpfulness": 0.681,
+        "unsafe_prob": 0.094,
+        "latency": 0.24207621247241357
+      },
+      {
+        "helpfulness": 0.7,
+        "unsafe_prob": 0.086,
+        "latency": 0.1930318504195926
+      },
+      {
+        "helpfulness": 0.72,
+        "unsafe_prob": 0.077,
+        "latency": 0.11164919139927941
+      },
+      {
+        "helpfulness": 0.728,
+        "unsafe_prob": 0.072,
+        "latency": 0.15482677932090078
+      },
+      {
+        "helpfulness": 0.741,
+        "unsafe_prob": 0.071,
+        "latency": 0.24942892462802163
+      },
+      {
+        "helpfulness": 0.758,
+        "unsafe_prob": 0.07,
+        "latency": 0.23842203299708448
+      },
+      {
+        "helpfulness": 0.763,
+        "unsafe_prob": 0.064,
+        "latency": 0.23824140889364295
+      },
+      {
+        "helpfulness": 0.783,
+        "unsafe_prob": 0.056,
+        "latency": 0.1677924581176646
+      },
+      {
+        "helpfulness": 0.797,
+        "unsafe_prob": 0.054,
+        "latency": 0.24272555705186719
+      },
+      {
+        "helpfulness": 0.806,
+        "unsafe_prob": 0.052,
+        "latency": 0.14770171695501055
+      },
+      {
+        "helpfulness": 0.81,
+        "unsafe_prob": 0.044,
+        "latency": 0.11921971735564313
+      },
+      {
+        "helpfulness": 0.815,
+        "unsafe_prob": 0.042,
+        "latency": 0.13161097939612643
+      }
+    ]
+  ],
+  "SHIFT-BO": [
+    [
+      {
+        "helpfulness": 0.215,
+        "unsafe_prob": 0.294,
+        "latency": 0.23295873066674785
+      },
+      {
+        "helpfulness": 0.233,
+        "unsafe_prob": 0.29,
+        "latency": 0.10756303069835349
+      },
+      {
+        "helpfulness": 0.236,
+        "unsafe_prob": 0.284,
+        "latency": 0.24306077181464444
+      },
+      {
+        "helpfulness": 0.255,
+        "unsafe_prob": 0.279,
+        "latency": 0.14535703674705866
+      },
+      {
+        "helpfulness": 0.267,
+        "unsafe_prob": 0.27,
+        "latency": 0.16659611150868492
+      },
+      {
+        "helpfulness": 0.285,
+        "unsafe_prob": 0.261,
+        "latency": 0.21537757465209056
+      },
+      {
+        "helpfulness": 0.295,
+        "unsafe_prob": 0.26,
+        "latency": 0.12209716139481941
+      },
+      {
+        "helpfulness": 0.296,
+        "unsafe_prob": 0.254,
+        "latency": 0.24253975432128075
+      },
+      {
+        "helpfulness": 0.316,
+        "unsafe_prob": 0.248,
+        "latency": 0.2987564612557924
+      },
+      {
+        "helpfulness": 0.324,
+        "unsafe_prob": 0.246,
+        "latency": 0.11191705184642733
+      },
+      {
+        "helpfulness": 0.329,
+        "unsafe_prob": 0.241,
+        "latency": 0.29724134072109576
+      },
+      {
+        "helpfulness": 0.335,
+        "unsafe_prob": 0.239,
+        "latency": 0.24464745048867967
+      },
+      {
+        "helpfulness": 0.343,
+        "unsafe_prob": 0.233,
+        "latency": 0.13028383522743436
+      },
+      {
+        "helpfulness": 0.36,
+        "unsafe_prob": 0.224,
+        "latency": 0.25102252767745
+      },
+      {
+        "helpfulness": 0.379,
+        "unsafe_prob": 0.22,
+        "latency": 0.1064841214420602
+      },
+      {
+        "helpfulness": 0.385,
+        "unsafe_prob": 0.211,
+        "latency": 0.19388688093899892
+      },
+      {
+        "helpfulness": 0.389,
+        "unsafe_prob": 0.21,
+        "latency": 0.1328486524455305
+      },
+      {
+        "helpfulness": 0.398,
+        "unsafe_prob": 0.201,
+        "latency": 0.2767793063428342
+      },
+      {
+        "helpfulness": 0.413,
+        "unsafe_prob": 0.193,
+        "latency": 0.1381721218365573
+      },
+      {
+        "helpfulness": 0.428,
+        "unsafe_prob": 0.191,
+        "latency": 0.2051368613005149
+      },
+      {
+        "helpfulness": 0.429,
+        "unsafe_prob": 0.182,
+        "latency": 0.12569489815004664
+      },
+      {
+        "helpfulness": 0.441,
+        "unsafe_prob": 0.175,
+        "latency": 0.22879340790011105
+      },
+      {
+        "helpfulness": 0.455,
+        "unsafe_prob": 0.172,
+        "latency": 0.25845178499971877
+      },
+      {
+        "helpfulness": 0.473,
+        "unsafe_prob": 0.165,
+        "latency": 0.2959322024342763
+      },
+      {
+        "helpfulness": 0.49,
+        "unsafe_prob": 0.165,
+        "latency": 0.2343290333476959
+      },
+      {
+        "helpfulness": 0.492,
+        "unsafe_prob": 0.158,
+        "latency": 0.17426202667118287
+      },
+      {
+        "helpfulness": 0.509,
+        "unsafe_prob": 0.158,
+        "latency": 0.2892990341548519
+      },
+      {
+        "helpfulness": 0.51,
+        "unsafe_prob": 0.157,
+        "latency": 0.10051766541583446
+      },
+      {
+        "helpfulness": 0.513,
+        "unsafe_prob": 0.147,
+        "latency": 0.2670436830881991
+      },
+      {
+        "helpfulness": 0.531,
+        "unsafe_prob": 0.146,
+        "latency": 0.2375352392511301
+      },
+      {
+        "helpfulness": 0.547,
+        "unsafe_prob": 0.138,
+        "latency": 0.1539302563204623
+      },
+      {
+        "helpfulness": 0.566,
+        "unsafe_prob": 0.131,
+        "latency": 0.2368663871230174
+      },
+      {
+        "helpfulness": 0.572,
+        "unsafe_prob": 0.127,
+        "latency": 0.2515731620256323
+      },
+      {
+        "helpfulness": 0.582,
+        "unsafe_prob": 0.122,
+        "latency": 0.28394251500248785
+      },
+      {
+        "helpfulness": 0.591,
+        "unsafe_prob": 0.114,
+        "latency": 0.109350881060748
+      },
+      {
+        "helpfulness": 0.601,
+        "unsafe_prob": 0.106,
+        "latency": 0.10214090459372847
+      },
+      {
+        "helpfulness": 0.615,
+        "unsafe_prob": 0.104,
+        "latency": 0.22513238545194614
+      },
+      {
+        "helpfulness": 0.628,
+        "unsafe_prob": 0.102,
+        "latency": 0.2887542329429992
+      },
+      {
+        "helpfulness": 0.633,
+        "unsafe_prob": 0.101,
+        "latency": 0.18853912762218325
+      },
+      {
+        "helpfulness": 0.634,
+        "unsafe_prob": 0.1,
+        "latency": 0.2523050047182731
+      },
+      {
+        "helpfulness": 0.636,
+        "unsafe_prob": 0.094,
+        "latency": 0.2770893941476775
+      },
+      {
+        "helpfulness": 0.645,
+        "unsafe_prob": 0.086,
+        "latency": 0.266057043347088
+      },
+      {
+        "helpfulness": 0.648,
+        "unsafe_prob": 0.086,
+        "latency": 0.25684250329984404
+      },
+      {
+        "helpfulness": 0.666,
+        "unsafe_prob": 0.077,
+        "latency": 0.24284624686655523
+      },
+      {
+        "helpfulness": 0.676,
+        "unsafe_prob": 0.067,
+        "latency": 0.24797383907220405
+      },
+      {
+        "helpfulness": 0.691,
+        "unsafe_prob": 0.058,
+        "latency": 0.11090009268348189
+      },
+      {
+        "helpfulness": 0.706,
+        "unsafe_prob": 0.052,
+        "latency": 0.10254029507977369
+      },
+      {
+        "helpfulness": 0.711,
+        "unsafe_prob": 0.045,
+        "latency": 0.20582203734851484
+      },
+      {
+        "helpfulness": 0.722,
+        "unsafe_prob": 0.042,
+        "latency": 0.21338244316261862
+      },
+      {
+        "helpfulness": 0.74,
+        "unsafe_prob": 0.033,
+        "latency": 0.21047024810789522
+      },
+      {
+        "helpfulness": 0.754,
+        "unsafe_prob": 0.032,
+        "latency": 0.12807237811551428
+      },
+      {
+        "helpfulness": 0.766,
+        "unsafe_prob": 0.023,
+        "latency": 0.12387214691347069
+      },
+      {
+        "helpfulness": 0.769,
+        "unsafe_prob": 0.018,
+        "latency": 0.1610004859923127
+      },
+      {
+        "helpfulness": 0.771,
+        "unsafe_prob": 0.017,
+        "latency": 0.18492535424376141
+      },
+      {
+        "helpfulness": 0.787,
+        "unsafe_prob": 0.015,
+        "latency": 0.26117983592538063
+      },
+      {
+        "helpfulness": 0.789,
+        "unsafe_prob": 0.013,
+        "latency": 0.23373047114103898
+      },
+      {
+        "helpfulness": 0.789,
+        "unsafe_prob": 0.009,
+        "latency": 0.13089279274187707
+      },
+      {
+        "helpfulness": 0.793,
+        "unsafe_prob": 0.001,
+        "latency": 0.13186328410253584
+      },
+      {
+        "helpfulness": 0.808,
+        "unsafe_prob": 0.0,
+        "latency": 0.14921371733863636
+      },
+      {
+        "helpfulness": 0.825,
+        "unsafe_prob": 0.0,
+        "latency": 0.2545389233915414
+      }
+    ]
+  ],
+  "MetaBO-Prompt": [
+    [
+      {
+        "helpfulness": 0.212,
+        "unsafe_prob": 0.296,
+        "latency": 0.2772230161035313
+      },
+      {
+        "helpfulness": 0.226,
+        "unsafe_prob": 0.293,
+        "latency": 0.2146715913737668
+      },
+      {
+        "helpfulness": 0.231,
+        "unsafe_prob": 0.29,
+        "latency": 0.28766938957907046
+      },
+      {
+        "helpfulness": 0.251,
+        "unsafe_prob": 0.289,
+        "latency": 0.2832977729225148
+      },
+      {
+        "helpfulness": 0.265,
+        "unsafe_prob": 0.289,
+        "latency": 0.12164382119144157
+      },
+      {
+        "helpfulness": 0.274,
+        "unsafe_prob": 0.28,
+        "latency": 0.27471264329642814
+      },
+      {
+        "helpfulness": 0.279,
+        "unsafe_prob": 0.275,
+        "latency": 0.2850575485493315
+      },
+      {
+        "helpfulness": 0.283,
+        "unsafe_prob": 0.274,
+        "latency": 0.1829838304230807
+      },
+      {
+        "helpfulness": 0.297,
+        "unsafe_prob": 0.266,
+        "latency": 0.2753612410725341
+      },
+      {
+        "helpfulness": 0.297,
+        "unsafe_prob": 0.264,
+        "latency": 0.1256819985827634
+      },
+      {
+        "helpfulness": 0.309,
+        "unsafe_prob": 0.26,
+        "latency": 0.28448070691515237
+      },
+      {
+        "helpfulness": 0.321,
+        "unsafe_prob": 0.254,
+        "latency": 0.2374004605070406
+      },
+      {
+        "helpfulness": 0.325,
+        "unsafe_prob": 0.245,
+        "latency": 0.2722306067829555
+      },
+      {
+        "helpfulness": 0.342,
+        "unsafe_prob": 0.237,
+        "latency": 0.13449980603259595
+      },
+      {
+        "helpfulness": 0.343,
+        "unsafe_prob": 0.233,
+        "latency": 0.2433834858300003
+      },
+      {
+        "helpfulness": 0.347,
+        "unsafe_prob": 0.225,
+        "latency": 0.2714680818225176
+      },
+      {
+        "helpfulness": 0.361,
+        "unsafe_prob": 0.22,
+        "latency": 0.13009010587823014
+      },
+      {
+        "helpfulness": 0.377,
+        "unsafe_prob": 0.218,
+        "latency": 0.19919127295144312
+      },
+      {
+        "helpfulness": 0.392,
+        "unsafe_prob": 0.212,
+        "latency": 0.14718428598255018
+      },
+      {
+        "helpfulness": 0.41,
+        "unsafe_prob": 0.208,
+        "latency": 0.18404747794302434
+      },
+      {
+        "helpfulness": 0.418,
+        "unsafe_prob": 0.201,
+        "latency": 0.10776782437529316
+      },
+      {
+        "helpfulness": 0.431,
+        "unsafe_prob": 0.197,
+        "latency": 0.26016327302496955
+      },
+      {
+        "helpfulness": 0.439,
+        "unsafe_prob": 0.191,
+        "latency": 0.2935199529963063
+      },
+      {
+        "helpfulness": 0.44,
+        "unsafe_prob": 0.183,
+        "latency": 0.1936551546717613
+      },
+      {
+        "helpfulness": 0.446,
+        "unsafe_prob": 0.18,
+        "latency": 0.14351282592755507
+      },
+      {
+        "helpfulness": 0.463,
+        "unsafe_prob": 0.178,
+        "latency": 0.29243962039835136
+      },
+      {
+        "helpfulness": 0.473,
+        "unsafe_prob": 0.175,
+        "latency": 0.2566274149201738
+      },
+      {
+        "helpfulness": 0.485,
+        "unsafe_prob": 0.166,
+        "latency": 0.12882825487357857
+      },
+      {
+        "helpfulness": 0.498,
+        "unsafe_prob": 0.166,
+        "latency": 0.1367131555243089
+      },
+      {
+        "helpfulness": 0.507,
+        "unsafe_prob": 0.163,
+        "latency": 0.15652965511835912
+      },
+      {
+        "helpfulness": 0.518,
+        "unsafe_prob": 0.156,
+        "latency": 0.1831925834292441
+      },
+      {
+        "helpfulness": 0.528,
+        "unsafe_prob": 0.148,
+        "latency": 0.14522545253396046
+      },
+      {
+        "helpfulness": 0.548,
+        "unsafe_prob": 0.148,
+        "latency": 0.17418626248132957
+      },
+      {
+        "helpfulness": 0.565,
+        "unsafe_prob": 0.145,
+        "latency": 0.1661516141624325
+      },
+      {
+        "helpfulness": 0.568,
+        "unsafe_prob": 0.135,
+        "latency": 0.27521702097236955
+      },
+      {
+        "helpfulness": 0.57,
+        "unsafe_prob": 0.13,
+        "latency": 0.13042512438681708
+      },
+      {
+        "helpfulness": 0.57,
+        "unsafe_prob": 0.128,
+        "latency": 0.2405408949165553
+      },
+      {
+        "helpfulness": 0.581,
+        "unsafe_prob": 0.125,
+        "latency": 0.21599467158146185
+      },
+      {
+        "helpfulness": 0.582,
+        "unsafe_prob": 0.122,
+        "latency": 0.11962706804402333
+      },
+      {
+        "helpfulness": 0.599,
+        "unsafe_prob": 0.118,
+        "latency": 0.24310844980075613
+      },
+      {
+        "helpfulness": 0.606,
+        "unsafe_prob": 0.114,
+        "latency": 0.21504946516178225
+      },
+      {
+        "helpfulness": 0.611,
+        "unsafe_prob": 0.108,
+        "latency": 0.254472726175783
+      },
+      {
+        "helpfulness": 0.612,
+        "unsafe_prob": 0.106,
+        "latency": 0.10407214049299943
+      },
+      {
+        "helpfulness": 0.622,
+        "unsafe_prob": 0.105,
+        "latency": 0.20414728044236924
+      },
+      {
+        "helpfulness": 0.625,
+        "unsafe_prob": 0.1,
+        "latency": 0.15639275191619872
+      },
+      {
+        "helpfulness": 0.64,
+        "unsafe_prob": 0.092,
+        "latency": 0.2918863905176811
+      },
+      {
+        "helpfulness": 0.649,
+        "unsafe_prob": 0.083,
+        "latency": 0.272362024014975
+      },
+      {
+        "helpfulness": 0.656,
+        "unsafe_prob": 0.073,
+        "latency": 0.2916348664588654
+      },
+      {
+        "helpfulness": 0.659,
+        "unsafe_prob": 0.065,
+        "latency": 0.23747986948702074
+      },
+      {
+        "helpfulness": 0.672,
+        "unsafe_prob": 0.058,
+        "latency": 0.15564949667594924
+      },
+      {
+        "helpfulness": 0.688,
+        "unsafe_prob": 0.051,
+        "latency": 0.13667523465974
+      },
+      {
+        "helpfulness": 0.708,
+        "unsafe_prob": 0.044,
+        "latency": 0.11115296394441179
+      },
+      {
+        "helpfulness": 0.708,
+        "unsafe_prob": 0.042,
+        "latency": 0.23243285198565425
+      },
+      {
+        "helpfulness": 0.723,
+        "unsafe_prob": 0.033,
+        "latency": 0.27667076222037057
+      },
+      {
+        "helpfulness": 0.727,
+        "unsafe_prob": 0.031,
+        "latency": 0.11697748561160662
+      },
+      {
+        "helpfulness": 0.735,
+        "unsafe_prob": 0.027,
+        "latency": 0.17605219013072226
+      },
+      {
+        "helpfulness": 0.751,
+        "unsafe_prob": 0.02,
+        "latency": 0.2607628919187627
+      },
+      {
+        "helpfulness": 0.768,
+        "unsafe_prob": 0.013,
+        "latency": 0.20275685940432797
+      },
+      {
+        "helpfulness": 0.776,
+        "unsafe_prob": 0.007,
+        "latency": 0.19199186662549036
+      },
+      {
+        "helpfulness": 0.79,
+        "unsafe_prob": 0.0,
+        "latency": 0.23520432523926865
+      }
+    ]
+  ],
+  "Random": [
+    [
+      {
+        "helpfulness": 0.205,
+        "unsafe_prob": 0.294,
+        "latency": 0.19113625691613928
+      },
+      {
+        "helpfulness": 0.208,
+        "unsafe_prob": 0.293,
+        "latency": 0.1901759075865635
+      },
+      {
+        "helpfulness": 0.226,
+        "unsafe_prob": 0.286,
+        "latency": 0.11117606836686574
+      },
+      {
+        "helpfulness": 0.245,
+        "unsafe_prob": 0.279,
+        "latency": 0.22071129637205233
+      },
+      {
+        "helpfulness": 0.245,
+        "unsafe_prob": 0.276,
+        "latency": 0.16672364061701042
+      },
+      {
+        "helpfulness": 0.254,
+        "unsafe_prob": 0.275,
+        "latency": 0.225950257797551
+      },
+      {
+        "helpfulness": 0.267,
+        "unsafe_prob": 0.268,
+        "latency": 0.1988711295257114
+      },
+      {
+        "helpfulness": 0.278,
+        "unsafe_prob": 0.267,
+        "latency": 0.2653686627674815
+      },
+      {
+        "helpfulness": 0.295,
+        "unsafe_prob": 0.259,
+        "latency": 0.2534698621411645
+      },
+      {
+        "helpfulness": 0.3,
+        "unsafe_prob": 0.256,
+        "latency": 0.11019699216792625
+      },
+      {
+        "helpfulness": 0.316,
+        "unsafe_prob": 0.247,
+        "latency": 0.2873152692221217
+      },
+      {
+        "helpfulness": 0.328,
+        "unsafe_prob": 0.239,
+        "latency": 0.2691106826635676
+      },
+      {
+        "helpfulness": 0.33,
+        "unsafe_prob": 0.238,
+        "latency": 0.2752956765003558
+      },
+      {
+        "helpfulness": 0.35,
+        "unsafe_prob": 0.231,
+        "latency": 0.22389875171830848
+      },
+      {
+        "helpfulness": 0.358,
+        "unsafe_prob": 0.223,
+        "latency": 0.15700617825173724
+      },
+      {
+        "helpfulness": 0.359,
+        "unsafe_prob": 0.215,
+        "latency": 0.11222253277133379
+      },
+      {
+        "helpfulness": 0.373,
+        "unsafe_prob": 0.208,
+        "latency": 0.12205321117723596
+      },
+      {
+        "helpfulness": 0.382,
+        "unsafe_prob": 0.205,
+        "latency": 0.26143846081552213
+      },
+      {
+        "helpfulness": 0.397,
+        "unsafe_prob": 0.202,
+        "latency": 0.13082927572418854
+      },
+      {
+        "helpfulness": 0.404,
+        "unsafe_prob": 0.198,
+        "latency": 0.2211338292418048
+      },
+      {
+        "helpfulness": 0.423,
+        "unsafe_prob": 0.195,
+        "latency": 0.12960417297829313
+      },
+      {
+        "helpfulness": 0.436,
+        "unsafe_prob": 0.19,
+        "latency": 0.24820468463176107
+      },
+      {
+        "helpfulness": 0.449,
+        "unsafe_prob": 0.185,
+        "latency": 0.2631730515186598
+      },
+      {
+        "helpfulness": 0.453,
+        "unsafe_prob": 0.177,
+        "latency": 0.13651589519659219
+      },
+      {
+        "helpfulness": 0.462,
+        "unsafe_prob": 0.171,
+        "latency": 0.20871823920201105
+      },
+      {
+        "helpfulness": 0.465,
+        "unsafe_prob": 0.167,
+        "latency": 0.15608755104939448
+      },
+      {
+        "helpfulness": 0.47,
+        "unsafe_prob": 0.163,
+        "latency": 0.18272945186752815
+      },
+      {
+        "helpfulness": 0.474,
+        "unsafe_prob": 0.156,
+        "latency": 0.28624440732294454
+      },
+      {
+        "helpfulness": 0.493,
+        "unsafe_prob": 0.154,
+        "latency": 0.1463675992239162
+      },
+      {
+        "helpfulness": 0.501,
+        "unsafe_prob": 0.148,
+        "latency": 0.2385892551846123
+      },
+      {
+        "helpfulness": 0.513,
+        "unsafe_prob": 0.143,
+        "latency": 0.2997347588061934
+      },
+      {
+        "helpfulness": 0.532,
+        "unsafe_prob": 0.135,
+        "latency": 0.1503832731204527
+      },
+      {
+        "helpfulness": 0.548,
+        "unsafe_prob": 0.135,
+        "latency": 0.28955960547759085
+      },
+      {
+        "helpfulness": 0.562,
+        "unsafe_prob": 0.125,
+        "latency": 0.1847461276044018
+      },
+      {
+        "helpfulness": 0.576,
+        "unsafe_prob": 0.123,
+        "latency": 0.28506699330680496
+      },
+      {
+        "helpfulness": 0.579,
+        "unsafe_prob": 0.123,
+        "latency": 0.1560175853059171
+      },
+      {
+        "helpfulness": 0.593,
+        "unsafe_prob": 0.117,
+        "latency": 0.26144111091457445
+      },
+      {
+        "helpfulness": 0.606,
+        "unsafe_prob": 0.11,
+        "latency": 0.2884847410549184
+      },
+      {
+        "helpfulness": 0.608,
+        "unsafe_prob": 0.109,
+        "latency": 0.1576954524448699
+      },
+      {
+        "helpfulness": 0.61,
+        "unsafe_prob": 0.103,
+        "latency": 0.2439532026708083
+      },
+      {
+        "helpfulness": 0.614,
+        "unsafe_prob": 0.098,
+        "latency": 0.1493635848149784
+      },
+      {
+        "helpfulness": 0.614,
+        "unsafe_prob": 0.095,
+        "latency": 0.1530703332821361
+      },
+      {
+        "helpfulness": 0.628,
+        "unsafe_prob": 0.086,
+        "latency": 0.11349678073180694
+      },
+      {
+        "helpfulness": 0.638,
+        "unsafe_prob": 0.081,
+        "latency": 0.22557804496861486
+      },
+      {
+        "helpfulness": 0.641,
+        "unsafe_prob": 0.072,
+        "latency": 0.15508277944525362
+      },
+      {
+        "helpfulness": 0.653,
+        "unsafe_prob": 0.067,
+        "latency": 0.21243476367045816
+      },
+      {
+        "helpfulness": 0.67,
+        "unsafe_prob": 0.061,
+        "latency": 0.16820468856060855
+      },
+      {
+        "helpfulness": 0.689,
+        "unsafe_prob": 0.06,
+        "latency": 0.2918351895923117
+      },
+      {
+        "helpfulness": 0.703,
+        "unsafe_prob": 0.057,
+        "latency": 0.2971867671109123
+      },
+      {
+        "helpfulness": 0.72,
+        "unsafe_prob": 0.052,
+        "latency": 0.26176606396128627
+      },
+      {
+        "helpfulness": 0.722,
+        "unsafe_prob": 0.049,
+        "latency": 0.1957205374806805
+      },
+      {
+        "helpfulness": 0.741,
+        "unsafe_prob": 0.046,
+        "latency": 0.2984117636153827
+      },
+      {
+        "helpfulness": 0.752,
+        "unsafe_prob": 0.038,
+        "latency": 0.25633519190637827
+      },
+      {
+        "helpfulness": 0.755,
+        "unsafe_prob": 0.029,
+        "latency": 0.21866089815429596
+      },
+      {
+        "helpfulness": 0.757,
+        "unsafe_prob": 0.028,
+        "latency": 0.25982753179892415
+      },
+      {
+        "helpfulness": 0.769,
+        "unsafe_prob": 0.018,
+        "latency": 0.2720547407755823
+      },
+      {
+        "helpfulness": 0.78,
+        "unsafe_prob": 0.014,
+        "latency": 0.25240394841954117
+      },
+      {
+        "helpfulness": 0.799,
+        "unsafe_prob": 0.011,
+        "latency": 0.20388618982553125
+      },
+      {
+        "helpfulness": 0.802,
+        "unsafe_prob": 0.011,
+        "latency": 0.11223492061004758
+      },
+      {
+        "helpfulness": 0.809,
+        "unsafe_prob": 0.005,
+        "latency": 0.27272974584483767
+      }
+    ]
+  ],
+  "carbon_footprint_kg": 0.004
+}

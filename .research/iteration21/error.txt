@@ -1,0 +1,72 @@
+/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/.venv/lib/python3.11/site-packages/torch/cuda/__init__.py:63: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+[codecarbon WARNING @ 13:31:46] Multiple instances of codecarbon are allowed to run at the same time.
+[codecarbon INFO @ 13:31:46] [setup] RAM Tracking...
+[codecarbon INFO @ 13:31:46] [setup] CPU Tracking...
+[codecarbon WARNING @ 13:31:47] No CPU tracking mode found. Falling back on estimation based on TDP for CPU. 
+ Linux OS detected: Please ensure RAPL files exist at /sys/class/powercap/intel-rapl/subsystem to measure CPU
+
+[codecarbon INFO @ 13:31:47] CPU Model on constant consumption mode: AMD EPYC 7713 64-Core Processor
+[codecarbon WARNING @ 13:31:47] No CPU tracking mode found. Falling back on CPU load mode.
+[codecarbon INFO @ 13:31:47] [setup] GPU Tracking...
+[codecarbon INFO @ 13:31:47] Tracking Nvidia GPU via pynvml
+[codecarbon INFO @ 13:31:47] The below tracking methods have been set up:
+                RAM Tracking Method: RAM power estimation model
+                CPU Tracking Method: cpu_load
+                GPU Tracking Method: pynvml
+            
+[codecarbon INFO @ 13:31:47] >>> Tracker's metadata:
+[codecarbon INFO @ 13:31:47]   Platform system: Linux-5.15.0-119-generic-x86_64-with-glibc2.35
+[codecarbon INFO @ 13:31:47]   Python version: 3.11.13
+[codecarbon INFO @ 13:31:47]   CodeCarbon version: 3.0.4
+[codecarbon INFO @ 13:31:47]   Available RAM : 2003.901 GB
+[codecarbon INFO @ 13:31:47]   CPU count: 128 thread(s) in 2 physical CPU(s)
+[codecarbon INFO @ 13:31:47]   CPU model: AMD EPYC 7713 64-Core Processor
+[codecarbon INFO @ 13:31:47]   GPU count: 8
+[codecarbon INFO @ 13:31:47]   GPU model: 8 x NVIDIA A100-SXM4-80GB
+[codecarbon INFO @ 13:31:50] Emissions data (if any) will be saved to file /home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/.research/iteration12/training_smoke/emissions.csv
+[codecarbon INFO @ 13:31:51] Energy consumed for RAM : 0.000010 kWh. RAM Power : 70.0 W
+[codecarbon INFO @ 13:31:51] Delta energy consumed for CPU with cpu_load : 0.000007 kWh, power : 45.050625000000004 W
+[codecarbon INFO @ 13:31:51] Energy consumed for All CPU : 0.000007 kWh
+[codecarbon INFO @ 13:31:51] Energy consumed for all GPUs : 0.000076 kWh. Total GPU Power : 265.78299979491914 W
+[codecarbon INFO @ 13:31:51] 0.000093 kWh of electricity used since the beginning.
+/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/.venv/lib/python3.11/site-packages/numpy/_core/_methods.py:222: RuntimeWarning: Degrees of freedom <= 0 for slice
+  ret = _var(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
+/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/.venv/lib/python3.11/site-packages/numpy/_core/_methods.py:214: RuntimeWarning: invalid value encountered in scalar divide
+  ret = ret.dtype.type(ret / rcount)
+[codecarbon WARNING @ 13:32:00] Multiple instances of codecarbon are allowed to run at the same time.
+[codecarbon INFO @ 13:32:00] [setup] RAM Tracking...
+[codecarbon INFO @ 13:32:00] [setup] CPU Tracking...
+[codecarbon WARNING @ 13:32:00] No CPU tracking mode found. Falling back on estimation based on TDP for CPU. 
+ Linux OS detected: Please ensure RAPL files exist at /sys/class/powercap/intel-rapl/subsystem to measure CPU
+
+[codecarbon INFO @ 13:32:00] CPU Model on constant consumption mode: AMD EPYC 7713 64-Core Processor
+[codecarbon WARNING @ 13:32:00] No CPU tracking mode found. Falling back on CPU load mode.
+[codecarbon INFO @ 13:32:00] [setup] GPU Tracking...
+[codecarbon INFO @ 13:32:00] Tracking Nvidia GPU via pynvml
+[codecarbon INFO @ 13:32:00] The below tracking methods have been set up:
+                RAM Tracking Method: RAM power estimation model
+                CPU Tracking Method: cpu_load
+                GPU Tracking Method: pynvml
+            
+[codecarbon INFO @ 13:32:00] >>> Tracker's metadata:
+[codecarbon INFO @ 13:32:00]   Platform system: Linux-5.15.0-119-generic-x86_64-with-glibc2.35
+[codecarbon INFO @ 13:32:00]   Python version: 3.11.13
+[codecarbon INFO @ 13:32:00]   CodeCarbon version: 3.0.4
+[codecarbon INFO @ 13:32:00]   Available RAM : 2003.901 GB
+[codecarbon INFO @ 13:32:00]   CPU count: 128 thread(s) in 2 physical CPU(s)
+[codecarbon INFO @ 13:32:00]   CPU model: AMD EPYC 7713 64-Core Processor
+[codecarbon INFO @ 13:32:00]   GPU count: 8
+[codecarbon INFO @ 13:32:00]   GPU model: 8 x NVIDIA A100-SXM4-80GB
+[codecarbon INFO @ 13:32:04] Emissions data (if any) will be saved to file /home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/.research/iteration12/training_full/emissions.csv
+[codecarbon INFO @ 13:32:04] Energy consumed for RAM : 0.000011 kWh. RAM Power : 70.0 W
+[codecarbon INFO @ 13:32:05] Delta energy consumed for CPU with cpu_load : 0.000007 kWh, power : 45.184895865 W
+[codecarbon INFO @ 13:32:05] Energy consumed for All CPU : 0.000007 kWh
+[codecarbon INFO @ 13:32:05] Energy consumed for all GPUs : 0.000094 kWh. Total GPU Power : 322.1372499748058 W
+[codecarbon INFO @ 13:32:05] 0.000112 kWh of electricity used since the beginning.
+/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/.venv/lib/python3.11/site-packages/numpy/_core/_methods.py:222: RuntimeWarning: Degrees of freedom <= 0 for slice
+  ret = _var(a, axis=axis, dtype=dtype, out=out, ddof=ddof,
+/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/.venv/lib/python3.11/site-packages/numpy/_core/_methods.py:214: RuntimeWarning: invalid value encountered in scalar divide
+  ret = ret.dtype.type(ret / rcount)
+
+FATAL ERROR in pipeline: FATAL: Could not download Hugging Face dataset 'super_natural_instructions'. Error: Dataset 'super_natural_instructions' doesn't exist on the Hub or cannot be accessed.

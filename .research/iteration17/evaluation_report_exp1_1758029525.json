@@ -1,0 +1,35 @@
+{
+    "experiment_id": 1,
+    "config_name": "full_experiment",
+    "results": {
+        "REFLECT-BO": {
+            "mean_best_helpfulness": 0.815,
+            "std_best_helpfulness": NaN,
+            "mean_auc_helpfulness": 0.5019166666666667
+        },
+        "SHIFT-BO": {
+            "mean_best_helpfulness": 0.825,
+            "std_best_helpfulness": NaN,
+            "mean_auc_helpfulness": 0.5330833333333334
+        },
+        "MetaBO-Prompt": {
+            "mean_best_helpfulness": 0.79,
+            "std_best_helpfulness": NaN,
+            "mean_auc_helpfulness": 0.5016166666666667
+        },
+        "Random": {
+            "mean_best_helpfulness": 0.809,
+            "std_best_helpfulness": NaN,
+            "mean_auc_helpfulness": 0.51215
+        },
+        "aggregate": {
+            "overall_mean_best_helpfulness": 0.80975
+        }
+    },
+    "statistical_tests": {
+        "wilcoxon_REFLECT-BO_vs_SHIFT-BO": {
+            "statistic": 0.0,
+            "p_value": 1.0
+        }
+    }
+}

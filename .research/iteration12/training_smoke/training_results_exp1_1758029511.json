@@ -1,0 +1,139 @@
+{
+  "REFLECT-BO": [
+    [
+      {
+        "helpfulness": 0.213,
+        "unsafe_prob": 0.3,
+        "latency": 0.15500586367382385
+      },
+      {
+        "helpfulness": 0.217,
+        "unsafe_prob": 0.292,
+        "latency": 0.23533989748458226
+      },
+      {
+        "helpfulness": 0.235,
+        "unsafe_prob": 0.292,
+        "latency": 0.1843843639370541
+      },
+      {
+        "helpfulness": 0.236,
+        "unsafe_prob": 0.289,
+        "latency": 0.20107105762067246
+      },
+      {
+        "helpfulness": 0.236,
+        "unsafe_prob": 0.287,
+        "latency": 0.22997688755590465
+      },
+      {
+        "helpfulness": 0.247,
+        "unsafe_prob": 0.285,
+        "latency": 0.21785313677518175
+      }
+    ]
+  ],
+  "SHIFT-BO": [
+    [
+      {
+        "helpfulness": 0.216,
+        "unsafe_prob": 0.3,
+        "latency": 0.26116385036656153
+      },
+      {
+        "helpfulness": 0.23,
+        "unsafe_prob": 0.297,
+        "latency": 0.13109589996235632
+      },
+      {
+        "helpfulness": 0.249,
+        "unsafe_prob": 0.293,
+        "latency": 0.11854916867602959
+      },
+      {
+        "helpfulness": 0.251,
+        "unsafe_prob": 0.285,
+        "latency": 0.2207452062733782
+      },
+      {
+        "helpfulness": 0.267,
+        "unsafe_prob": 0.277,
+        "latency": 0.20724561829094013
+      },
+      {
+        "helpfulness": 0.287,
+        "unsafe_prob": 0.274,
+        "latency": 0.2104081262546454
+      }
+    ]
+  ],
+  "MetaBO-Prompt": [
+    [
+      {
+        "helpfulness": 0.217,
+        "unsafe_prob": 0.294,
+        "latency": 0.27234138006215547
+      },
+      {
+        "helpfulness": 0.228,
+        "unsafe_prob": 0.287,
+        "latency": 0.10916487673113245
+      },
+      {
+        "helpfulness": 0.233,
+        "unsafe_prob": 0.284,
+        "latency": 0.11595839538472551
+      },
+      {
+        "helpfulness": 0.237,
+        "unsafe_prob": 0.283,
+        "latency": 0.15559472062201843
+      },
+      {
+        "helpfulness": 0.25,
+        "unsafe_prob": 0.279,
+        "latency": 0.17403619342337653
+      },
+      {
+        "helpfulness": 0.254,
+        "unsafe_prob": 0.277,
+        "latency": 0.2873309175424988
+      }
+    ]
+  ],
+  "Random": [
+    [
+      {
+        "helpfulness": 0.213,
+        "unsafe_prob": 0.294,
+        "latency": 0.1342277296396194
+      },
+      {
+        "helpfulness": 0.228,
+        "unsafe_prob": 0.292,
+        "latency": 0.17589108835152956
+      },
+      {
+        "helpfulness": 0.247,
+        "unsafe_prob": 0.286,
+        "latency": 0.21138994875492922
+      },
+      {
+        "helpfulness": 0.261,
+        "unsafe_prob": 0.277,
+        "latency": 0.25519998230924895
+      },
+      {
+        "helpfulness": 0.266,
+        "unsafe_prob": 0.277,
+        "latency": 0.16309060961181637
+      },
+      {
+        "helpfulness": 0.271,
+        "unsafe_prob": 0.275,
+        "latency": 0.2885819428670109
+      }
+    ]
+  ],
+  "carbon_footprint_kg": 0.0045
+}
