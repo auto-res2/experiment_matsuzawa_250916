@@ -8,103 +8,86 @@ import wandb
 import random
 import numpy as np
 
-# Use relative imports for custom modules
 from .preprocess import get_dataloaders
-from .train import run_experiment
+from .train import run_experiment, make_run_name
 from .evaluate import generate_report
 
-# Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
+
 
 def set_seed(seed):
     random.seed(seed)
     np.random.seed(seed)
     torch.manual_seed(seed)
     if torch.cuda.is_available():
-        torch.cuda.manual_seed(seed)
         torch.cuda.manual_seed_all(seed)
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False
 
-def load_config(config_path):
-    logger.info(f"Loading configuration from {config_path}")
-    with open(config_path, 'r') as f:
-        try:
-            config = yaml.safe_load(f)
-        except yaml.YAMLError as e:
-            logger.error(f"Error parsing YAML file: {e}")
-            raise
-    return config
+
+def load_config(path):
+    logger.info(f"Loading config {path}")
+    with open(path, 'r') as fh:
+        return yaml.safe_load(fh)
+
 
 def main():
-    parser = argparse.ArgumentParser(description="Run ZORRO++ experiments.")
-    group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument('--smoke-test', action='store_true', help='Run a small-scale smoke test.')
-    group.add_argument('--full-experiment', action='store_true', help='Run the full experiment.')
-    args = parser.parse_args()
+    ap = argparse.ArgumentParser()
+    group = ap.add_mutually_exclusive_group(required=True)
+    group.add_argument('--smoke-test', action='store_true')
+    group.add_argument('--full-experiment', action='store_true')
+    args = ap.parse_args()
 
-    if args.smoke_test:
-        config_path = 'config/smoke_test.yaml'
-    else:
-        config_path = 'config/full_experiment.yaml'
+    cfg_path = 'config/smoke_test.yaml' if args.smoke_test else 'config/full_experiment.yaml'
+    config = load_config(cfg_path)
 
-    # --- 1. Setup --- 
-    config = load_config(config_path)
-    timestamp = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
-    # Ensure results under iteration5
-    results_dir = os.path.join('.research', 'iteration5', f'results_{timestamp}')
+    ts = datetime.now().strftime('%Y-%m-%d_%H-%M-%S')
+    results_dir = os.path.join('.research', 'iteration5', f'results_{ts}')
     os.makedirs(results_dir, exist_ok=True)
     config['results_dir'] = results_dir
-    
-    # Init WandB
-    if config.get('wandb', {}).get('enabled', False):
+
+    if config.get('wandb', {}).get('enabled'):
         try:
-            wandb.init(
-                project=config['wandb']['project'],
-                entity=config['wandb'].get('entity'),
-                config=config
-            )
+            wandb.init(project=config['wandb']['project'], entity=config['wandb'].get('entity'), config=config)
         except Exception as e:
-            logger.warning(f"Could not initialize wandb: {e}. Disabling wandb.")
+            logger.warning(f"wandb initialisation failed: {e}. Disabling.")
             config['wandb']['enabled'] = False
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
-    logger.info(f"Using device: {device}")
+    logger.info(f"Using device {device}")
 
-    # --- 2. Data Preparation ---
-    logger.info("Preparing dataloaders...")
+    logger.info("Preparing dataloaders …")
     dataloaders = get_dataloaders(config)
-    if not dataloaders:
-        logger.error("No dataloaders were created. Please check the dataset configurations.")
-        return
 
-    # --- 3. Run Experiments ---
-    logger.info("Starting experimental runs...")
-    experiment_configs = config.get('experiments', [])
-    for exp_config in experiment_configs:
-        run_name = f"{exp_config['exp_name']}_{exp_config['model']['name']}_{exp_config['dataset']['name']}_{exp_config['dataset']['corruption']}_{exp_config['method']}_eta{exp_config['stream']['eta']}_seed{exp_config['seed']}"
-        if run_name in dataloaders:
-            logger.info(f"--- Running: {run_name} ---")
-            set_seed(exp_config['seed'])
-            # Merge global config with run-specific config
-            run_config = {**config, **exp_config}
-            run_config['results_dir'] = results_dir  # ensure path is correct
-            try:
-                run_experiment(run_config, dataloaders[run_name], device)
-            except Exception as e:
-                logger.error(f"Experiment {run_name} failed with error: {e}", exc_info=True)
-        else:
-            logger.warning(f"Dataloader for run {run_name} not found. Skipping.")
+    logger.info("Launching experiments …")
+    for exp_cfg in config['experiments']:
+        # skip template configs
+        if 'corruption' not in exp_cfg['dataset']:
+            continue
+        try:
+            run_name = make_run_name(exp_cfg)
+        except ValueError:
+            logger.debug("Template encountered inside loop – skipping.")
+            continue
+        if run_name not in dataloaders:
+            logger.warning(f"No dataloader for {run_name}. Skipping run.")
+            continue
+        logger.info(f"---- Running {run_name} ----")
+        set_seed(exp_cfg['seed'])
+        exp_cfg = {**config, **exp_cfg, 'results_dir': results_dir}  # merge
+        try:
+            run_experiment(exp_cfg, dataloaders[run_name], device)
+        except Exception as e:
+            logger.error(f"Run {run_name} failed: {e}", exc_info=True)
 
-    # --- 4. Evaluation --- 
-    logger.info("All experiments finished. Generating final report.")
+    logger.info("All runs complete. Generating report …")
     generate_report(results_dir)
 
-    if config.get('wandb', {}).get('enabled', False):
+    if config.get('wandb', {}).get('enabled'):
         wandb.finish()
 
-    logger.info("Workflow complete.")
+    logger.info("Workflow finished.")
 
 if __name__ == '__main__':
     main()
