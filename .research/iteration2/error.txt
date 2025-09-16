@@ -1,0 +1,15 @@
+Using CPython 3.11.13
+Creating virtual environment at: .venv
+Resolved 2 packages in 100ms
+   Building scarf-experiment @ file:///home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916
+      Built scarf-experiment @ file:///home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916
+Prepared 2 packages in 1.62s
+Installed 2 packages in 17ms
+ + pyyaml==6.0.2
+ + scarf-experiment==0.1.0 (from file:///home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/src/main.py", line 16, in <module>
+    from preprocess_py import preprocess
+ModuleNotFoundError: No module named 'preprocess_py'
