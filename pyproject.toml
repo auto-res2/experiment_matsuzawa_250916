@@ -4,9 +4,13 @@ version = "0.1.0"
 description = "Implementation of REFLECT-BO for research paper publication."
 authors = ["AI Researcher"]
 
-# Explicitly include the Python package so Poetry can build the wheel
+# Explicitly include only the top-level Python modules so Poetry’s wheel build
+# succeeds without requiring a non-existent package directory.
 packages = [
-    { include = "reflect_bo_research" }
+    { include = "main.py" },
+    { include = "train.py" },
+    { include = "preprocess.py" },
+    { include = "evaluate.py" }
 ]
 
 [tool.poetry.dependencies]

@@ -211,9 +211,9 @@ def run(config, training_output_path):
     print(header)
 
     # --- Output Directories (MANDATED PATHS) ------------------------------------
-    output_dir_img = Path(".research/iteration3/images")
+    output_dir_img = Path(".research/iteration4/images")
     output_dir_img.mkdir(parents=True, exist_ok=True)
-    output_dir_json = Path(".research/iteration3")
+    output_dir_json = Path(".research/iteration4")
     output_dir_json.mkdir(parents=True, exist_ok=True)
 
     # ---------------- Experiment-specific Metrics -------------------------------
@@ -227,7 +227,7 @@ def run(config, training_output_path):
                 "au_cvar_alpha_0.9": calculate_au_cvar(histories, alpha=0.9),
             }
 
-        # Placeholder ANOVA
+        # Placeholder ANOVA for demonstration purposes
         f_val, p_val = stats.f_oneway(*[np.random.rand(10) for _ in results.keys()])
         final_metrics["statistical_tests"] = {
             "anova_on_helpfulness": {"f_value": f_val, "p_value": p_val}
