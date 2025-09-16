@@ -1,0 +1,10 @@
+{
+  "research_topic": "KVキャッシュ量子化 × 精度保持を改善したい（2bit域）",
+  "queries": [
+    "2-bit KV quantization",
+    "accuracy preservation quantization",
+    "low-bit attention cache",
+    "quantization error reduction",
+    "mixed-precision quantization"
+  ]
+}
