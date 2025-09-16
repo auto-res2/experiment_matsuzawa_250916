@@ -519,7 +519,242 @@
     }
   ],
   "new_method": {
-    "method": "Open Problems: 1. Existing few-bit backward schemes for point-clouds ignore both fine-grained spatial variation *and* strong temporal correlation that appears in sequential scans (SLAM, autonomous driving); thus they repeatedly learn almost identical code-books every frame.\n2. Histogram-based bin search still accounts for ≥15 % of wall-time when we push to >1 M points or run on edge GPUs; this overhead grows with resolution.\n3. Re-computing edge-conv features on the backward pass doubles the number of KNN searches, wasting compute although neighbour sets change little between frames.\n4. Current methods allocate a fixed bit-width for all regions although activation entropy varies drastically; low-entropy areas could be stored cheaper without harming gradients.\n5. None of the prior works compress the large attention K/V tensors that dominate memory in modern state-space / transformer point models.\nMethods: We propose STAG-FBB (Spatio-Temporal Adaptive Gradient-aware Few-Bit Backward) consisting of four new components that plug on top of HA-FBB-PC.\nA. Streaming spatio-temporal quantile sketch\n   • Replace per-batch histograms with a GPU-friendly GK-Quantile sketch maintained per centroid over a sliding window of the last T=4 frames. 512-entry buffers approximate any quantile with <0.5 % error and update in O(log m) time.\n   • Bin boundaries for the current frame are read directly from sketch quantiles → <0.05 ms/layer regardless of point count.\nB. Tiny predictor for zero-histogram layers\n   • For small residual MLP layers we skip sketches entirely and predict the 2-bit boundaries via a 3-layer MLP that consumes (mean, var, #points) of the input patch + previous-step gradient amplitude. Parameters are shared across all layers and trained once on a held-out set (<20 k steps).\nC. Compute-reuse aware edge tensor caching\n   • We delta-encode KNN indices between successive frames with run-length & var-length codes; identical neighbourhoods are detected by a warp-level SHA-1 hash. If unchanged we reuse the saved edge-features from the previous frame instead of recomputation, cutting ∼28 % backward FLOPs in SLAM sequences.\nD. Entropy-adaptive mixed bit-width\n   • Within each centroid we measure Shannon entropy H of the 4-bit code stream online. Blocks with H<1.2 are down-shifted to 2 bits, H>2.5 kept at 4 bits, else 3 bits. A 16-byte header records the per-block bit-width. This yields extra 8-12 % memory drop.\nE. Attention-tensor support\n   • Extend the same quantile sketch + adaptive bits to PointMamba/Transformer K,V tensors (but not Q, which is re-computed). Combined with activation compression this removes the last ≥35 % memory hotspot in state-space models.\nAll kernels are <1100 LOC CUDA + Triton and exposed via PyTorch autograd.Functions.\nExperimental Setup: Architectures: PointMamba-L, PointNext-XL-Seg, DGCNN, BSC-UNet-H.\nDatasets: Sequential – SemanticKITTI (seq. 00-10), nuScenes lidar train/val; Static – ModelNet40, ScanObjectNN.\nProtocols: For sequential sets we feed 5 contiguous frames and slide window; for static we use single-frame (T=1) to confirm no regression.\nBaselines: FP16, torch.checkpoint, ActNN-Q, IFB-PC, HA-FBB-PC (our immediate predecessor).\nMetrics: peak GPU memory, wall-clock time/epoch, OA/mIoU, additional energy (nVidia SM counters), and extra FLOPs.\nAblations: (i) skip sketch (use hist) (ii) no temporal reuse (iii) fixed 3-bit (iv) no K/V compression.\nExpected Result: • STAG-FBB cuts *total* training memory by 63-68 % on sequential sets and 57-60 % on static ones vs FP16; gains +10–12 % over HA-FBB-PC.\n• Throughput improves 1.25× over HA-FBB-PC owing to sketch & reuse; overall speed within ±4 % of vanilla training (no checkpointing).\n• Accuracy drop ≤0.15 % OA / ≤0.25  mIoU compared to FP16.\n• Mixed bit-width contributes 7–9 % memory and no accuracy loss; predictor adds <0.1 % OA.\n• Attention K/V compression removes 32-38 % of remaining footprint in PointMamba, enabling 2× larger scenes on a single 24 GB RTX-3090.\nExpected Conclusion: By unifying spatial, temporal and information-theoretic adaptivity, STAG-FBB moves few-bit backward from per-batch optimisation to a streaming regime that supports long point-cloud sequences with practically zero overhead. The method not only outperforms existing activation-only compressors but also halves compute wastage by reusing edge tensors and compresses attention maps, opening the door to real-time training of autonomous-driving perception models on single prosumer GPUs. Future work will explore sketch-based quantisation for gradient *aggregation* across distributed learners, further shrinking inter-GPU communication."
+    "method": "Open Problems: 1. Existing few-bit backward schemes for point-clouds ignore both fine-grained spatial variation *and* strong temporal correlation that appears in sequential scans (SLAM, autonomous driving); thus they repeatedly learn almost identical code-books every frame.\n2. Histogram-based bin search still accounts for ≥15 % of wall-time when we push to >1 M points or run on edge GPUs; this overhead grows with resolution.\n3. Re-computing edge-conv features on the backward pass doubles the number of KNN searches, wasting compute although neighbour sets change little between frames.\n4. Current methods allocate a fixed bit-width for all regions although activation entropy varies drastically; low-entropy areas could be stored cheaper without harming gradients.\n5. None of the prior works compress the large attention K/V tensors that dominate memory in modern state-space / transformer point models.\nMethods: We propose STAG-FBB (Spatio-Temporal Adaptive Gradient-aware Few-Bit Backward) consisting of four new components that plug on top of HA-FBB-PC.\nA. Streaming spatio-temporal quantile sketch\n   • Replace per-batch histograms with a GPU-friendly GK-Quantile sketch maintained per centroid over a sliding window of the last T=4 frames. 512-entry buffers approximate any quantile with <0.5 % error and update in O(log m) time.\n   • Bin boundaries for the current frame are read directly from sketch quantiles → <0.05 ms/layer regardless of point count.\nB. Tiny predictor for zero-histogram layers\n   • For small residual MLP layers we skip sketches entirely and predict the 2-bit boundaries via a 3-layer MLP that consumes (mean, var, #points) of the input patch + previous-step gradient amplitude. Parameters are shared across all layers and trained once on a held-out set (<20 k steps).\nC. Compute-reuse aware edge tensor caching\n   • We delta-encode KNN indices between successive frames with run-length & var-length codes; identical neighbourhoods are detected by a warp-level SHA-1 hash. If unchanged we reuse the saved edge-features from the previous frame instead of recomputation, cutting ∼28 % backward FLOPs in SLAM sequences.\nD. Entropy-adaptive mixed bit-width\n   • Within each centroid we measure Shannon entropy H of the 4-bit code stream online. Blocks with H<1.2 are down-shifted to 2 bits, H>2.5 kept at 4 bits, else 3 bits. A 16-byte header records the per-block bit-width. This yields extra 8-12 % memory drop.\nE. Attention-tensor support\n   • Extend the same quantile sketch + adaptive bits to PointMamba/Transformer K,V tensors (but not Q, which is re-computed). Combined with activation compression this removes the last ≥35 % memory hotspot in state-space models.\nAll kernels are <1100 LOC CUDA + Triton and exposed via PyTorch autograd.Functions.\nExperimental Setup: Architectures: PointMamba-L, PointNext-XL-Seg, DGCNN, BSC-UNet-H.\nDatasets: Sequential – SemanticKITTI (seq. 00-10), nuScenes lidar train/val; Static – ModelNet40, ScanObjectNN.\nProtocols: For sequential sets we feed 5 contiguous frames and slide window; for static we use single-frame (T=1) to confirm no regression.\nBaselines: FP16, torch.checkpoint, ActNN-Q, IFB-PC, HA-FBB-PC (our immediate predecessor).\nMetrics: peak GPU memory, wall-clock time/epoch, OA/mIoU, additional energy (nVidia SM counters), and extra FLOPs.\nAblations: (i) skip sketch (use hist) (ii) no temporal reuse (iii) fixed 3-bit (iv) no K/V compression.\nExpected Result: • STAG-FBB cuts *total* training memory by 63-68 % on sequential sets and 57-60 % on static ones vs FP16; gains +10–12 % over HA-FBB-PC.\n• Throughput improves 1.25× over HA-FBB-PC owing to sketch & reuse; overall speed within ±4 % of vanilla training (no checkpointing).\n• Accuracy drop ≤0.15 % OA / ≤0.25  mIoU compared to FP16.\n• Mixed bit-width contributes 7–9 % memory and no accuracy loss; predictor adds <0.1 % OA.\n• Attention K/V compression removes 32-38 % of remaining footprint in PointMamba, enabling 2× larger scenes on a single 24 GB RTX-3090.\nExpected Conclusion: By unifying spatial, temporal and information-theoretic adaptivity, STAG-FBB moves few-bit backward from per-batch optimisation to a streaming regime that supports long point-cloud sequences with practically zero overhead. The method not only outperforms existing activation-only compressors but also halves compute wastage by reusing edge tensors and compresses attention maps, opening the door to real-time training of autonomous-driving perception models on single prosumer GPUs. Future work will explore sketch-based quantisation for gradient *aggregation* across distributed learners, further shrinking inter-GPU communication.",
+    "experimental_design": {
+      "experiment_strategy": "1. End-to-End Benchmark on Standard Workloads\n   Goal: Show that STAG-FBB simultaneously reduces memory, wall-time and preserves accuracy across both sequential and static point-cloud tasks.\n\n   a. Setup\n      • Hardware: 8×A100-80 GB (single node).  \n      • Models: PointMamba-L (seq), PointNext-XL-Seg (seq), DGCNN (static), BSC-UNet-H (static).  \n      • Datasets & Schedules:  \n        – SemanticKITTI (train seq 00-10, val seq 11) – 80 epochs.  \n        – nuScenes-lidar (train/val) – 60 epochs.  \n        – ModelNet40, ScanObjectNN – 250 epochs.  \n      • Methods Compared: FP16 (upper bound), torch.checkpoint, ActNN-Q, IFB-PC, HA-FBB-PC, STAG-FBB.\n      • Metrics captured per epoch: peak GPU memory, wall-clock time, total FLOPs (nvprof), energy (nVidia SM counters), OA/mIoU.\n   b. Expected Outcome\n      • Memory: STAG-FBB → 63-68 % less than FP16, 10-12 % less than HA-FBB-PC.  \n      • Speed: 1.25× faster than HA-FBB-PC, within ±4 % of vanilla FP16.  \n      • Accuracy loss ≤0.15 % OA / ≤0.25 mIoU vs FP16.  \n      These results would establish that the proposed scheme is the first to cut memory >60 % while keeping virtually full speed and accuracy on real production-scale tasks.\n\n2. Component-by-Component Ablation & Micro-Benchmarks\n   Goal: Isolate how each novel ingredient (A–E) contributes to the gains and verify that no single part dominates the benefit.\n\n   a. Setup\n      • Model/Dataset: PointNext-XL-Seg on SemanticKITTI (most memory-heavy pipeline).  \n      • Variants:  \n        i) No temporal sketch (revert to per-frame histogram).  \n        ii) No tiny predictor.  \n        iii) No edge-tensor caching.  \n        iv) Fixed 3-bit (disable entropy adaptivity).  \n        v) No K/V compression.  \n        vi) Full STAG-FBB.  \n      • Measurements: extra memory, delta-FLOPs, time/iter, accuracy.\n   b. Expected Outcome\n      • Each switch-off yields a measurable regression:  \n        – i) +14 % time, +0.8 GB memory.  \n        – iii) +28 % backward FLOPs, +11 % time.  \n        – iv) +8-9 % memory.  \n        – v) +35 % memory for PointMamba.  \n      • No single component accounts for more than half the total gain, proving that the benefit is truly synergistic.  \n      • Accuracy remains statistically unchanged across variants, proving that compression decisions are gradient-aware.\n      This experiment would validate the design choices and demonstrate that every proposed mechanism has a tangible, complementary effect.\n\n3. Scalability Stress-Test: Longer Sequences & Larger Models\n   Goal: Demonstrate that STAG-FBB enables problem sizes that baselines cannot even launch, translating extra capacity into higher task quality.\n\n   a. Setup\n      • Task 1 (Temporal Depth): Train PointMamba-L with input windows of 10 consecutive LiDAR frames (vs default 5).  \n      • Task 2 (Model Size): Instantly scale PointNext-XXL-Seg (2.3× params of XL) until the first OOM on HA-FBB-PC; keep same hyper-params otherwise.  \n      • Compare STAG-FBB vs HA-FBB-PC (strongest prior) under identical batch sizes; if HA-FBB-PC OOMs, reduce its batch until it fits, then match total steps.\n   b. Expected Outcome\n      • Task 1: HA-FBB-PC exceeds 80 GB at sequence length >6 and fails; STAG-FBB still fits 10-frame windows with 12–15 GB margin. Resulting mIoU improves +0.7 due to richer temporal context.  \n      • Task 2: HA-FBB-PC OOMs at PointNext-XL; STAG-FBB trains XXL using 74 GB/ GPU, improving validation mIoU by +1.3.  \n      These findings would highlight the unique ability of STAG-FBB to unlock either deeper temporal models or larger geometrical capacity, converting saved memory directly into accuracy—an aspect no earlier few-bit method could demonstrate.\n\nCollectively, the three experiments examine effectiveness from complementary angles: overall efficiency, per-module relevance, and unlocked scalability. Positive outcomes on all three would provide compelling, multi-faceted evidence that STAG-FBB is a decisive advance for memory- and compute-constrained point-cloud learning.",
+      "experiment_details": "──────────────────────────────────────────────────────────────────────\nEXPERIMENT 1 End-to-End Benchmark on Standard Workloads\n──────────────────────────────────────────────────────────────────────\nA. Models\n   1. PointMamba-L       (≈ 104 M params; window-attn = 8 heads, d=512)\n   2. PointNext-XL-Seg   (≈ 88 M params; 5 stages, width 1024)\n   3. DGCNN-Cls          (as in Wang et al. 2019, 1024 points)\n   4. BSC-UNet-H         (large ScanNet variant, ≈ 42 M params)\n   Baselines: identical architectures trained with\n      a) FP16 (PyTorch AMP)            b) torch.checkpoint (ckpt)\n      c) ActNN-Q                       d) IFB-PC\n      e) HA-FBB-PC                     f) STAG-FBB (ours)\n\nB. Datasets & Pre-processing\n   1. SemanticKITTI              – frames 0000-10727 (train seq 00-10), 11087-12097 (val seq 11)\n   2. nuScenes-lidar             – 28130 train, 6019 val samples\n   3. ModelNet40                 – 9843 train, 2468 test meshes\n   4. ScanObjectNN (PB_T50_RS)   – 7500 train, 2500 test clouds\nPre-processing (common)\n   • Uniform sampling to N pts (N=65 536 for SemanticKITTI/nuScenes ‑ 5-frame cube, 15 000 for static)\n   • Normalise to unit cube, centre at origin\n   • Augmentations (train only):\n        – Random SO(3) rotation, anisotropic scaling 0.9-1.1\n        – Point-drop 0-10 %, Gaussian jitter σ=0.01, intensity scaling ±10 %\n   • Sequential loader: 5-frame sliding window, stride = 1, returns tensor [B, T, N, F] (F = xyz + intensity)\n\nC. Splits / Seeds / Repeats\n   • Train/val/test splits follow official protocols above.\n   • Five random seeds {11, 17, 23, 29, 31}\n   • For each seed we train full schedule → keep LAST epoch ckpt (no early-stop) and BEST-VAL ckpt (highest OA/mIoU). Report mean ± SEM over 5 seeds using BEST-VAL.\n\nD. Training Hyper-params (all methods)\n   • Optimiser: AdamW (β1=0.9, β2=0.95, ε=1e-8) • Weight-decay: 0.05\n   • LR schedule: cosine w/ warm-up 10 % of total steps\n   • Base LR: 1.6e-3 (PointMamba-L), 1.2e-3 (PointNext-XL), 6e-4 (others)\n   • Batch size per GPU: 2 (PointMamba-L 5-frames), 4 (PointNext), 32 (DGCNN/BSC)\n   • Gradient clip: 1.0\n   • STAG-FBB-specific: sketch buf = 512, sliding window T = 4, entropy thresholds {1.2, 2.5}\n\nE. Evaluation Metrics\n   Primary: Overall Accuracy (OA), mIoU (for segmentation)\n   Secondary: Peak GPU memory (MB), wall-clock time/epoch (s), training FLOPs (PyTorch profiler), SM energy (J) via `nvidia-smi --query-gpu=total_energy_consumption`, ECE (classification calibration), Brier Score.\n\nF. Robustness & OOD checks (run once using BEST-VAL ckpt for each seed)\n   1. Noise: add Gaussian jitter σ∈{0.02, 0.05}. Report ∆OA/∆mIoU.\n   2. Distribution shift: evaluate SemanticKITTI seq 12-21 (un-seen in train), and Waymo-Open validation set (LiDAR subsets) ⇒ compute OA, mIoU.\n   3. Adversarial: FGSM ε=0.01 on coords; report success rate.\n   4. Domain transfer: fine-tune on nuScenes-lidar → test on Argoverse v2; measure mIoU after 10-epoch quick-adapt.\n\nG. Hyper-parameter Sensitivity\n   • Grid-search sketch-buffer {256, 512, 1024}\n   • Window length T {2, 4, 6}\n   • Entropy thresholds varied ±0.2.\n   Measure memory + OA.\n\nH. Resource Usage Logging\n   • FLOPs: `fvcore.nn.FlopCountAnalysis(model, input)` once/epoch\n   • Time: PyTorch `torch.cuda.Event` around forward/backward\n   • Memory: `torch.cuda.max_memory_allocated`\n   • Wall-clock cost (USD): cluster tariff $1.75/hour × total GPU-hours.\n\nI. Example Code (PointNext-XL-Seg excerpt)\n```\nfrom stagfbb import enable_stagfbb  # installs custom autograd funcs\nfrom pointnext.models import PointNextXL\nfrom torch.profiler import profile, schedule, tensorboard_trace_handler\n\nmodel = PointNextXL(num_classes=20).cuda()\nmodel = enable_stagfbb(model)  # replaces edge-conv + attention modules\nopt = torch.optim.AdamW(model.parameters(), lr=1.2e-3, weight_decay=0.05)\ntrain_loader = build_kitti_loader(...)\n\nfor epoch in range(80):\n    for clouds, labels in train_loader:\n        clouds, labels = clouds.cuda(non_blocking=True), labels.cuda()\n        with torch.cuda.amp.autocast():\n            logits = model(clouds)\n            loss = criterion(logits, labels)\n        scaler.scale(loss).backward()\n        scaler.step(opt); scaler.update(); opt.zero_grad(set_to_none=True)\n    torch.cuda.reset_peak_memory_stats()\n```\n\nJ. Expected Aggregate Runtime (8×A100)\n   • SemanticKITTI: 80 epochs × 3.8 min/epoch ≈ 5.1 GPU-hrs per seed → 25 GPU-hrs total.\n   • Memory peak: ≤ 29 GB for PointMamba-L-5f with STAG-FBB.\n\n──────────────────────────────────────────────────────────────────────\nEXPERIMENT 2 Component Ablation & Micro-Benchmarks\n──────────────────────────────────────────────────────────────────────\nA. Model / Data\n   • PointNext-XL-Seg + SemanticKITTI (identical preprocessing) but restrict to 40 epochs to accelerate ablations.\n\nB. Variants (6 total)\n   v0  Full STAG-FBB                   (reference)\n   v1 -temporal sketch                (uses hist per frame)\n   v2 -tiny predictor                 (always sketch)\n   v3 -edge-tensor caching            (forces recompute)\n   v4 -entropy-adapt (fixed 3-bit)\n   v5 -K/V compression                (PointMamba only; skipped here, but FLOPs recorded by dummy layer)\n\nC. Measurements (per iteration, averaged over 100 iters @ epoch 5)\n   • Forward time, backward time, total time (ns)\n   • Extra memory Δ vs v0\n   • FLOPs counted by Nsight Compute\n   • OA/mIoU at epoch 40\n   • Energy / iter via `nvidia-smi dmon` (power draw × time)\n\nD. Seeds: 3 (17, 23, 31) Selection: BEST-VAL.\n\nE. Hyper-parameter Scans\n   • For v1 vary sketch-buf size {128..1024} → time vs mem curve\n   • For v3 vary SHA-1 hash group width {32, 64}\n\nF. Example micro-profiler wrapper\n```\nwith torch.autograd.profiler.emit_nvtx():\n    ...training loop...\n```\n   parse output to isolate edge-conv vs attention function calls.\n\n──────────────────────────────────────────────────────────────────────\nEXPERIMENT 3 Scalability Stress-Test\n──────────────────────────────────────────────────────────────────────\nA. Task 1  Longer Temporal Windows\n   • Model: PointMamba-L\n   • Inputs: 10 continuous frames (N≈1.3 M pts / sample)\n   • Batch/GPU: 1 (keep global batch = 8 with gradient accumulation).\n   • Compare HA-FBB-PC vs STAG-FBB.\n   • If HA-FBB-PC fails >6 frames: systematically reduce frames until fits; record mIoU at maximal feasible length.\n\nB. Task 2  Wider Network\n   • Model: PointNext-XXL-Seg (width ×1.6, depth +2 blocks, ≈ 198 M params)\n   • Same 5-frame window, batch = 2.\n\nC. Evaluation\n   • For both tasks train 40 epochs (warm start with XL weights for fairness).\n   • Report: memory footprint (GB), throughput (samples/s), OA/mIoU improvement vs PointNext-XL 5-frame.\n   • If baseline OOMs, note “OOM” and reduce batch until success; record effective wall-clock/epoch to equalise total optimisation steps.\n\n──────────────────────────────────────────────────────────────────────\nGLOBAL IMPLEMENTATION NOTES / FOOTNOTES\n──────────────────────────────────────────────────────────────────────\n* ActNN-Q implemented from github.com/ucbrise/actnn ‑ we ported to PyTorch 2.1 and disabled layer fusion¹\n* IFB-PC & HA-FBB-PC official CUDA kernels compiled with `-gencode sm_80` to run on A100; STAG-FBB re-uses their API for drop-in replacement.\n* FLOPs are theoretical (MAC×2) and exclude IO compress/decompress micro-kernels (<2 %).\n\n¹ Fused-bn gives slightly faster forward time; disabling aligns memory accounting with ours.\n\n──────────────────────────────────────────────────────────────────────\nROBUSTNESS / FAIL-FAST POLICY\n──────────────────────────────────────────────────────────────────────\nAll datasets are publicly available and licenced for research use. The experimental scripts raise RuntimeError if dataset root folders are empty.\n\n──────────────────────────────────────────────────────────────────────\n",
+      "expected_models": [
+        "PointMamba-L",
+        "PointNext-XL-Seg",
+        "PointNext-XXL-Seg",
+        "DGCNN",
+        "BSC-UNet-H"
+      ],
+      "expected_datasets": [
+        "SemanticKITTI",
+        "nuScenes-lidar",
+        "ModelNet40",
+        "ScanObjectNN",
+        "Waymo Open (LiDAR subset)",
+        "Argoverse v2"
+      ],
+      "external_resources": {
+        "hugging_face": {
+          "models": [],
+          "datasets": [
+            {
+              "id": "fenfenda/All-in-one-semantickitti",
+              "author": "fenfenda",
+              "sha": "03e824f8304bf315c5108469f6e7ae2be4cef390",
+              "created_at": "2025-07-09T14:00:24+00:00",
+              "last_modified": "2025-07-10T09:00:54+00:00",
+              "private": false,
+              "gated": false,
+              "disabled": false,
+              "downloads": 9,
+              "likes": 0,
+              "siblings": [
+                {
+                  "rfilename": ".gitattributes"
+                },
+                {
+                  "rfilename": "README.md"
+                },
+                {
+                  "rfilename": "beam_missing.zip"
+                },
+                {
+                  "rfilename": "cross_sensor.zip"
+                },
+                {
+                  "rfilename": "fog.zip"
+                },
+                {
+                  "rfilename": "snow.zip"
+                },
+                {
+                  "rfilename": "wet_ground.zip"
+                }
+              ],
+              "card_data": {
+                "license": "apache-2.0",
+                "language": [],
+                "tags": [],
+                "datasets": [],
+                "task_categories": [],
+                "size_categories": [],
+                "metrics": [],
+                "widget": []
+              },
+              "tags": [
+                "license:apache-2.0",
+                "region:us"
+              ],
+              "readme": "---\r\nlicense: apache-2.0\r\n---\r\n",
+              "extracted_code": ""
+            },
+            {
+              "id": "xjturjc/nuscenes_lidarseg",
+              "author": "xjturjc",
+              "sha": "ef2f542d881604b8665754eda9ac99df19a6a867",
+              "created_at": "2024-02-05T06:09:46+00:00",
+              "last_modified": "2024-02-05T06:14:31+00:00",
+              "private": false,
+              "gated": false,
+              "disabled": false,
+              "downloads": 3,
+              "likes": 0,
+              "siblings": [
+                {
+                  "rfilename": ".gitattributes"
+                },
+                {
+                  "rfilename": "README.md"
+                },
+                {
+                  "rfilename": "nuScenes-lidarseg-all-v1.0.tar"
+                },
+                {
+                  "rfilename": "nuScenes-panoptic-v1.0-all.tar"
+                }
+              ],
+              "card_data": {
+                "license": "apache-2.0",
+                "language": [],
+                "tags": [],
+                "datasets": [],
+                "task_categories": [],
+                "size_categories": [],
+                "metrics": [],
+                "widget": []
+              },
+              "tags": [
+                "license:apache-2.0",
+                "size_categories:n<1K",
+                "format:webdataset",
+                "modality:text",
+                "library:datasets",
+                "library:webdataset",
+                "library:mlcroissant",
+                "region:us"
+              ],
+              "readme": "---\nlicense: apache-2.0\n---\n",
+              "extracted_code": ""
+            },
+            {
+              "id": "jxie/modelnet40",
+              "author": "jxie",
+              "sha": "5a0f89b20bd80f87ed9f1680cbf221821e2e5a5f",
+              "created_at": "2023-07-31T20:11:39+00:00",
+              "last_modified": "2023-08-24T05:23:10+00:00",
+              "private": false,
+              "gated": false,
+              "disabled": false,
+              "downloads": 3854,
+              "likes": 1,
+              "siblings": [
+                {
+                  "rfilename": ".gitattributes"
+                },
+                {
+                  "rfilename": "README.md"
+                },
+                {
+                  "rfilename": "data/test-00000-of-00001-ba121bbca2fe1c3b.parquet"
+                },
+                {
+                  "rfilename": "data/train-00000-of-00003-c36449eb08025a08.parquet"
+                },
+                {
+                  "rfilename": "data/train-00001-of-00003-e697f9c72fe46187.parquet"
+                },
+                {
+                  "rfilename": "data/train-00002-of-00003-d35741615d18cb4a.parquet"
+                }
+              ],
+              "card_data": {
+                "language": [],
+                "tags": [],
+                "datasets": [],
+                "task_categories": [],
+                "size_categories": [],
+                "metrics": [],
+                "widget": []
+              },
+              "tags": [
+                "size_categories:10K<n<100K",
+                "format:parquet",
+                "library:datasets",
+                "library:dask",
+                "library:mlcroissant",
+                "library:polars",
+                "region:us"
+              ],
+              "readme": "---\ndataset_info:\n  features:\n  - name: inputs\n    sequence:\n      sequence: float32\n  - name: label\n    dtype: int32\n  splits:\n  - name: train\n    num_bytes: 1290220440\n    num_examples: 9843\n  - name: test\n    num_bytes: 323505440\n    num_examples: 2468\n  download_size: 991193551\n  dataset_size: 1613725880\n---\n# Dataset Card for \"modelnet40\"\n\n[More Information needed](https://github.com/huggingface/datasets/blob/main/CONTRIBUTING.md#how-to-contribute-to-the-dataset-cards)",
+              "extracted_code": ""
+            },
+            {
+              "id": "jxie/scanobjectnn",
+              "author": "jxie",
+              "sha": "a62e6a64ad99405d117ca4ee3bc4d04f506c184b",
+              "created_at": "2023-08-28T22:43:01+00:00",
+              "last_modified": "2023-08-28T22:43:52+00:00",
+              "private": false,
+              "gated": false,
+              "disabled": false,
+              "downloads": 68,
+              "likes": 0,
+              "siblings": [
+                {
+                  "rfilename": ".gitattributes"
+                },
+                {
+                  "rfilename": "README.md"
+                },
+                {
+                  "rfilename": "data/bg_test-00000-of-00001-931c0a7f2170b140.parquet"
+                },
+                {
+                  "rfilename": "data/bg_train-00000-of-00001-e841d9621be1dbf9.parquet"
+                },
+                {
+                  "rfilename": "data/hardest_test-00000-of-00001-148153221587dda1.parquet"
+                },
+                {
+                  "rfilename": "data/hardest_train-00000-of-00001-354e47a29f486f8d.parquet"
+                },
+                {
+                  "rfilename": "data/nobg_test-00000-of-00001-f98235db2503ce9e.parquet"
+                },
+                {
+                  "rfilename": "data/nobg_train-00000-of-00001-d783efe284dc641f.parquet"
+                }
+              ],
+              "card_data": {
+                "language": [],
+                "tags": [],
+                "datasets": [],
+                "task_categories": [],
+                "size_categories": [],
+                "metrics": [],
+                "widget": []
+              },
+              "tags": [
+                "size_categories:10K<n<100K",
+                "format:parquet",
+                "library:datasets",
+                "library:pandas",
+                "library:mlcroissant",
+                "library:polars",
+                "region:us"
+              ],
+              "readme": "---\ndataset_info:\n  features:\n  - name: inputs\n    sequence:\n      sequence: float32\n  - name: label\n    dtype: int64\n  splits:\n  - name: nobg_train\n    num_bytes: 75689020\n    num_examples: 2309\n  - name: nobg_test\n    num_bytes: 19045180\n    num_examples: 581\n  - name: bg_train\n    num_bytes: 75689020\n    num_examples: 2309\n  - name: bg_test\n    num_bytes: 19045180\n    num_examples: 581\n  - name: hardest_train\n    num_bytes: 374216480\n    num_examples: 11416\n  - name: hardest_test\n    num_bytes: 94471960\n    num_examples: 2882\n  download_size: 493795631\n  dataset_size: 658156840\n---\n# Dataset Card for \"scanobjectnn\"\n\n[More Information needed](https://github.com/huggingface/datasets/blob/main/CONTRIBUTING.md#how-to-contribute-to-the-dataset-cards)",
+              "extracted_code": ""
+            }
+          ]
+        }
+      }
+    }
   },
   "idea_info_history": [
     {
