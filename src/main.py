@@ -24,14 +24,26 @@ if str(ROOT_DIR) not in sys.path:
 # -----------------------------------------------------------------------------
 import yaml  # noqa: E402  pylint: disable=wrong-import-position
 
+
 # We import the lightweight modules via ``importlib`` inside a helper to avoid
 # import-time side-effects before CLI parsing is finished.
 
 def _lazy_import(name: str):
-    return importlib.import_module(name)
+    """Import *name* either as a top-level module or relative to this package."""
+    try:
+        return importlib.import_module(name)
+    except ModuleNotFoundError as err:
+        # Fall back to relative import if available (e.g. when packaged).
+        if __package__:
+            try:
+                return importlib.import_module(f"{__package__}.{name}")
+            except ModuleNotFoundError:
+                pass  # Re-raise original below.
+        raise err
 
 
-def _load_pipeline_modules():
+def _load_pipeline_modules() -> None:  # noqa: D401 – imperative mood
+    """Dynamically import the pipeline building blocks."""
     global preprocess, train, evaluate  # pylint: disable=global-statement
     preprocess = _lazy_import("preprocess_py").preprocess
     train = _lazy_import("train_py").train

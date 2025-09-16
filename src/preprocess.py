@@ -5,7 +5,7 @@ def preprocess(config: Dict[str, Any]) -> Dict[str, Any]:
     """Placeholder preprocessing step enforcing *fail-fast* policy.
 
     If the configuration requests access to a real dataset (key
-    `requires_real_data`) we abort immediately because such datasets are not
+    ``requires_real_data``) we abort immediately because such datasets are not
     accessible inside the execution sandbox.
     """
     if config.get("requires_real_data"):
