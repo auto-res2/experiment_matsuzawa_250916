@@ -6,5 +6,82 @@
     "point cloud quantization",
     "octree memory optimization",
     "kd-tree memory efficiency"
+  ],
+  "research_study_list": [
+    {
+      "title": "MuSCLE: Multi Sweep Compression of LiDAR using Deep Entropy Models"
+    },
+    {
+      "title": "PointMamba: A Simple State Space Model for Point Cloud Analysis"
+    },
+    {
+      "title": "BiPointNet: Binary Neural Network for Point Clouds"
+    },
+    {
+      "title": "Efficient Hierarchical Entropy Model for Learned Point Cloud Compression"
+    },
+    {
+      "title": "Compressed 3D Gaussian Splatting for Accelerated Novel View Synthesis"
+    },
+    {
+      "title": "MuSCLE: Multi Sweep Compression of LiDAR using Deep Entropy Models"
+    },
+    {
+      "title": "Efficient Hierarchical Entropy Model for Learned Point Cloud Compression"
+    },
+    {
+      "title": "ACRF: Compressing Explicit Neural Radiance Fields via Attribute Compression"
+    },
+    {
+      "title": "Compressed 3D Gaussian Splatting for Accelerated Novel View Synthesis"
+    },
+    {
+      "title": "Neural NeRF Compression"
+    },
+    {
+      "title": "BiPointNet: Binary Neural Network for Point Clouds"
+    },
+    {
+      "title": "LiDAR-PTQ: Post-Training Quantization for Point Cloud 3D Object Detection"
+    },
+    {
+      "title": "Binarizing Sparse Convolutional Networks for Efficient Point Cloud Analysis"
+    },
+    {
+      "title": "Compressed 3D Gaussian Splatting for Accelerated Novel View Synthesis"
+    },
+    {
+      "title": "A Statistical Manifold Framework for Point Cloud Data"
+    },
+    {
+      "title": "OctreeOcc: Efficient and Multi-Granularity Occupancy Prediction Using Octree Queries"
+    },
+    {
+      "title": "OctField: Hierarchical Implicit Functions for 3D Modeling"
+    },
+    {
+      "title": "MuSCLE: Multi Sweep Compression of LiDAR using Deep Entropy Models"
+    },
+    {
+      "title": "OcTr: Octree-Based Transformer for 3D Object Detection"
+    },
+    {
+      "title": "Efficient Hierarchical Entropy Model for Learned Point Cloud Compression"
+    },
+    {
+      "title": "A new near-linear time algorithm for k-nearest neighbor search using a compressed cover tree"
+    },
+    {
+      "title": "Coresets for Decision Trees of Signals"
+    },
+    {
+      "title": "Coresets for Decision Trees of Signals"
+    },
+    {
+      "title": "Few-bit Backward: Quantized Gradients of Activation Functions for Memory Footprint Reduction"
+    },
+    {
+      "title": "Explainable k-Means and k-Medians Clustering"
+    }
   ]
 }
