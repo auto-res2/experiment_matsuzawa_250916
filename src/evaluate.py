@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 from typing import Dict, Any
 
-_OUTPUT_DIR = Path(".research/iteration7")  # UPDATED PATH
+_OUTPUT_DIR = Path(".research/iteration8")  # UPDATED PATH
 
 
 def evaluate(train_artifacts: Dict[str, Any]) -> Dict[str, Any]:

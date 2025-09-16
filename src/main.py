@@ -19,6 +19,10 @@ from typing import Dict, Any
 ROOT_DIR = Path(__file__).resolve().parent.parent
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
+# Also ensure the *src* directory itself is importable for fallback look-ups
+SRC_DIR = ROOT_DIR / "src"
+if SRC_DIR.exists() and str(SRC_DIR) not in sys.path:
+    sys.path.insert(0, str(SRC_DIR))
 
 # -----------------------------------------------------------------------------
 # Local imports (deferred to ensure path fix above is in effect)
@@ -37,7 +41,8 @@ def _lazy_import(name: str) -> ModuleType:
     2. Try relative to *__package__* (works when ``python -m ...`` is used).
     3. Try relative to the *root* distribution package (works from the installed
        wheel where modules are laid out as ``scarf_experiment.<module>``).
-    4. FINAL SAFETY NET: load the *file* directly from ROOT_DIR if present.
+    4. FINAL SAFETY NET: load the *file* directly from ROOT_DIR **or src/** if
+       present.
     """
     # (1) plain import first ---------------------------------------------------
     try:
@@ -59,14 +64,15 @@ def _lazy_import(name: str) -> ModuleType:
                 pass
 
         # (4) FINAL fallback – direct file import -----------------------------
-        candidate = ROOT_DIR / f"{name}.py"
-        if candidate.exists():
-            spec = importlib.util.spec_from_file_location(name, candidate)
-            if spec and spec.loader:
-                module = importlib.util.module_from_spec(spec)
-                sys.modules[name] = module  # cache so subsequent imports work
-                spec.loader.exec_module(module)  # type: ignore[attr-defined]
-                return module
+        for base in (ROOT_DIR, SRC_DIR):
+            candidate = base / f"{name}.py"
+            if candidate.exists():
+                spec = importlib.util.spec_from_file_location(name, candidate)
+                if spec and spec.loader:
+                    module = importlib.util.module_from_spec(spec)
+                    sys.modules[name] = module  # cache so subsequent imports work
+                    spec.loader.exec_module(module)  # type: ignore[attr-defined]
+                    return module
 
         # Nothing worked – re-raise the *original* error for clarity
         raise first_err
