@@ -6,5 +6,82 @@
     "online adaptation convergence",
     "entropy minimization adaptation",
     "meta-learning test-time adaptation"
+  ],
+  "research_study_list": [
+    {
+      "title": "Evaluation of Test-Time Adaptation Under Computational Time Constraints"
+    },
+    {
+      "title": "Leveraging Proxy of Training Data for Test-Time Adaptation"
+    },
+    {
+      "title": "Towards Stable Test-time Adaptation in Dynamic Wild World"
+    },
+    {
+      "title": "Towards Stable Test-time Adaptation in Dynamic Wild World"
+    },
+    {
+      "title": "Robust Test-Time Adaptation in Dynamic Scenarios"
+    },
+    {
+      "title": "Test Time Adaptation With Regularized Loss for Weakly Supervised Salient Object Detection"
+    },
+    {
+      "title": "Tent: Fully Test-Time Adaptation by Entropy Minimization"
+    },
+    {
+      "title": "What How and When Should Object Detectors Update in Continually Changing Test Domains?"
+    },
+    {
+      "title": "DELTA: DEGRADATION-FREE FULLY TEST-TIME ADAPTATION"
+    },
+    {
+      "title": "Test-Time Training with Self-Supervision for Generalization under Distribution Shifts"
+    },
+    {
+      "title": "Parameter-free, Dynamic, and Strongly-Adaptive Online Learning"
+    },
+    {
+      "title": "Gradient-Variation Online Learning under Generalized Smoothness"
+    },
+    {
+      "title": "Understanding Adam Optimizer via Online Learning of Updates: Adam is FTRL in Disguise"
+    },
+    {
+      "title": "Online PAC-Bayes Learning"
+    },
+    {
+      "title": "Provably Efficient Model-based Policy Adaptation"
+    },
+    {
+      "title": "The Entropy Enigma: Success and Failure of Entropy Minimization"
+    },
+    {
+      "title": "Tent: Fully Test-Time Adaptation by Entropy Minimization"
+    },
+    {
+      "title": "Diversify, Contextualize, and Adapt: Efficient Entropy Modeling for Neural Image Codec"
+    },
+    {
+      "title": "Entropy Minimization In Emergent Languages"
+    },
+    {
+      "title": "Generalization Guarantees for Sparse Kernel Approximation with Entropic Optimal Features"
+    },
+    {
+      "title": "Test Time Adaptation via Conjugate Pseudo-labels"
+    },
+    {
+      "title": "Active Test-Time Adaptation: Theoretical Analyses and An Algorithm"
+    },
+    {
+      "title": "EcoTTA: Memory-Efficient Continual Test-Time Adaptation via Self-Distilled Regularization"
+    },
+    {
+      "title": "Robust Test-Time Adaptation in Dynamic Scenarios"
+    },
+    {
+      "title": "Improved Test-Time Adaptation for Domain Generalization"
+    }
   ]
 }
