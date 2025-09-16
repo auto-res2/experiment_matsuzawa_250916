@@ -4,13 +4,12 @@ version = "0.1.0"
 description = "Implementation of REFLECT-BO for research paper publication."
 authors = ["AI Researcher"]
 
-# Explicitly include only the top-level Python modules so Poetry’s wheel build
-# succeeds without requiring a non-existent package directory.
+# Define a minimal stub package solely to satisfy Poetry’s packaging rules.
+# All runnable scripts (main.py, train.py, etc.) live at project root and are
+# executed directly; they are **not** imported as a library. Creating this stub
+# prevents build failures without requiring a wholesale repository restructure.
 packages = [
-    { include = "main.py" },
-    { include = "train.py" },
-    { include = "preprocess.py" },
-    { include = "evaluate.py" }
+    { include = "reflect_bo_research" }
 ]
 
 [tool.poetry.dependencies]

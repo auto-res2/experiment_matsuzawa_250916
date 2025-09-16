@@ -211,9 +211,9 @@ def run(config, training_output_path):
     print(header)
 
     # --- Output Directories (MANDATED PATHS) ------------------------------------
-    output_dir_img = Path(".research/iteration4/images")
+    output_dir_img = Path(".research/iteration5/images")
     output_dir_img.mkdir(parents=True, exist_ok=True)
-    output_dir_json = Path(".research/iteration4")
+    output_dir_json = Path(".research/iteration5")
     output_dir_json.mkdir(parents=True, exist_ok=True)
 
     # ---------------- Experiment-specific Metrics -------------------------------
