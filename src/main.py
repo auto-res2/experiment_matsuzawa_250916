@@ -38,9 +38,8 @@ import yaml  # noqa: E402  pylint: disable=wrong-import-position
 def _lazy_import(name: str) -> ModuleType:
     """Import *name* with multiple fallbacks.
 
-    The search strategy is purposely exhaustive because the package can be
-    executed in a variety of layouts (editable install, sdist, wheel, or direct
-    source invocation in the CI sandbox).
+    Extended to handle extension-less single-file modules that live next to the
+    sources inside the repository (CI packaging quirk).
     """
     # (1) plain import first ---------------------------------------------------
     try:
@@ -61,18 +60,17 @@ def _lazy_import(name: str) -> ModuleType:
             except ModuleNotFoundError:
                 pass
 
-        # (4) FINAL fallback – direct file import -----------------------------
-        # We look inside ROOT_DIR, its *parent* (needed for wheels where the
-        # loose modules sit in site-packages/), and SRC_DIR.
+        # (4) FINAL fallback – manual file lookup -----------------------------
         for base in (ROOT_DIR, ROOT_DIR.parent, SRC_DIR):
-            candidate = base / f"{name}.py"
-            if candidate.exists():
-                spec = importlib.util.spec_from_file_location(name, candidate)
-                if spec and spec.loader:
-                    module = importlib.util.module_from_spec(spec)
-                    sys.modules[name] = module  # cache for subsequent imports
-                    spec.loader.exec_module(module)  # type: ignore[attr-defined]
-                    return module
+            for candidate_name in (f"{name}.py", name):  # accept extensionless
+                candidate = base / candidate_name
+                if candidate.exists():
+                    spec = importlib.util.spec_from_file_location(name, candidate)
+                    if spec and spec.loader:
+                        module = importlib.util.module_from_spec(spec)
+                        sys.modules[name] = module  # cache for subsequent imports
+                        spec.loader.exec_module(module)  # type: ignore[attr-defined]
+                        return module
 
         # Nothing worked – re-raise the *original* error for clarity
         raise first_err
