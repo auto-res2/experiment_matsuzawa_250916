@@ -44,10 +44,10 @@ def run_evaluation(config, training_run_dir):
     final_report = {'experiment_id': exp_id, 'config_name': config['name']}
     figure_paths = []
 
-    # Mandatory paths for iteration15
-    output_dir_img = Path(".research/iteration15/images")
+    # Mandatory paths for iteration16
+    output_dir_img = Path(".research/iteration16/images")
     output_dir_img.mkdir(parents=True, exist_ok=True)
-    output_dir_json = Path(".research/iteration15/")
+    output_dir_json = Path(".research/iteration16/")
     output_dir_json.mkdir(parents=True, exist_ok=True)
 
     if exp_id == 1:
