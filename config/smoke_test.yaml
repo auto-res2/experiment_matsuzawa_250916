@@ -1,46 +1,40 @@
 name: 'smoke_test'
-experiment_ids_to_run: [1] # Run only one experiment for a quick check
+experiment_ids_to_run: [1]
 
 paths:
-  # MIMIC-IV is a private dataset, path must be configured by user.
-  # For smoke test, we rely on public data and skip this.
-  mimic_iv_dir: '/tmp/mimic-iv-notes-dummy'
-  processed_data_path: 'data/smoke_test'
-  training_output_path: '.research/iteration12/training_smoke'
-
-api_details:
-  provider: 'huggingface' # Use local models to avoid API costs for testing
+  # For smoke test, MIMIC-IV is not used to ensure it runs without private data.
+  mimic_iv_dir: 'data/raw/mimic-iv-dummy'
+  processed_data_path: 'artifacts/data/smoke_test'
+  training_output_path: '.research/iteration23/smoke_test_runs'
 
 model_names:
-  encoder: 'sentence-transformers/all-MiniLM-L6-v2' # Smaller encoder for speed
-  generator: 'gpt2'
-  scorer: 'gpt-4-0613' # Scorer is often critical, keep as specified but expect it to be mocked if key is absent
+  encoder: 'sentence-transformers/all-MiniLM-L6-v2'
+  generator: 'gpt-3.5-turbo' # Use a fast OpenAI model
+  scorer: 'gpt-4-turbo-preview'
   paraphraser: 'tuner007/pegasus_paraphrase'
-  continual_backend: 'gpt2'
+  continual_backend: 'NousResearch/Llama-2-7b-chat-hf'
 
 seeds: [42]
 
-# --- Experiment 1 Config ---
+# --- Experiment 1: Zero/Low-Log Bootstrap ---
 experiment_1:
-  tasks: ['FinReg-Compliance']
+  tasks: ['FinReg-Compliance-5'] # Only run the public data task
+  methods: ['REFLECT-BO', 'Random']
 
-# --- Experiment 2 Config ---
+# --- Experiment 2: Continual Private Adaptation ---
 experiment_2:
-  methods: ['REFLECT-BO', 'REFLECT-BO-NoDP']
   tasks: ['Super-NI']
+  methods: ['REFLECT-BO', 'REFLECT-BO-NoDP']
 
-# --- Experiment 3 Config ---
+# --- Experiment 3: Human-in-the-Loop ---
 experiment_3:
   tasks: ['GSM8K']
+  methods: ['REFLECT-BO']
 
-sec_edgar_ciks: ['0000320193'] # Just Apple Inc. for a quick test
-
-model_drift_schedule:
-  - 'gpt2'
-  - 'distilgpt2'
+sec_edgar_ciks: ['0000320193'] # Apple Inc. for a single data point
 
 optimization_params:
-  api_budget: 6
+  api_budget: 5
   bootstrap_budget: 2
 
 hyperparameters:

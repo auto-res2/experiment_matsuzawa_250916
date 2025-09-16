@@ -1,125 +1,129 @@
 import argparse
 import os
 import sys
-import random
-from pathlib import Path
 import yaml
-import torch
+import random
 import numpy as np
+import torch
 
-# Add src to path to allow relative imports
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '.')))
+# Ensure src is in the python path
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-import preprocess
-import train
-import evaluate
+from src import preprocess, train, evaluate
 
-def set_global_seeds(seed):
-    random.seed(seed)
-    np.random.seed(seed)
-    torch.manual_seed(seed)
+def set_seeds(seed_value):
+    """Set seeds for reproducibility."""
+    random.seed(seed_value)
+    np.random.seed(seed_value)
+    torch.manual_seed(seed_value)
     if torch.cuda.is_available():
-        torch.cuda.manual_seed_all(seed)
+        torch.cuda.manual_seed_all(seed_value)
         torch.backends.cudnn.deterministic = True
         torch.backends.cudnn.benchmark = False
-    print(f"Global random seed set to {seed}")
 
-def load_config(config_path):
+def load_config(path: str) -> dict:
+    """Load a YAML configuration file."""
     try:
-        with open(config_path, 'r') as f:
+        with open(path, 'r') as f:
             return yaml.safe_load(f)
     except FileNotFoundError:
-        print(f"FATAL: Configuration file not found at '{config_path}'", file=sys.stderr)
+        print(f"Error: Configuration file not found at '{path}'.", file=sys.stderr)
         sys.exit(1)
     except yaml.YAMLError as e:
-        print(f"FATAL: Error parsing YAML file '{config_path}': {e}", file=sys.stderr)
+        print(f"Error: Could not parse YAML file '{path}': {e}", file=sys.stderr)
         sys.exit(1)
 
-def _ensure_experiment_id_in_config(cfg):
-    """Utility to guarantee that `cfg['experiment_id']` exists.
-
-    Many helper functions assume the key is present. During smoke-tests we only
-    have `experiment_ids_to_run`, so we derive the first (and only) element
-    from that list unless already provided."""
-    if 'experiment_id' not in cfg or cfg['experiment_id'] is None:
-        ids = cfg.get('experiment_ids_to_run', [])
-        if not ids:
-            raise KeyError("Configuration is missing both 'experiment_id' and 'experiment_ids_to_run'.")
-        cfg['experiment_id'] = ids[0]
-
+def run_stage(stage: str, config: dict):
+    """Run a specific stage of the experimental pipeline."""
+    print(f"\n{'='*20} RUNNING STAGE: {stage.upper()} {'='*20}")
+    if stage == 'preprocess':
+        preprocess.run(config)
+    elif stage == 'train':
+        train.run(config)
+    elif stage == 'evaluate':
+        evaluate.run(config)
+    else:
+        raise ValueError(f"Unknown stage: '{stage}'. Must be one of 'preprocess', 'train', 'evaluate'.")
+    print(f"{'='*20} STAGE COMPLETE: {stage.upper()} {'='*20}")
 
 def main():
-    parser = argparse.ArgumentParser(description="Run REFLECT-BO experiments end-to-end.")
-    group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument('--smoke-test', action='store_true', help='Run a small-scale smoke test.')
-    group.add_argument('--full-experiment', action='store_true', help='Run the full-scale experiment.')
+    parser = argparse.ArgumentParser(description="Run REFLECT-BO research experiments.")
+    
+    # Stage selection
+    parser.add_argument(
+        'stage',
+        type=str,
+        choices=['preprocess', 'train', 'evaluate', 'all'],
+        help="The experimental stage to run."
+    )
+
+    # Configuration selection (mutually exclusive)
+    config_group = parser.add_mutually_exclusive_group(required=True)
+    config_group.add_argument(
+        '--smoke-test',
+        action='store_true',
+        help="Run with the smoke test configuration for quick validation."
+    )
+    config_group.add_argument(
+        '--full-experiment',
+        action='store_true',
+        help="Run with the full experiment configuration for publication-worthy results."
+    )
 
     args = parser.parse_args()
 
+    # Determine which config file to load
     if args.smoke_test:
         config_path = 'config/smoke_test.yaml'
-        print("Executing SMOKE TEST...")
+        print("--- Mode: SMOKE TEST ---")
     else:
         config_path = 'config/full_experiment.yaml'
-        print("Executing FULL EXPERIMENT...")
+        print("--- Mode: FULL EXPERIMENT ---")
 
+    # Load the primary configuration
     config = load_config(config_path)
-    set_global_seeds(config['seeds'][0])  # Use first seed for global setup
-
-    # Phase 1: Two-Phase Execution (Smoke Test then Full Experiment)
+    set_seeds(config['seeds'][0]) # Use the first seed for global setup
+    
+    # For full experiment, first run a validation smoke test
     if args.full_experiment:
-        print("\nPHASE 1: Running smoke test first for validation...")
+        print("\n--- Validating pipeline with a smoke test before full run... ---")
         smoke_config = load_config('config/smoke_test.yaml')
-        _ensure_experiment_id_in_config(smoke_config)
-        set_global_seeds(smoke_config['seeds'][0])
         try:
-            # A minimal run to validate the pipeline
-            temp_path = preprocess.run_preprocessing(smoke_config)
-            temp_train_dir = train.run_experiment(smoke_config, temp_path)
-            evaluate.run_evaluation(smoke_config, temp_train_dir)
-            print("\nSmoke test PASSED. Proceeding to full experiment.")
+            set_seeds(smoke_config['seeds'][0])
+            # Run smoke test for the first experiment ID only
+            smoke_config['experiment_id'] = smoke_config['experiment_ids_to_run'][0]
+            run_stage('preprocess', smoke_config)
+            run_stage('train', smoke_config)
+            run_stage('evaluate', smoke_config)
+            print("--- Smoke test PASSED. Proceeding to full experiment. ---")
         except Exception as e:
-            print(f"\nFATAL: Smoke test FAILED with error: {e}", file=sys.stderr)
-            print("Aborting full experiment to save resources.", file=sys.stderr)
+            print(f"\nFATAL: Smoke test FAILED. Aborting full experiment. Error: {e}", file=sys.stderr)
+            import traceback
+            traceback.print_exc()
             sys.exit(1)
+        # Reset seed for the main run
+        set_seeds(config['seeds'][0])
 
-    # Reset seed for the main experiment run
-    _ensure_experiment_id_in_config(config)  # ensures key exists before loops
-    set_global_seeds(config['seeds'][0])
-
-    # PHASE 2: Main Experiment Pipeline
+    # Execute the requested stage(s)
+    stages_to_run = ['preprocess', 'train', 'evaluate'] if args.stage == 'all' else [args.stage]
+    
     try:
         for exp_id in config['experiment_ids_to_run']:
-            print("\n=======================================================")
-            print(f"            STARTING EXPERIMENT {exp_id}")
-            print("=======================================================")
-            config['experiment_id'] = exp_id  # inject current id into config
-
-            # 1. Data Preprocessing
-            print("\n--- STAGE 1: DATA PREPROCESSING ---")
-            processed_data_path = preprocess.run_preprocessing(config)
-            print("--- PREPROCESSING COMPLETE ---")
-
-            # 2. Training / Optimization
-            print("\n--- STAGE 2: TRAINING / OPTIMIZATION ---")
-            training_run_dir = train.run_experiment(config, processed_data_path)
-            print("--- TRAINING COMPLETE ---")
-
-            # 3. Evaluation
-            print("\n--- STAGE 3: EVALUATION ---")
-            evaluate.run_evaluation(config, training_run_dir)
-            print("--- EVALUATION COMPLETE ---")
-
-    except (FileNotFoundError, ConnectionError, RuntimeError, ValueError) as e:
-        print(f"\nFATAL ERROR in pipeline: {e}", file=sys.stderr)
+            print(f"\n{'#'*60}\n{'#':<2} Experiment ID: {exp_id}{'#':>40}\n{'#'*60}")
+            # Inject the current experiment ID into the config for this run
+            config['experiment_id'] = exp_id
+            for stage in stages_to_run:
+                run_stage(stage, config)
+    except (FileNotFoundError, ConnectionError, RuntimeError, ValueError, AssertionError) as e:
+        print(f"\nFATAL ERROR during experiment execution: {e}", file=sys.stderr)
         sys.exit(1)
     except Exception as e:
-        import traceback
         print(f"\nUNHANDLED EXCEPTION: {e}", file=sys.stderr)
+        import traceback
         traceback.print_exc()
         sys.exit(1)
 
-    print("\nAll configured experiments finished successfully.")
+    print("\nAll specified experiments and stages completed successfully.")
 
 if __name__ == '__main__':
     main()
