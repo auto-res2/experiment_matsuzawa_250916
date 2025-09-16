@@ -6,5 +6,82 @@
     "parallel GAT training",
     "sparse GAT training",
     "quantized GAT training"
+  ],
+  "research_study_list": [
+    {
+      "title": "Bandit Samplers for Training Graph Neural Networks"
+    },
+    {
+      "title": "Are GATs Out of Balance?"
+    },
+    {
+      "title": "Dynamic Rescaling for Training GNNs"
+    },
+    {
+      "title": "GATE: How to Keep Out Intrusive Neighbors"
+    },
+    {
+      "title": "GraphSAINT: Graph Sampling Based Inductive Learning Method"
+    },
+    {
+      "title": "GACT: Activation Compressed Training for Generic Network Architectures"
+    },
+    {
+      "title": "GACT: Activation Compressed Training for Generic Network Architectures"
+    },
+    {
+      "title": "Generative Teaching Networks: Accelerating Neural Architecture Search by Learning to Generate Synthetic Training Data"
+    },
+    {
+      "title": "Accelerating Transformer Pre-training with 2:4 Sparsity"
+    },
+    {
+      "title": "Transformer Quality in Linear Time"
+    },
+    {
+      "title": "Dynamic Rescaling for Training GNNs"
+    },
+    {
+      "title": "Bandit Samplers for Training Graph Neural Networks"
+    },
+    {
+      "title": "Graph Ladling: Shockingly Simple Parallel GNN Training without Intermediate Communication"
+    },
+    {
+      "title": "Are GATs Out of Balance?"
+    },
+    {
+      "title": "GBA: A Tuning-free Approach to Switch between Synchronous and Asynchronous Training for Recommendation Models"
+    },
+    {
+      "title": "RSC: Accelerate Graph Neural Networks Training via Randomized Sparse Computations"
+    },
+    {
+      "title": "Two Heads Are Better Than One: Boosting Graph Sparse Training via Semantic and Topological Awareness"
+    },
+    {
+      "title": "Joint Edge-Model Sparse Learning is Provably Efficient for Graph Neural Networks"
+    },
+    {
+      "title": "A Unified Lottery Ticket Hypothesis for Graph Neural Networks"
+    },
+    {
+      "title": "Graph Lottery Ticket Automated"
+    },
+    {
+      "title": "Degree-Quant: Quantization-Aware Training for Graph Neural Networks"
+    },
+    {
+      "title": "$\\rm A^2Q$: Aggregation-Aware Quantization for Graph Neural Networks"
+    },
+    {
+      "title": "Not All Bits have Equal Value: Heterogeneous Precisions via Trainable Noise"
+    },
+    {
+      "title": "Are GATs Out of Balance?"
+    },
+    {
+      "title": "Quantizable Transformers: Removing Outliers by Helping Attention Heads Do Nothing"
+    }
   ]
 }
