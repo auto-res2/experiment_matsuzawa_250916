@@ -60,13 +60,24 @@ def get_image_transforms():
     ])
 
 
-def _attempt_load_hf_dataset(name: str, **kwargs):
-    """Load a dataset from the Hugging Face Hub, passing an auth token if available."""
+def _attempt_load_hf_dataset(dataset_id: str, *args, **kwargs):
+    """Load a dataset from the Hugging Face Hub with optional auth token.
+
+    Parameters
+    ----------
+    dataset_id: str
+        The repository ID of the dataset (e.g. "imagenette").
+    *args / **kwargs:
+        Additional positional or keyword arguments forwarded verbatim to
+        `datasets.load_dataset`. This makes it possible to pass a configuration
+        name as a positional arg (e.g. "full") *or* via the `name=` kwarg
+        without risking a python `TypeError` about multiple values for `name`.
+    """
     token = os.getenv("HF_TOKEN", None)
     try:
-        return load_dataset(name, **kwargs, cache_dir=DATA_CACHE_DIR, token=token)
+        return load_dataset(dataset_id, *args, cache_dir=DATA_CACHE_DIR, token=token, **kwargs)
     except Exception as e:
-        raise RuntimeError(f"Could not load dataset '{name}' from the Hub: {e}") from e
+        raise RuntimeError(f"Could not load dataset '{dataset_id}' from the Hub: {e}") from e
 
 # -----------------------------------------------------------------------------
 # Minimal dataset wrappers
@@ -147,7 +158,7 @@ def get_dataloaders(config):
         batch_size = exp_cfg['dataloader']['batch_size']
 
         try:
-            # CIFAR10-C placeholder (for smoke-tests)
+            # CIFAR10-C placeholder (used by smoke-tests)
             if 'cifar10-c' in d_name:
                 ds = _attempt_load_hf_dataset('cifar10', split='test')
                 if 'img' in ds.column_names:
@@ -169,7 +180,7 @@ def get_dataloaders(config):
                     ds = _attempt_load_hf_dataset('imagenet-1k', split='validation')
                 except RuntimeError as e:
                     logging.warning(
-                        "Imagenet-1k dataset gated/unavailable ({}). Falling back to open 'imagenette'.".format(e)
+                        f"Imagenet-1k dataset gated/unavailable ({e}). Falling back to open 'imagenette'."
                     )
                     ds = _attempt_load_hf_dataset('imagenette', name='full', split='validation')
                     if 'img' in ds.column_names:
