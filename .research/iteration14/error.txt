@@ -1,0 +1,165 @@
+2025-09-16 12:29:50,779 [INFO] Executing in FULL EXPERIMENT mode.
+2025-09-16 12:29:50,780 [INFO] Loading configuration from: config/full_experiment.yaml
+2025-09-16 12:29:50,977 [INFO] Global random seed set to 42
+2025-09-16 12:29:50,978 [INFO] Results will be saved in: .research/iteration14
+2025-09-16 12:29:50,978 [INFO] --- Phase 1: Data Preparation ---
+2025-09-16 12:29:50,978 [INFO] Data manifest is empty – nothing to download.
+2025-09-16 12:29:50,978 [INFO] All data assets are verified and ready.
+2025-09-16 12:29:50,978 [INFO] --- Phase 2: Running Experiments ---
+2025-09-16 12:29:50,978 [INFO] 
+--- Starting run [1/11]: exp1_accuracy_resnet50.a1_in1k_synthetic_shot_ZORROpp_eta0.25_seed42 ---
+2025-09-16 12:29:50,979 [INFO] Loading model: resnet50.a1_in1k
+2025-09-16 12:29:51,331 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet50.a1_in1k)
+2025-09-16 12:29:51,568 [INFO] [timm/resnet50.a1_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
+Running ZORROpp:   0%|          | 0/1000 [00:00<?, ?it/s]2025-09-16 12:29:54,242 [ERROR] Experiment exp1_accuracy_resnet50.a1_in1k_synthetic_shot_ZORROpp_eta0.25_seed42 failed: 'ResNet' object has no attribute 'head'
+Traceback (most recent call last):
+  File "/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/src/evaluate.py", line 216, in run_experiments
+    results_df = run_single_experiment(exp_config, dataloader, device)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/src/evaluate.py", line 63, in run_single_experiment
+    outputs = adaptor(inputs)
+              ^^^^^^^^^^^^^^^
+  File "/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/.venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1518, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/.venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1527, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/src/train.py", line 159, in forward
+    return self.model.head.fc(transformed_features)
+           ^^^^^^^^^^^^^^^
+  File "/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/.venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1695, in __getattr__
+    raise AttributeError(f"'{type(self).__name__}' object has no attribute '{name}'")
+AttributeError: 'ResNet' object has no attribute 'head'
+Running ZORROpp:   0%|          | 0/1000 [00:01<?, ?it/s]
+2025-09-16 12:29:54,247 [INFO] 
+--- Starting run [2/11]: exp1_accuracy_resnet50.a1_in1k_synthetic_shot_ZORROpp_eta0.25_seed43 ---
+2025-09-16 12:29:54,247 [INFO] Loading model: resnet50.a1_in1k
+2025-09-16 12:29:54,540 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet50.a1_in1k)
+2025-09-16 12:29:54,725 [INFO] [timm/resnet50.a1_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
+Running ZORROpp:   0%|          | 0/1000 [00:00<?, ?it/s]2025-09-16 12:29:56,099 [ERROR] Experiment exp1_accuracy_resnet50.a1_in1k_synthetic_shot_ZORROpp_eta0.25_seed43 failed: 'ResNet' object has no attribute 'head'
+Traceback (most recent call last):
+  File "/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/src/evaluate.py", line 216, in run_experiments
+    results_df = run_single_experiment(exp_config, dataloader, device)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/src/evaluate.py", line 63, in run_single_experiment
+    outputs = adaptor(inputs)
+              ^^^^^^^^^^^^^^^
+  File "/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/.venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1518, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/.venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1527, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/src/train.py", line 159, in forward
+    return self.model.head.fc(transformed_features)
+           ^^^^^^^^^^^^^^^
+  File "/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/.venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1695, in __getattr__
+    raise AttributeError(f"'{type(self).__name__}' object has no attribute '{name}'")
+AttributeError: 'ResNet' object has no attribute 'head'
+Running ZORROpp:   0%|          | 0/1000 [00:00<?, ?it/s]
+2025-09-16 12:29:56,103 [INFO] 
+--- Starting run [3/11]: exp1_accuracy_resnet50.a1_in1k_synthetic_shot_ZORROpp_eta0.25_seed44 ---
+2025-09-16 12:29:56,104 [INFO] Loading model: resnet50.a1_in1k
+2025-09-16 12:29:56,386 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet50.a1_in1k)
+2025-09-16 12:29:56,574 [INFO] [timm/resnet50.a1_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
+Running ZORROpp:   0%|          | 0/1000 [00:00<?, ?it/s]2025-09-16 12:29:57,970 [ERROR] Experiment exp1_accuracy_resnet50.a1_in1k_synthetic_shot_ZORROpp_eta0.25_seed44 failed: 'ResNet' object has no attribute 'head'
+Traceback (most recent call last):
+  File "/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/src/evaluate.py", line 216, in run_experiments
+    results_df = run_single_experiment(exp_config, dataloader, device)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/src/evaluate.py", line 63, in run_single_experiment
+    outputs = adaptor(inputs)
+              ^^^^^^^^^^^^^^^
+  File "/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/.venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1518, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/.venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1527, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/src/train.py", line 159, in forward
+    return self.model.head.fc(transformed_features)
+           ^^^^^^^^^^^^^^^
+  File "/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/.venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1695, in __getattr__
+    raise AttributeError(f"'{type(self).__name__}' object has no attribute '{name}'")
+AttributeError: 'ResNet' object has no attribute 'head'
+Running ZORROpp:   0%|          | 0/1000 [00:00<?, ?it/s]
+2025-09-16 12:29:57,976 [INFO] 
+--- Starting run [4/11]: exp1_accuracy_resnet50.a1_in1k_synthetic_shot_BN_eta0.25_seed42 ---
+2025-09-16 12:29:57,977 [INFO] Loading model: resnet50.a1_in1k
+2025-09-16 12:29:58,343 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet50.a1_in1k)
+2025-09-16 12:29:58,527 [INFO] [timm/resnet50.a1_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
+Running BN:   0%|          | 0/1000 [00:00<?, ?it/s]Running BN:   6%|▋         | 64/1000 [00:00<00:06, 155.24it/s]Running BN:   6%|▋         | 64/1000 [00:00<00:06, 155.24it/s, Acc=0.00%]Running BN:  13%|█▎        | 128/1000 [00:00<00:05, 155.24it/s, Acc=0.00%]Running BN:  19%|█▉        | 192/1000 [00:00<00:05, 155.24it/s, Acc=0.00%]Running BN:  26%|██▌       | 256/1000 [00:00<00:01, 552.95it/s, Acc=0.00%]Running BN:  26%|██▌       | 256/1000 [00:00<00:01, 552.95it/s, Acc=0.00%]Running BN:  32%|███▏      | 320/1000 [00:00<00:01, 552.95it/s, Acc=0.00%]Running BN:  38%|███▊      | 384/1000 [00:00<00:01, 552.95it/s, Acc=0.00%]Running BN:  45%|████▍     | 448/1000 [00:00<00:00, 793.50it/s, Acc=0.00%]Running BN:  45%|████▍     | 448/1000 [00:00<00:00, 793.50it/s, Acc=0.00%]Running BN:  51%|█████     | 512/1000 [00:00<00:00, 793.50it/s, Acc=0.00%]Running BN:  58%|█████▊    | 576/1000 [00:01<00:00, 556.75it/s, Acc=0.00%]Running BN:  58%|█████▊    | 576/1000 [00:01<00:00, 556.75it/s, Acc=0.00%]Running BN:  64%|██████▍   | 640/1000 [00:01<00:00, 556.75it/s, Acc=0.16%]Running BN:  70%|███████   | 704/1000 [00:01<00:00, 556.75it/s, Acc=0.14%]Running BN:  77%|███████▋  | 768/1000 [00:01<00:00, 729.97it/s, Acc=0.14%]Running BN:  77%|███████▋  | 768/1000 [00:01<00:00, 729.97it/s, Acc=0.13%]Running BN:  83%|████████▎ | 832/1000 [00:01<00:00, 729.97it/s, Acc=0.12%]Running BN:  90%|████████▉ | 896/1000 [00:01<00:00, 491.48it/s, Acc=0.12%]Running BN:  90%|████████▉ | 896/1000 [00:01<00:00, 491.48it/s, Acc=0.11%]Running BN:  96%|█████████▌| 960/1000 [00:01<00:00, 491.48it/s, Acc=0.10%]Running BN: 1024it [00:01, 595.69it/s, Acc=0.10%]                         Running BN: 1024it [00:01, 595.69it/s, Acc=0.10%]Running BN: 1024it [00:02, 443.45it/s, Acc=0.10%]
+2025-09-16 12:30:02,568 [WARNING] Unsupported operator aten::add_ encountered 69 time(s)
+2025-09-16 12:30:02,568 [WARNING] Unsupported operator aten::max_pool2d encountered 1 time(s)
+2025-09-16 12:30:02,597 [INFO] Saved results for exp1_accuracy_resnet50.a1_in1k_synthetic_shot_BN_eta0.25_seed42 to .research/iteration14/results_20250916-122950/exp1_accuracy_resnet50.a1_in1k_synthetic_shot_BN_eta0.25_seed42.parquet
+2025-09-16 12:30:02,597 [INFO] 
+--- Starting run [5/11]: exp1_accuracy_resnet50.a1_in1k_synthetic_shot_Tent_eta0.25_seed42 ---
+2025-09-16 12:30:02,597 [INFO] Loading model: resnet50.a1_in1k
+2025-09-16 12:30:02,892 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet50.a1_in1k)
+2025-09-16 12:30:03,075 [INFO] [timm/resnet50.a1_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
+Running Tent:   0%|          | 0/1000 [00:00<?, ?it/s]Running Tent:   6%|▋         | 64/1000 [00:00<00:05, 157.48it/s]Running Tent:   6%|▋         | 64/1000 [00:00<00:05, 157.48it/s, Acc=0.00%]Running Tent:  13%|█▎        | 128/1000 [00:00<00:05, 157.48it/s, Acc=0.00%]Running Tent:  19%|█▉        | 192/1000 [00:00<00:01, 424.61it/s, Acc=0.00%]Running Tent:  19%|█▉        | 192/1000 [00:00<00:01, 424.61it/s, Acc=0.00%]Running Tent:  26%|██▌       | 256/1000 [00:00<00:01, 424.61it/s, Acc=0.00%]Running Tent:  32%|███▏      | 320/1000 [00:00<00:01, 424.61it/s, Acc=0.00%]Running Tent:  38%|███▊      | 384/1000 [00:00<00:00, 718.24it/s, Acc=0.00%]Running Tent:  38%|███▊      | 384/1000 [00:00<00:00, 718.24it/s, Acc=0.00%]Running Tent:  45%|████▍     | 448/1000 [00:00<00:00, 718.24it/s, Acc=0.00%]Running Tent:  51%|█████     | 512/1000 [00:00<00:00, 827.37it/s, Acc=0.00%]Running Tent:  51%|█████     | 512/1000 [00:00<00:00, 827.37it/s, Acc=0.00%]Running Tent:  58%|█████▊    | 576/1000 [00:01<00:00, 827.37it/s, Acc=0.00%]Running Tent:  64%|██████▍   | 640/1000 [00:01<00:00, 593.27it/s, Acc=0.00%]Running Tent:  64%|██████▍   | 640/1000 [00:01<00:00, 593.27it/s, Acc=0.00%]Running Tent:  70%|███████   | 704/1000 [00:01<00:00, 593.27it/s, Acc=0.00%]Running Tent:  77%|███████▋  | 768/1000 [00:01<00:00, 719.57it/s, Acc=0.00%]Running Tent:  77%|███████▋  | 768/1000 [00:01<00:00, 719.57it/s, Acc=0.00%]Running Tent:  83%|████████▎ | 832/1000 [00:01<00:00, 719.57it/s, Acc=0.00%]Running Tent:  90%|████████▉ | 896/1000 [00:01<00:00, 476.79it/s, Acc=0.00%]Running Tent:  90%|████████▉ | 896/1000 [00:01<00:00, 476.79it/s, Acc=0.00%]Running Tent:  96%|█████████▌| 960/1000 [00:01<00:00, 476.79it/s, Acc=0.00%]Running Tent: 1024it [00:01, 579.91it/s, Acc=0.00%]                         Running Tent: 1024it [00:01, 579.91it/s, Acc=0.00%]Running Tent: 1024it [00:02, 440.53it/s, Acc=0.00%]
+2025-09-16 12:30:07,005 [WARNING] Unsupported operator aten::add_ encountered 69 time(s)
+2025-09-16 12:30:07,005 [WARNING] Unsupported operator aten::max_pool2d encountered 1 time(s)
+2025-09-16 12:30:07,016 [INFO] Saved results for exp1_accuracy_resnet50.a1_in1k_synthetic_shot_Tent_eta0.25_seed42 to .research/iteration14/results_20250916-122950/exp1_accuracy_resnet50.a1_in1k_synthetic_shot_Tent_eta0.25_seed42.parquet
+2025-09-16 12:30:07,016 [INFO] 
+--- Starting run [6/11]: exp2_bounds_resnet50.a1_in1k_synthetic_mixed_ZORROpp_eta1.0_seed42 ---
+2025-09-16 12:30:07,016 [INFO] Loading model: resnet50.a1_in1k
+2025-09-16 12:30:07,291 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet50.a1_in1k)
+2025-09-16 12:30:07,481 [INFO] [timm/resnet50.a1_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
+Running ZORROpp:   0%|          | 0/2000 [00:00<?, ?it/s]2025-09-16 12:30:10,835 [ERROR] Experiment exp2_bounds_resnet50.a1_in1k_synthetic_mixed_ZORROpp_eta1.0_seed42 failed: 'ResNet' object has no attribute 'head'
+Traceback (most recent call last):
+  File "/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/src/evaluate.py", line 216, in run_experiments
+    results_df = run_single_experiment(exp_config, dataloader, device)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/src/evaluate.py", line 63, in run_single_experiment
+    outputs = adaptor(inputs)
+              ^^^^^^^^^^^^^^^
+  File "/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/.venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1518, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/.venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1527, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/src/train.py", line 159, in forward
+    return self.model.head.fc(transformed_features)
+           ^^^^^^^^^^^^^^^
+  File "/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/.venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1695, in __getattr__
+    raise AttributeError(f"'{type(self).__name__}' object has no attribute '{name}'")
+AttributeError: 'ResNet' object has no attribute 'head'
+Running ZORROpp:   0%|          | 0/2000 [00:02<?, ?it/s]
+2025-09-16 12:30:10,840 [INFO] 
+--- Starting run [7/11]: exp2_bounds_resnet50.a1_in1k_synthetic_mixed_ZORROpp_eta1.0_seed42 ---
+2025-09-16 12:30:10,841 [INFO] Loading model: resnet50.a1_in1k
+2025-09-16 12:30:11,130 [INFO] Loading pretrained weights from Hugging Face hub (timm/resnet50.a1_in1k)
+2025-09-16 12:30:11,313 [INFO] [timm/resnet50.a1_in1k] Safe alternative available for 'pytorch_model.bin' (as 'model.safetensors'). Loading weights using safetensors.
+Running ZORROpp:   0%|          | 0/2000 [00:00<?, ?it/s]2025-09-16 12:30:13,799 [ERROR] Experiment exp2_bounds_resnet50.a1_in1k_synthetic_mixed_ZORROpp_eta1.0_seed42 failed: 'ResNet' object has no attribute 'head'
+Traceback (most recent call last):
+  File "/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/src/evaluate.py", line 216, in run_experiments
+    results_df = run_single_experiment(exp_config, dataloader, device)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/src/evaluate.py", line 63, in run_single_experiment
+    outputs = adaptor(inputs)
+              ^^^^^^^^^^^^^^^
+  File "/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/.venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1518, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/.venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1527, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/src/train.py", line 159, in forward
+    return self.model.head.fc(transformed_features)
+           ^^^^^^^^^^^^^^^
+  File "/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/.venv/lib/python3.11/site-packages/torch/nn/modules/module.py", line 1695, in __getattr__
+    raise AttributeError(f"'{type(self).__name__}' object has no attribute '{name}'")
+AttributeError: 'ResNet' object has no attribute 'head'
+Running ZORROpp:   0%|          | 0/2000 [00:01<?, ?it/s]
+2025-09-16 12:30:13,810 [ERROR] An unhandled error occurred during experiment execution: 'method'
+Traceback (most recent call last):
+  File "/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/src/main.py", line 88, in main
+    run_experiments(config)
+  File "/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/src/evaluate.py", line 207, in run_experiments
+    f"{exp_config['method']}_eta{exp_config['stream']['eta']}_"
+       ~~~~~~~~~~^^^^^^^^^^
+KeyError: 'method'
+2025-09-16 12:30:13,811 [ERROR] Experiment run aborted.
