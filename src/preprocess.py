@@ -1,0 +1,1 @@
+"""No heavy pre-processing is needed for CIFAR-10; transformation pipelines live in train.py"""

@@ -1,1 +1,22 @@
-# Please list the required python packages.
+[project]
+name = "symphony-benchmark"
+version = "0.1.0"
+description = "Structured refactor of SYMPHONY baseline experiment"
+readme = "README.md"
+requires-python = ">=3.9"
+
+[build-system]
+requires = ["setuptools>=67", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project.optional-dependencies]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[project]
+dependencies = [
+  "torch>=2.0.0",
+  "torchvision>=0.15.0",
+  "PyYAML>=6.0",
+]
