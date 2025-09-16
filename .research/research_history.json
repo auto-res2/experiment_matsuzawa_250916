@@ -1,0 +1,10 @@
+{
+  "research_topic": "3D点群処理のメモリ効率に関して改善したい",
+  "queries": [
+    "memory-efficient point cloud",
+    "point cloud compression",
+    "point cloud quantization",
+    "octree memory optimization",
+    "kd-tree memory efficiency"
+  ]
+}
