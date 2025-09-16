@@ -10,6 +10,7 @@ import argparse
 import importlib
 import sys
 from pathlib import Path
+from types import ModuleType
 from typing import Dict, Any
 
 # -----------------------------------------------------------------------------
@@ -29,13 +30,14 @@ import yaml  # noqa: E402  pylint: disable=wrong-import-position
 # Robust dynamic import helper
 # -----------------------------------------------------------------------------
 
-def _lazy_import(name: str):
+def _lazy_import(name: str) -> ModuleType:
     """Import *name* with multiple fallbacks.
 
     1. Try as a top-level module (works for editable installs / source checkout).
     2. Try relative to *__package__* (works when ``python -m ...`` is used).
     3. Try relative to the *root* distribution package (works from the installed
        wheel where modules are laid out as ``scarf_experiment.<module>``).
+    4. FINAL SAFETY NET: load the *file* directly from ROOT_DIR if present.
     """
     # (1) plain import first ---------------------------------------------------
     try:
@@ -56,7 +58,17 @@ def _lazy_import(name: str):
             except ModuleNotFoundError:
                 pass
 
-        # Nothing worked  re-raise the *original* error for clarity
+        # (4) FINAL fallback – direct file import -----------------------------
+        candidate = ROOT_DIR / f"{name}.py"
+        if candidate.exists():
+            spec = importlib.util.spec_from_file_location(name, candidate)
+            if spec and spec.loader:
+                module = importlib.util.module_from_spec(spec)
+                sys.modules[name] = module  # cache so subsequent imports work
+                spec.loader.exec_module(module)  # type: ignore[attr-defined]
+                return module
+
+        # Nothing worked – re-raise the *original* error for clarity
         raise first_err
 
 
@@ -64,7 +76,7 @@ def _lazy_import(name: str):
 # Pipeline module loader
 # -----------------------------------------------------------------------------
 
-def _load_pipeline_modules() -> None:  # noqa: D401  imperative mood
+def _load_pipeline_modules() -> None:  # noqa: D401 – imperative mood
     """Dynamically import the pipeline building blocks."""
     global preprocess, train, evaluate  # pylint: disable=global-statement
     preprocess = _lazy_import("preprocess_py").preprocess
