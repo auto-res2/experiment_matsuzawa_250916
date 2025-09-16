@@ -1,0 +1,14 @@
+Using CPython 3.11.13
+Creating virtual environment at: .venv
+Resolved 1 package in 1.12s
+   Building aurora-experiment @ file:///home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916
+      Built aurora-experiment @ file:///home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916
+Prepared 1 package in 253ms
+Installed 1 package in 13ms
+ + aurora-experiment==0.1.0 (from file:///home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916)
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/toma/t-80-8-b-03/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/src/main.py", line 10, in <module>
+    import yaml
+ModuleNotFoundError: No module named 'yaml'
