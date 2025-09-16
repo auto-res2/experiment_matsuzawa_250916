@@ -1,0 +1,19 @@
+warning: No `requires-python` value found in the workspace. Defaulting to `>=3.11`.
+/home/toma/t-80-8-b-01/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/.venv/lib/python3.11/site-packages/torch/cuda/__init__.py:63: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]
+2025-09-16 11:07:13,079 - INFO - Loading configuration from config/full_experiment.yaml
+2025-09-16 11:07:13,108 - WARNING - Could not initialize wandb: api_key not configured (no-tty). call wandb.login(key=[your_api_key]). Disabling wandb.
+2025-09-16 11:07:13,353 - INFO - Using device: cuda
+2025-09-16 11:07:13,354 - INFO - Preparing dataloaders...
+Traceback (most recent call last):
+  File "<frozen runpy>", line 198, in _run_module_as_main
+  File "<frozen runpy>", line 88, in _run_code
+  File "/home/toma/t-80-8-b-01/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/src/main.py", line 110, in <module>
+    main()
+  File "/home/toma/t-80-8-b-01/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/src/main.py", line 77, in main
+    dataloaders = get_dataloaders(config)
+                  ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/toma/t-80-8-b-01/_work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/src/preprocess.py", line 126, in get_dataloaders
+    d_corr = exp_config['dataset']['corruption']
+             ~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^
+KeyError: 'corruption'
