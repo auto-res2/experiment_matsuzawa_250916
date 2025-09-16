@@ -258,9 +258,11 @@ def run(config: dict):
     exp_id = config["experiment_id"]
     run_dir = Path(config["paths"]["training_output_path"])
 
-    # Updated output directories to iteration28 as per specification
-    json_dir = Path(".research/iteration28/")
-    img_dir = Path(".research/iteration28/images/")
+    # ------------------------------------------------------------------
+    # Mandatory iteration29 paths
+    # ------------------------------------------------------------------
+    json_dir = Path(".research/iteration29/")
+    img_dir = Path(".research/iteration29/images/")
     json_dir.mkdir(parents=True, exist_ok=True)
     img_dir.mkdir(parents=True, exist_ok=True)
 
@@ -276,6 +278,7 @@ def run(config: dict):
     else:
         raise ValueError(f"Unknown experiment ID: {exp_id}")
 
+    # ----------------  Dispatch to per-experiment analysis  -------------- #
     if exp_id == 1:
         analysis_results = analyze_experiment_1(df, config)
         generate_plots(df, exp_id, img_dir)

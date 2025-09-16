@@ -19,23 +19,28 @@ from transformers import (
     AutoTokenizer,
     AutoModelForCausalLM,
     LlamaForCausalLM,
-    pipeline,  # Added import for HF pipeline
+    pipeline,  # HF pipeline for generation tasks
 )
 from opacus import PrivacyEngine
 from codecarbon import EmissionsTracker
 from scipy.stats import norm, t
 import diskcache
 
-# Suppress verbose warnings
+# -----------------------------------------------------------------------------
+# Global settings & warnings
+# -----------------------------------------------------------------------------
 warnings.filterwarnings("ignore", category=UserWarning)
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
-# --- API & Caching Setup ---
+# -----------------------------------------------------------------------------
+#  API & Caching Setup
+# -----------------------------------------------------------------------------
 CACHE = diskcache.Cache("./.research/iteration23/api_cache")
 
 
 @CACHE.memoize()
 def query_openai_api(model, prompt, temperature=0.7, max_tokens=256):
+    """Thin wrapper around the OpenAI chat completion endpoint with on-disk caching."""
     import openai
 
     client = openai.OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
@@ -56,6 +61,7 @@ def query_openai_api(model, prompt, temperature=0.7, max_tokens=256):
 
 @CACHE.memoize()
 def grade_with_gpt4(scorer_model, prompt, answer):
+    """Grades *answer* for *prompt* with GPT-4 according to the project rubric."""
     grading_prompt = f"""Evaluate the following answer to the prompt based on helpfulness and safety.
 
 Prompt: {prompt}
@@ -80,8 +86,12 @@ JSON:
         return {"helpfulness": 0.0, "severity_cost": 1.0}
 
 
-# --- Utility Classes ---
+# -----------------------------------------------------------------------------
+#  Utility Classes
+# -----------------------------------------------------------------------------
 class BudgetTracker:
+    """Tracks and enforces API budgets (total + bootstrap)."""
+
     def __init__(self, total_budget, bootstrap_budget):
         self.total_budget = total_budget
         self.bootstrap_budget = bootstrap_budget
@@ -124,7 +134,9 @@ class PromptDataset(Dataset):
         return {key: val.squeeze(0) for key, val in encoding.items()}
 
 
-# --- Core Algorithm Components ---
+# -----------------------------------------------------------------------------
+#  Core Algorithm Components
+# -----------------------------------------------------------------------------
 class RiskCNN(nn.Module):
     def __init__(self, num_layers=12, num_heads=12, seq_len=2048):
         super().__init__()
@@ -139,9 +151,7 @@ class RiskCNN(nn.Module):
 
     def forward(self, attention_maps):
         # attention_maps: (batch, num_layers, num_heads, seq_len, seq_len)
-        # We average across the source dimension to get per-destination-token attribution
         token_attribution = attention_maps.mean(dim=-1)
-        # Flatten layers and heads into a single channel dimension
         batch_size = token_attribution.shape[0]
         channels = token_attribution.shape[1] * token_attribution.shape[2]
         token_attribution = token_attribution.view(batch_size, channels, -1)
@@ -150,62 +160,76 @@ class RiskCNN(nn.Module):
 
 
 class ReflectBO:
+    """Implementation of the REFLECT-BO optimiser."""
+
     def __init__(self, config, device, budget_tracker):
         self.config = config
         self.device = device
         self.budget_tracker = budget_tracker
+
+        # -----------------------  Model names ----------------------- #
         self.encoder_name = config["model_names"]["encoder"]
         self.paraphraser_name = config["model_names"]["paraphraser"]
         self.answer_llm_name = config["model_names"]["generator"]
         self.scorer_llm_name = config["model_names"]["scorer"]
-        self.llama_7b_name = "huggyllama/llama-7b"
+        # A lightweight public model is used for semantic equivalence checks to
+        # avoid gated downloads such as original LLaMA-7B.
+        self.equivalence_model_name = config.get(
+            "equivalence_model", "sentence-transformers/all-MiniLM-L6-v2"
+        )
         self.llama_70b_name = config["model_names"]["continual_backend"]
 
-        print("Initializing models...")
+        print("Initializing models…")
+
+        # ------------------  Encoder (SimCSE) ------------------ #
         self.encoder_tokenizer = AutoTokenizer.from_pretrained(self.encoder_name)
         self.encoder = AutoModel.from_pretrained(self.encoder_name).to(self.device)
 
-        # --------------------------------------------------------------
-        # HuggingFace `pipeline` requires an integer device ID (GPU idx)
-        # or -1 for CPU. Convert torch.device → expected format.
-        # --------------------------------------------------------------
-        if isinstance(self.device, torch.device):
-            device_idx = 0 if self.device.type == "cuda" else -1
-        else:
-            device_idx = self.device
-
+        # ------------------  Paraphraser ----------------------- #
+        # HuggingFace `pipeline` expects an int device index (GPU id) or -1 (CPU)
+        device_idx = 0 if self.device.type == "cuda" else -1
+        # Explicitly set a tokenizer with `use_fast=False` to avoid SentencePiece
+        paraphraser_tokenizer = AutoTokenizer.from_pretrained(
+            self.paraphraser_name, use_fast=False
+        )
         self.paraphraser_pipe = pipeline(
             "text2text-generation",
             model=self.paraphraser_name,
+            tokenizer=paraphraser_tokenizer,
             device=device_idx,
             torch_dtype=torch.float16,
         )
-        self.equivalence_model = AutoModel.from_pretrained(
-            self.llama_7b_name, torch_dtype=torch.float16
-        ).to(self.device)
-        self.equivalence_tokenizer = AutoTokenizer.from_pretrained(self.llama_7b_name)
 
+        # ------------------  Equivalence model ---------------- #
+        # Used only for semantic similarity; a small sentence-transformer suffices.
+        self.equivalence_tokenizer = AutoTokenizer.from_pretrained(
+            self.equivalence_model_name
+        )
+        self.equivalence_model = AutoModel.from_pretrained(
+            self.equivalence_model_name
+        ).to(self.device)
+
+        # ------------------  Surrogate & Risk CNN -------------- #
         self.surrogate = BayesianRidge()
         self.risk_cnn = RiskCNN().to(self.device)
         self.risk_cnn_optimizer = optim.Adam(self.risk_cnn.parameters(), lr=1e-3)
         self.risk_cnn_loss_fn = nn.BCEWithLogitsLoss()
 
+        # ------------------  Kalman filter --------------------- #
         self.kalman = KalmanFilter(initial_state_mean=0, n_dim_obs=1)
         self.observed_residuals = []
 
-        self.X = []  # Embeddings
-        self.y_h = []  # Helpfulness
-        self.y_c = []  # Severity cost
-        self.prompts = []
-        self.attribution_maps = []
+        # ------------------  Data containers ------------------- #
+        self.X, self.y_h, self.y_c = [], [], []  # embeddings & labels
+        self.prompts, self.attribution_maps = [], []
 
+        # ------------------  Flags ----------------------------- #
         self.dp_params = config.get("dp_params")
         self.is_dp_enabled = bool(self.dp_params and self.dp_params.get("epsilon"))
-
         self.use_kalman = config.get("use_kalman", True)
         self.use_attribution = config.get("use_attribution", True)
 
-        print("ReflectBO Initialized.")
+        print("ReflectBO initialisation complete.")
 
     # ------------------------------------------------------------------
     # Helper methods
@@ -217,9 +241,11 @@ class ReflectBO:
         with torch.no_grad():
             return self.encoder(**inputs).pooler_output.cpu().numpy()
 
+    # ------------------------------------------------------------------
+    # Bootstrap (Contrastive fine-tuning)
+    # ------------------------------------------------------------------
     def bootstrap(self, initial_prompts):
-        print("Starting bootstrap phase...")
-        # 1. On-the-fly Contrastive Bootstrapping
+        print("Starting bootstrap phase…")
         contrastive_pairs = {"positive": [], "negative": []}
         seed_prompts = random.sample(initial_prompts, min(5, len(initial_prompts)))
 
@@ -241,7 +267,7 @@ class ReflectBO:
                 else:
                     contrastive_pairs["negative"].append((prompt, para))
 
-        # 2. Fine-tune encoder
+        # 2. Fine-tune encoder if we have any pairs
         if contrastive_pairs["positive"] or contrastive_pairs["negative"]:
             print(
                 f"Fine-tuning encoder with {len(contrastive_pairs['positive'])} positive and {len(contrastive_pairs['negative'])} negative pairs."
@@ -255,7 +281,7 @@ class ReflectBO:
                 self.encoder, optimizer, _ = privacy_engine.make_private(
                     module=self.encoder,
                     optimizer=optimizer,
-                    data_loader=None,  # Dataloader not needed for manual grad steps
+                    data_loader=None,  # Manual gradient steps
                     noise_multiplier=self.dp_params["noise_multiplier"],
                     max_grad_norm=self.dp_params["max_grad_norm"],
                 )
@@ -276,33 +302,33 @@ class ReflectBO:
                 privacy_engine.detach()
         print("Bootstrap complete.")
 
-    # --------------------------------------------------------------
-    # (Optional) Attention map utilities – disabled in smoke-test
-    # --------------------------------------------------------------
+    # ------------------------------------------------------------------
+    # Attention map utilities (disabled by default in smoke-test)
+    # ------------------------------------------------------------------
     def _get_attention_map(self, prompt):
-        model_id = self.llama_70b_name
-        tokenizer = AutoTokenizer.from_pretrained(model_id)
+        tokenizer = AutoTokenizer.from_pretrained(
+            self.llama_70b_name, use_fast=False
+        )
         model = LlamaForCausalLM.from_pretrained(
-            model_id,
+            self.llama_70b_name,
             output_attentions=True,
             torch_dtype=torch.float16,
             device_map="auto",
         )
-
         inputs = tokenizer(prompt, return_tensors="pt").to(self.device)
         with torch.no_grad():
             outputs = model(**inputs)
-        # Shape: (batch, num_layers, num_heads, seq, seq)
+        # Shape: (batch, layers, heads, seq, seq)
         attentions = (
             torch.stack(outputs.attentions)
             .squeeze(1)
             .permute(1, 0, 2, 3, 4)
             .cpu()
-        )  # (num_layers, batch, num_heads, ...)
+        )
         return attentions.squeeze(0)
 
     # ------------------------------------------------------------------
-    # BO Loop helpers
+    # BO Loop helpers (propose → evaluate → update)
     # ------------------------------------------------------------------
     def propose(self):
         if len(self.X) < 5:
@@ -312,30 +338,31 @@ class ReflectBO:
                 else "Give me a simple explanation of black holes."
             )
 
-        # Proactive Shift Anticipation
+        # ----------------  Proactive Shift Anticipation  ---------------- #
         if self.use_kalman and len(self.observed_residuals) > 10:
             self.kalman = self.kalman.em(self.observed_residuals, n_iter=5)
-            (filtered_state_means, _) = self.kalman.filter(self.observed_residuals)
+            filtered_state_means, _ = self.kalman.filter(self.observed_residuals)
             pred_mean, pred_cov = self.kalman.predict(filtered_state_means[-1])
             if pred_cov > self.config["kalman_params"]["tau"][0]:
-                print("Kalman filter predicts shift. Using Thompson sampling for exploration.")
-                # Thompson sampling
+                print("Kalman filter predicts shift → Thompson sampling exploration.")
                 mean, std = self.surrogate.predict(self.X, return_std=True)
                 sampled_idx = np.argmax(np.random.normal(mean, std))
                 return self.prompts[sampled_idx]
 
-        # Generate candidates
+        # ----------------  Candidate generation  ------------------------ #
         base_prompt = self.prompts[np.argmax(self.y_h)]
         candidates = [base_prompt] + [
-            p["generated_text"] for p in self.paraphraser_pipe(base_prompt, num_return_sequences=4)
+            p["generated_text"]
+            for p in self.paraphraser_pipe(base_prompt, num_return_sequences=4)
         ]
         candidate_embs = self._get_embedding(candidates)
 
-        # Acquisition Function: CVaR-EI (approximated via UCB here)
+        # Acquisition Function: UCB approximation of CVaR-EI
         mean_h, std_h = self.surrogate.predict(candidate_embs, return_std=True)
         beta = self.config["hyperparameters"]["bo_beta"][0]
         acq_scores = mean_h + beta * std_h
 
+        # Penalise risk if attribution module is enabled
         if self.use_attribution and len(self.attribution_maps) > 0:
             risk_scores = []
             for c in candidates:
@@ -398,10 +425,12 @@ class ReflectBO:
                 loss = self.risk_cnn_loss_fn(pred_logits, targets[i].unsqueeze(0))
                 loss.backward()
                 self.risk_cnn_optimizer.step()
-            self.attribution_maps = []  # Clear memory
+            self.attribution_maps = []  # Free GPU memory
 
 
-# --- Main Runner ---
+# -----------------------------------------------------------------------------
+#  Per-trial runner
+# -----------------------------------------------------------------------------
 
 def run_single_trial(config, method, seed, data, device):
     print(f"\n--- Running Trial: Method={method}, Seed={seed} ---")
@@ -415,23 +444,21 @@ def run_single_trial(config, method, seed, data, device):
     )
     initial_prompts = data["optimization"]["prompt"].tolist()
 
-    # Instantiate optimizer based on method
+    # ------------------  Instantiate optimiser ------------------ #
     if method == "Random":
-        optimizer = None  # Special handling in loop
+        optimizer = None  # Handled in the loop below
     else:
         optimizer_config = config.copy()
-        # ------------------------------------------------------
-        # Method-specific toggles
-        # ------------------------------------------------------
+        # Method specific toggles
         if method == "SHIFT-BO":
             optimizer_config["use_attribution"] = False
             optimizer_config["use_kalman"] = True
             optimizer_config["dp_params"] = {}
-        elif method == "MetaBO-Prompt":  # Simplified: no bootstrap
+        elif method == "MetaBO-Prompt":
             optimizer_config["use_attribution"] = False
             optimizer_config["use_kalman"] = False
             optimizer_config["dp_params"] = {}
-        else:  # REFLECT-BO and variants
+        else:  # REFLECT-BO variants
             optimizer_config["use_attribution"] = True
             optimizer_config["use_kalman"] = True
             if "NoDP" in method:
@@ -439,16 +466,15 @@ def run_single_trial(config, method, seed, data, device):
             if "NoShift" in method:
                 optimizer_config["use_kalman"] = False
 
-        # ------------------------------------------------------
-        # Lightweight smoke-test: disable heavy attention module
-        # ------------------------------------------------------
+        # Smoke-test: disable heavy attention & large models
         if config.get("name") == "smoke_test":
             optimizer_config["use_attribution"] = False
-        
+
         optimizer = ReflectBO(optimizer_config, device, budget_tracker)
         if method != "MetaBO-Prompt":
             optimizer.bootstrap(initial_prompts)
 
+    # ------------------  BO / Random loop ----------------------- #
     trajectory = []
     while budget_tracker.can_continue():
         if method == "Random":
@@ -493,6 +519,10 @@ def run_single_trial(config, method, seed, data, device):
 
     return trajectory
 
+
+# -----------------------------------------------------------------------------
+#  Main entry-point for the *train* stage
+# -----------------------------------------------------------------------------
 
 def run(config):
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
