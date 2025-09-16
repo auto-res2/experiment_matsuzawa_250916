@@ -1,0 +1,151 @@
+wandb:
+  enabled: true
+  project: "ZORROPP-ICML24"
+  entity: "ai-research-group" # Replace with your wandb entity
+
+# Note: This config generates a very large number of experiments.
+# It is intended for a multi-GPU, distributed computing environment.
+# Running this on a single machine will take a very long time.
+
+experiments:
+# --- EXPERIMENT 1 --- #
+# Vision Models on Image Corruptions
+- &exp1_resnet50_imagenetc
+  exp_name: 'exp1'
+  model:
+    name: 'resnet50.a1_in1k'
+  dataset:
+    name: 'imagenet-c'
+    num_classes: 1000
+  stream:
+    frames: 50000
+  dataloader:
+    batch_size: 64
+
+- &exp1_vit_imagenetc
+  <<: *exp1_resnet50_imagenetc
+  model:
+    name: 'vit_base_patch16_224.augreg2_in21k_ft_in1k'
+
+# Audio Model on Audio Corruptions (Example setup)
+- &exp1_wav2vec_esc50c
+  exp_name: 'exp1'
+  model:
+    name: 'facebook/wav2vec2-base'
+  dataset:
+    name: 'esc50-c' # Requires custom download and processing
+    num_classes: 50
+  stream:
+    frames: 50000
+  dataloader:
+    batch_size: 16
+
+# --- EXPERIMENT 2 --- #
+- &exp2_resnet50_synthetic
+  exp_name: 'exp2'
+  model:
+    name: 'resnet50.a1_in1k'
+  dataset:
+    name: 'synthetic-stream'
+    corruption: 'mixed'
+    severity: 5
+    num_classes: 1000
+  method: 'ZorroPP'
+  stream:
+    eta: 1.0
+    frames: 1000000 # 1 Million frames
+  dataloader:
+    batch_size: 128
+  seed: 42
+
+# --- EXPERIMENT 3 --- #
+- &exp3_mobilenet_edgeharc
+  exp_name: 'exp3'
+  model:
+    name: 'mobilenetv3_small_100.lamb_in1k'
+  dataset:
+    name: 'edgehar-c' # Will use MobiAct Zenodo record
+    corruption: 'drift'
+    severity: 5
+    num_classes: 10 # Example number of classes
+  stream:
+    eta: 1.0
+    frames: 200000
+  dataloader:
+    batch_size: 256
+  seed: 42
+
+# --- GENERATE ALL RUNS (EXAMPLE FOR RESNET50 ON IMAGENET-C) --- #
+# A full instantiation would be extremely long. This demonstrates the structure.
+# In a real scenario, a script would generate these variations.
+
+# ResNet50 on ImageNet-C, shot_noise and fog, all methods, all etas, all seeds
+- <<: *exp1_resnet50_imagenetc
+  dataset: { name: 'imagenet-c', corruption: 'shot_noise', severity: 5, num_classes: 1000 }
+  method: 'ZorroPP'
+  adaptor_params: {m: 16, tau: 500, d: 2}
+  stream: { eta: 1.0, frames: 50000 }
+  seed: 42
+- <<: *exp1_resnet50_imagenetc
+  dataset: { name: 'imagenet-c', corruption: 'shot_noise', severity: 5, num_classes: 1000 }
+  method: 'ZorroPP'
+  adaptor_params: {m: 16, tau: 500, d: 2}
+  stream: { eta: 0.5, frames: 50000 }
+  seed: 43
+- <<: *exp1_resnet50_imagenetc
+  dataset: { name: 'imagenet-c', corruption: 'shot_noise', severity: 5, num_classes: 1000 }
+  method: 'Tent'
+  stream: { eta: 1.0, frames: 50000 }
+  seed: 44
+
+- <<: *exp1_resnet50_imagenetc
+  dataset: { name: 'imagenet-c', corruption: 'fog', severity: 5, num_classes: 1000 }
+  method: 'ZorroPP'
+  adaptor_params: {m: 16, tau: 500, d: 2}
+  stream: { eta: 0.25, frames: 50000 }
+  seed: 42
+- <<: *exp1_resnet50_imagenetc
+  dataset: { name: 'imagenet-c', corruption: 'fog', severity: 5, num_classes: 1000 }
+  method: 'RoTTA'
+  stream: { eta: 0.25, frames: 50000 }
+  seed: 43
+
+# ViT on ImageNet-C, one run example
+- <<: *exp1_vit_imagenetc
+  dataset: { name: 'imagenet-c', corruption: 'gaussian_noise', severity: 5, num_classes: 1000 }
+  method: 'ZorroPP'
+  adaptor_params: {m: 16, tau: 500, d: 2}
+  stream: { eta: 1.0, frames: 50000 }
+  seed: 42
+
+# Exp 2 variations
+- <<: *exp2_resnet50_synthetic
+  adaptor_params: {m: 8, tau: 500, d: 2, sigma_dp: 0.05}
+- <<: *exp2_resnet50_synthetic
+  adaptor_params: {m: 16, tau: 500, d: 2, sigma_dp: 0.1}
+- <<: *exp2_resnet50_synthetic
+  adaptor_params: {m: 32, tau: 500, d: 2, sigma_dp: 0.0}
+
+# Exp 3 variations
+- <<: *exp3_mobilenet_edgeharc
+  method: 'ZorroPP-adaptive'
+  adaptor_params:
+    m: 16
+    tau: 500
+    d: 2
+    sigma_dp: 0.1
+    epsilon_max: 4.0
+    pid_gains: {Kp: 0.4, Ki: 0.05, Kd: 0.01}
+    power_budget_watts: 2.0
+    latency_budget_ms: 2.0
+
+- <<: *exp3_mobilenet_edgeharc
+  method: 'ZorroPP-full'
+  adaptor_params:
+    m: 16
+    tau: 500
+    d: 2
+    sigma_dp: 0.0 # No DP for this variant
+
+- <<: *exp3_mobilenet_edgeharc
+  method: 'RoTTA'

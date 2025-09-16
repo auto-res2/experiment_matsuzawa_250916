@@ -1,0 +1,40 @@
+wandb:
+  enabled: false
+  project: "ZORROPP-ICML24-smoke-test"
+
+experiments:
+  - exp_name: 'exp1'
+    model:
+      name: 'resnet50'
+    dataset:
+      name: 'cifar10-c'
+      corruption: 'shot_noise'
+      severity: 5
+      num_classes: 10
+    method: 'ZorroPP'
+    adaptor_params:
+      m: 16
+      tau: 500
+      d: 2
+    stream:
+      eta: 1.0
+      frames: 200
+    dataloader:
+      batch_size: 32
+    seed: 42
+  
+  - exp_name: 'exp1'
+    model:
+      name: 'resnet50'
+    dataset:
+      name: 'cifar10-c'
+      corruption: 'shot_noise'
+      severity: 5
+      num_classes: 10
+    method: 'Tent'
+    stream:
+      eta: 1.0
+      frames: 200
+    dataloader:
+      batch_size: 32
+    seed: 42
