@@ -2,9 +2,11 @@
 name = "zorropp-research"
 version = "1.0.0"
 description = "Experiments for ZORRO++ TTA method."
-authors = [{name = "AI Researcher"}]
+authors = [{ name = "AI Researcher" }]
 
-[project.dependencies]
+# -----------------------------------------------------------------------------
+# Dependencies – must be a sequence, not a table (PEP 621 compliant)
+# -----------------------------------------------------------------------------
 dependencies = [
     "torch>=2.1.0",
     "torchvision>=0.16.0",
