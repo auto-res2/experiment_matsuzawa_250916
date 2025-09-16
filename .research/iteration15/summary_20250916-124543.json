@@ -1,0 +1,111 @@
+{
+  "aggregated_performance": [
+    {
+      "method": "BN",
+      "model_name": "mobilenetv3_small_100",
+      "dataset_name": "synthetic",
+      "corruption": "drift",
+      "eta": 1.0,
+      "mean_acc": 10.286458333333332,
+      "std_acc": 0.0,
+      "mean_latency": 0.13162000477313995,
+      "mean_power": 311.534
+    },
+    {
+      "method": "BN",
+      "model_name": "resnet50.a1_in1k",
+      "dataset_name": "synthetic",
+      "corruption": "shot",
+      "eta": 0.25,
+      "mean_acc": 0.22135416666666666,
+      "std_acc": 0.033619647102494925,
+      "mean_latency": 0.5599807858467102,
+      "mean_power": 285.20860000000005
+    },
+    {
+      "method": "RoTTA",
+      "model_name": "mobilenetv3_small_100",
+      "dataset_name": "synthetic",
+      "corruption": "drift",
+      "eta": 1.0,
+      "mean_acc": 9.635416666666668,
+      "std_acc": 0.0,
+      "mean_latency": 0.1309880018234253,
+      "mean_power": 356.261
+    },
+    {
+      "method": "Tent",
+      "model_name": "resnet50.a1_in1k",
+      "dataset_name": "synthetic",
+      "corruption": "shot",
+      "eta": 0.25,
+      "mean_acc": 0.16276041666666666,
+      "std_acc": 0.08404911775623733,
+      "mean_latency": 0.4520320177078247,
+      "mean_power": 273.4018
+    },
+    {
+      "method": "ZORROpp",
+      "model_name": "mobilenetv3_small_100",
+      "dataset_name": "synthetic",
+      "corruption": "drift",
+      "eta": 1.0,
+      "mean_acc": 10.416666666666668,
+      "std_acc": 0.0,
+      "mean_latency": 0.13342800736427307,
+      "mean_power": 108.948
+    },
+    {
+      "method": "ZORROpp",
+      "model_name": "resnet50.a1_in1k",
+      "dataset_name": "synthetic",
+      "corruption": "mixed",
+      "eta": 1.0,
+      "mean_acc": 0.05859375,
+      "std_acc": 0.050429470653742405,
+      "mean_latency": 0.5137904047966003,
+      "mean_power": 236.22719999999998
+    },
+    {
+      "method": "ZORROpp",
+      "model_name": "resnet50.a1_in1k",
+      "dataset_name": "synthetic",
+      "corruption": "shot",
+      "eta": 0.25,
+      "mean_acc": 0.2560763888888889,
+      "std_acc": 0.12614128423384038,
+      "mean_latency": 0.5922986745834351,
+      "mean_power": 272.26886666666667
+    },
+    {
+      "method": "ZORROpp-full",
+      "model_name": "mobilenetv3_small_100",
+      "dataset_name": "synthetic",
+      "corruption": "drift",
+      "eta": 1.0,
+      "mean_acc": 10.546875,
+      "std_acc": 0.0,
+      "mean_latency": 0.13125599920749664,
+      "mean_power": 100.613
+    }
+  ],
+  "zorro_vs_baseline": [
+    {
+      "method_zorro": "ZORROpp",
+      "model_name": "resnet50.a1_in1k",
+      "dataset_name": "synthetic",
+      "corruption": "shot",
+      "eta": 0.25,
+      "mean_acc_zorro": 0.2560763888888889,
+      "std_acc_zorro": 0.12614128423384038,
+      "mean_latency_zorro": 0.5922986745834351,
+      "mean_power_zorro": 272.26886666666667,
+      "method_baseline": "BN",
+      "mean_acc_baseline": 0.22135416666666666,
+      "std_acc_baseline": 0.033619647102494925,
+      "mean_latency_baseline": 0.5599807858467102,
+      "mean_power_baseline": 285.20860000000005,
+      "delta_acc": 0.03472222222222224
+    }
+  ]
+}
