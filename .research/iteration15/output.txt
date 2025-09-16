@@ -1,0 +1,26 @@
+=== uv sync start Tue Sep 16 12:55:13 PM UTC 2025 ===
+=== uv install end Tue Sep 16 12:55:20 PM UTC 2025 ===
+=== [PHASE 1/2] Smoke test start Tue Sep 16 12:55:20 PM UTC 2025 ===
+Executing SMOKE TEST...
+Global random seed set to 42
+Global random seed set to 42
+
+=======================================================
+            STARTING EXPERIMENT 1
+=======================================================
+
+--- STAGE 1: DATA PREPROCESSING ---
+Starting preprocessing. Output will be saved to data/smoke_test
+Scraping SEC EDGAR 10-K filings for 'Risk Factors'...
+Warning: Unable to scrape risk factors from SEC EDGAR. Falling back to embedded public-domain excerpts.
+
+Cleaning and tokenizing text...
+  Splitting task: FinReg-Compliance (3 prompts)
+
+Preprocessing complete.
+  Optimization data: 0 samples saved to data/smoke_test/optimization.parquet
+  Test data: 3 samples saved to data/smoke_test/test.parquet
+--- PREPROCESSING COMPLETE ---
+
+--- STAGE 2: TRAINING / OPTIMIZATION ---
+Using device: cuda
