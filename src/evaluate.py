@@ -6,13 +6,38 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 from scipy.stats import ttest_rel
 
-IMAGES_DIR = os.path.join(".research", "iteration8", "images")
+# -----------------------------------------------------------------------------
+# Mandatory path update: all evaluation artefacts must go to iteration9
+# -----------------------------------------------------------------------------
+IMAGES_DIR = os.path.join(".research", "iteration9", "images")
 os.makedirs(IMAGES_DIR, exist_ok=True)
 
-RESULTS_DIR = os.path.join(".research", "iteration8")
+RESULTS_DIR = os.path.join(".research", "iteration9")
 os.makedirs(RESULTS_DIR, exist_ok=True)
 
+# -----------------------------------------------------------------------------
+# Core helpers
+# -----------------------------------------------------------------------------
+
 def analyze_experiment(exp_name, exp_config, base_dir):
+    """Load training logs for a single experiment and compute aggregate metrics.
+
+    Parameters
+    ----------
+    exp_name : str
+        Name of the experiment as given in the YAML config.
+    exp_config : dict
+        Sub-configuration of the current experiment (models, seeds, etc.).
+    base_dir : str
+        Directory that contains the per-run sub-folders written by train.py.
+
+    Returns
+    -------
+    results : dict
+        Aggregated statistics per model.
+    all_seeds_data : list[dict]
+        Raw data for each seed – used later for statistical tests & plots.
+    """
     results = {}
     all_seeds_data = []
 
@@ -31,7 +56,7 @@ def analyze_experiment(exp_name, exp_config, base_dir):
         if not model_results:
             continue
 
-        # Aggregate results across seeds
+        # ------ Aggregate statistics across seeds --------------------------------
         final_test_acc = [max([e['test_acc'] for e in r['log']]) for r in model_results]
         time_to_convergence = []
         for r in model_results:
@@ -39,7 +64,7 @@ def analyze_experiment(exp_name, exp_config, base_dir):
             converged_epoch = next((e for e in r['log'] if e['val_acc'] >= target_acc), None)
             if converged_epoch:
                 time_taken = sum([e['epoch_time_s'] for e in r['log'] if e['epoch'] <= converged_epoch['epoch']])
-                time_to_convergence.append(time_taken / 3600)  # to GPU-hours
+                time_to_convergence.append(time_taken / 3600)  # convert to GPU-hours
             else:
                 time_to_convergence.append(float("inf"))
 
@@ -66,7 +91,9 @@ def analyze_experiment(exp_name, exp_config, base_dir):
         }
     return results, all_seeds_data
 
+
 def run_statistical_tests(results_df):
+    """Paired t-tests against META-LEAP baseline (if present)."""
     models = results_df['model'].unique()
     if len(models) < 2:
         return
@@ -86,9 +113,7 @@ def run_statistical_tests(results_df):
                 if f"{metric}_meta" in merged and f"{metric}_other" in merged:
                     stat, p_val = ttest_rel(merged[f"{metric}_meta"], merged[f"{metric}_other"])
                     if p_val < 0.05:
-                        print(
-                            f"Metric '{metric}': meta-leap is significantly different from {model_name} (p={p_val:.4f})"
-                        )
+                        print(f"Metric '{metric}': meta-leap is significantly different from {model_name} (p={p_val:.4f})")
 
 
 def create_plots(exp_name, all_seeds_data):
@@ -96,7 +121,7 @@ def create_plots(exp_name, all_seeds_data):
     if df.empty:
         return
 
-    # Unroll the logs
+    # ------------------------------ Unroll logs --------------------------------
     records = []
     for _, row in df.iterrows():
         for log_entry in row['log']:
@@ -110,13 +135,7 @@ def create_plots(exp_name, all_seeds_data):
     # Plot 1: Validation Accuracy vs. Wall-clock time
     log_df['cumulative_time_s'] = log_df.groupby(['model', 'seed'])['epoch_time_s'].cumsum()
     plt.figure(figsize=(10, 6))
-    sns.lineplot(
-        data=log_df,
-        x='cumulative_time_s',
-        y='val_acc',
-        hue='model',
-        errorbar='sd',
-    )
+    sns.lineplot(data=log_df, x='cumulative_time_s', y='val_acc', hue='model', errorbar='sd')
     plt.title(f"{exp_name}: Validation Accuracy vs. Time")
     plt.xlabel("Wall-clock Time (seconds)")
     plt.ylabel("Validation Accuracy")
@@ -128,13 +147,7 @@ def create_plots(exp_name, all_seeds_data):
     # Plot 2: Predictor Correlation (Rho) vs. Epoch
     if 'predictor_corr_rho' in log_df.columns:
         plt.figure(figsize=(10, 6))
-        sns.lineplot(
-            data=log_df,
-            x='epoch',
-            y='predictor_corr_rho',
-            hue='model',
-            errorbar='sd',
-        )
+        sns.lineplot(data=log_df, x='epoch', y='predictor_corr_rho', hue='model', errorbar='sd')
         plt.title(f"{exp_name}: Predictor Correlation ($\\rho$) vs. Epoch")
         plt.xlabel("Epoch")
         plt.ylabel("Pearson Correlation ($\\rho$)")
@@ -144,9 +157,12 @@ def create_plots(exp_name, all_seeds_data):
         plt.savefig(os.path.join(IMAGES_DIR, f"{exp_name}_rho_vs_epoch.pdf"))
         plt.close()
 
+# -----------------------------------------------------------------------------
+# Entry point called from src/main.py
+# -----------------------------------------------------------------------------
 
 def main(config):
-    base_dir = os.path.join(".research", "iteration1")
+    base_dir = os.path.join(".research", "iteration1")  # training logs live here
     all_results = {}
 
     for exp_name, exp_config in config['experiments'].items():
@@ -155,16 +171,20 @@ def main(config):
         results, all_seeds_data = analyze_experiment(exp_name, exp_config, base_dir)
         all_results[exp_name] = results
 
-        # Save per-experiment JSON to mandated directory
+        # ---- Save per-experiment summary --------------------------------------
         json_path = os.path.join(RESULTS_DIR, f"{exp_name}_summary.json")
         with open(json_path, "w") as f:
             json.dump(results, f, indent=4)
         print(f"Saved summary to {json_path}")
 
-        # Create plots
+        # Print JSON contents for verification (required by grading script)
+        print("--- Summary JSON content ---")
+        print(json.dumps(results, indent=4))
+
+        # ---- Plots -----------------------------------------------------------
         create_plots(exp_name, all_seeds_data)
 
-        # Statistical tests
+        # ---- Statistical tests ----------------------------------------------
         if all_seeds_data:
             df_list = []
             for item in all_seeds_data:
@@ -173,23 +193,18 @@ def main(config):
                 target_acc = 0.75 * best_epoch['val_acc']
                 converged = next((e for e in item['log'] if e['val_acc'] >= target_acc), None)
                 if converged:
-                    time_to_75 = (
-                        sum(e['epoch_time_s'] for e in item['log'] if e['epoch'] <= converged['epoch'])
-                        / 3600
-                    )
+                    time_to_75 = sum(e['epoch_time_s'] for e in item['log'] if e['epoch'] <= converged['epoch']) / 3600
 
-                df_list.append(
-                    {
-                        'model': item['model'],
-                        'seed': item['seed'],
-                        'final_test_acc': best_epoch['test_acc'],
-                        'gpu_hours_to_75_acc': time_to_75,
-                        'avg_epoch_time_s': np.mean([e['epoch_time_s'] for e in item['log']]),
-                    }
-                )
+                df_list.append({
+                    'model': item['model'],
+                    'seed': item['seed'],
+                    'final_test_acc': best_epoch['test_acc'],
+                    'gpu_hours_to_75_acc': time_to_75,
+                    'avg_epoch_time_s': np.mean([e['epoch_time_s'] for e in item['log']]),
+                })
             run_statistical_tests(pd.DataFrame(df_list))
 
-    # Final JSON output (aggregated)
+    # ---------------------- Final aggregated output ---------------------------
     final_path = os.path.join(RESULTS_DIR, "final_summary.json")
     with open(final_path, "w") as f:
         json.dump(all_results, f, indent=4)
@@ -197,6 +212,6 @@ def main(config):
     print("\n--- Final Aggregated Results ---")
     print(json.dumps(all_results, indent=4))
 
-    # Machine-parseable output for automated checking
+    # Machine-parseable one-liner (used by automated checker)
     print("\n--- Machine-Parseable Output ---")
     print(json.dumps(all_results))
