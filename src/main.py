@@ -31,7 +31,7 @@ def main():
     # --- Stage 3: Evaluation ---
     print("\n--- Running Evaluation Stage ---")
 
-    print("--- Evaluation Stage Complete --
+    print("--- Evaluation Stage Complete ---")
 
 if __name__ == '__main__':
     main()
