@@ -41,6 +41,9 @@ jobs:
           python-version: "3.11"
           enable-cache: false
 
+      - name: Install dependencies beforehand
+        run: uv sync
+
       # 3. ログ用ディレクトリの準備
       - name: Prepare iteration dir
         run: |
