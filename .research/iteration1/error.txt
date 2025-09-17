@@ -1,11 +1,3 @@
 warning: No `requires-python` value found in the workspace. Defaulting to `>=3.11`.
-Traceback (most recent call last):
-  File "<frozen runpy>", line 189, in _run_module_as_main
-  File "<frozen runpy>", line 159, in _get_module_details
-  File "<frozen importlib._bootstrap_external>", line 1074, in get_code
-  File "<frozen importlib._bootstrap_external>", line 1004, in source_to_code
-  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
-  File "/home/runner/work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/src/main.py", line 34
-    print("--- Evaluation Stage Complete --
-          ^
-SyntaxError: unterminated string literal (detected at line 34)
+/home/runner/work/experiment_matsuzawa_250916/experiment_matsuzawa_250916/.venv/lib/python3.11/site-packages/torch/cuda/__init__.py:63: FutureWarning: The pynvml package is deprecated. Please install nvidia-ml-py instead. If you did not install pynvml directly, please report this to the maintainers of the package that installed pynvml for you.
+  import pynvml  # type: ignore[import]

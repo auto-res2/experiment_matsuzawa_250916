@@ -1,1 +1,7 @@
-=== [PHASE 1/2] Smoke test PASSED Wed Sep 17 07:44:09 UTC 2025 ===
+
+--- Running Training Stage ---
+--- Training Stage Complete ---
+
+--- Running Evaluation Stage ---
+--- Evaluation Stage Complete ---
+=== [PHASE 2/2] Full experiment end Wed Sep 17 07:44:37 UTC 2025 ===
