@@ -12,7 +12,7 @@ on:
         default: '["ubuntu-latest"]'
 
 permissions:
-  # id-token: write
+  id-token: write
   contents: write
 
 defaults:
@@ -24,9 +24,25 @@ jobs:
     name: Autonomous Experiment and Fix Cycle
     runs-on: ${{ fromJSON(github.event.inputs.runner_type) }}
     timeout-minutes: 6000
+    
+    env:
+      SYNC_COMMAND: "uv sync"
+      SMOKE_TEST_COMMAND: |
+        uv run python -m src.main --smoke-test \
+          > >(tee -a "$ITERATION_DIR/output.txt") \
+          2> >(tee -a "$ITERATION_DIR/error.txt" >&2)
+        echo "=== [PHASE 1/2] Smoke test PASSED $(date -u) ===" | tee -a "$ITERATION_DIR/output.txt"
+      FULL_EXPERIMENT_COMMAND: |
+        if [ -n "$ITERATION_DIR" ] && [ -d "$ITERATION_DIR" ]; then
+          find "$ITERATION_DIR" -mindepth 1 -delete
+        fi
+        uv run python -m src.main --full-experiment \
+          > >(tee -a "$ITERATION_DIR/output.txt") \
+          2> >(tee -a "$ITERATION_DIR/error.txt" >&2)
+        echo "=== [PHASE 2/2] Full experiment end $(date -u) ===" | tee -a "$ITERATION_DIR/output.txt"
 
     steps:
-      - name: Checkout target branch
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -36,18 +52,13 @@ jobs:
         with:
           python-version: "3.11"
           enable-cache: false
-      # 権限が必要な可能性のある uv sync は先に行う
-      - name: Install dependencies
-        run: uv sync
-
+      
       - name: Prepare iteration dir
         run: |
           iteration_dir=".research/iteration${{ github.event.inputs.experiment_iteration }}"
           mkdir -p "$iteration_dir"
           echo "ITERATION_DIR=$iteration_dir" >> "$GITHUB_ENV"
 
-      # ★★★ ここからが核心 ★★★
-      # AIに完全な自律実行ループを委任する
       - name: Claude Code Autonomous Run, Fix, and Validate Loop
         uses: anthropics/claude-code-action@v1
         with:
@@ -56,36 +67,19 @@ jobs:
             You are a fully autonomous agent. Your task is to ensure the experiment code runs successfully by executing, analyzing, fixing, and re-validating it.
             You have been granted full tool access.
 
-            1.  Run Smoke Test: Execute the command 
-            ```bash
-            uv run python -m src.main --smoke-test \
-              > >(tee -a "${{ env.ITERATION_DIR }}/output.txt") \
-              2> >(tee -a "${{ env.ITERATION_DIR }}/error.txt" >&2)
-            echo "=== [PHASE 1/2] Smoke test PASSED $(date -u) ===" | tee -a "${{ env.ITERATION_DIR }}/output.txt"
-            ```
-            
-            2.  Analyze & Fix: If the command fails, you MUST analyze the error, use your tools to fix the code, and then commit the changes.
-            3.  Loop until Success: Repeat step 1 and 2 until the smoke test passes.
-
-            4.  Run Full Experiment: Once the smoke test passes, execute 
-            ```bash
-            if [ -n "${{ env.ITERATION_DIR }}" ] && [ -d "${{ env.ITERATION_DIR }}" ]; then
-              find "${{ env.ITERATION_DIR }}" -mindepth 1 -delete
-            fi
-
-            uv run python -m src.main --full-experiment \
-              > >(tee -a "${{ env.ITERATION_DIR }}/output.txt") \
-              2> >(tee -a "${{ env.ITERATION_DIR }}/error.txt" >&2)
-            echo "=== [PHASE 2/2] Full experiment end $(date -u) ===" | tee -a "${{ env.ITERATION_DIR }}/output.txt"
-            ```
-            5.  **Final Fix Loop:** If the full experiment fails, repeat the analyze, fix, and re-run cycle until it succeeds.
-            6.  **Commit all fixes** you make with a message like "[Claude Fix] Automated code correction".
+            1.  Initial Setup: First, run `bash -c "$SYNC_COMMAND"` to install dependencies.
+            2.  Run Smoke Test: Execute the command `bash -c "$SMOKE_TEST_COMMAND"`.
+            3.  Analyze & Fix: If the command fails, you MUST analyze the error, use your tools to fix the code, and then commit the changes.
+            4.  Loop until Success: Repeat step 1 and 2 until the smoke test passes.
+            5.  Run Full Experiment: Once the smoke test passes, execute `bash -c "$FULL_EXPERIMENT_COMMAND"`.
+            6.  Final Fix Loop:** If the full experiment fails, repeat the analyze, fix, and re-run cycle until it succeeds.
+            7.  Commit all fixes you make with a message like "[Claude Fix] Automated code correction".
 
             Execute all steps autonomously. Do not ask for permission.
           
           claude_args: "--max-turns=50 --allowed-tools Bash,Write,Edit,MultiEdit,TodoWrite"
 
-      - name: Commit and push experiment results (Fallback)
+      - name: Commit and push experiment results
         if: always()
         run: |
           git config --local user.email "action@github.com"
