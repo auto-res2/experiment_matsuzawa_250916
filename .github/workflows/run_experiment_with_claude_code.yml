@@ -1,3 +1,4 @@
+
 name: Autonomous Experiment with Claude Code
 
 on:
@@ -11,8 +12,10 @@ on:
         required: true
         default: '["ubuntu-latest"]'
 
+# (修正点) 権限ブロックに id-token: write を追加
 permissions:
-  contents: write # Claudeがコードを修正してコミット＆プッシュするために必須
+  id-token: write
+  contents: write
 
 defaults:
   run:
@@ -22,11 +25,10 @@ jobs:
   autonomous-experiment-and-fix:
     name: Autonomous Experiment and Fix Cycle
     runs-on: ${{ fromJSON(github.event.inputs.runner_type) }}
-    timeout-minutes: 360 # 6 hours
+    timeout-minutes: 6000
 
     steps:
-      # 1. 指定されたブランチをチェックアウト
-      # (修正点) name と uses を一つのステップに統合
+      # 1. 現在のブランチをチェックアウト
       - name: Checkout target branch
         uses: actions/checkout@v4
         with:
@@ -37,47 +39,51 @@ jobs:
         uses: astral-sh/setup-uv@v6
         with:
           python-version: "3.11"
+          enable-cache: false
 
-      # 3. 依存関係のインストール (Claudeにも実行させるが、念のため事前に行う)
-      - name: Install dependencies
-        run: uv sync
+      # 3. ログ用ディレクトリの準備
+      - name: Prepare iteration dir
+        run: |
+          iteration_dir=".research/iteration${{ github.event.inputs.experiment_iteration }}"
+          mkdir -p "$iteration_dir"
+          echo "ITERATION_DIR=$iteration_dir" >> "$GITHUB_ENV"
 
-      # 4. ★ Claude Codeによる自律的な実行・修正ループ ★
+      # 4. Claude Codeによる自律的な実行・修正ループ
       - name: Claude Code Autonomous Run
         uses: anthropics/claude-code-action@v1
         with:
-          # (修正点) 正しいパラメータ名を使用
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: |
-            You are an autonomous agent responsible for running a research experiment.
-            Your task is to ensure the code runs successfully. Follow these steps precisely:
+            You are an autonomous agent running a research experiment. Your goal is to make the code run successfully.
+            Follow these steps precisely. Do not ask for permission. Execute all tasks autonomously.
 
-            1.  First, run the smoke test using the command: `uv run python -m src.main --smoke-test`
-            2.  If the command fails, you MUST analyze the error output, fix the code in the repository, and then re-run the smoke test. Repeat this fix-and-run cycle until the smoke test passes.
-            3.  Once the smoke test passes, run the full experiment using the command: `uv run python -m src.main --full-experiment`
-            4.  If this command fails, you MUST also fix the code and re-run the full experiment. Repeat until it succeeds.
-            5.  If you make any code corrections, you MUST commit and push them to the current branch. Use a commit message like "[Claude Fix] Automated code correction".
-            6.  Do not ask for permission at any stage. Execute all tasks autonomously. Complete all steps successfully.
+            1. First, install dependencies using `uv sync`. If it fails, you MUST fix the underlying issue (e.g., in pyproject.toml) and retry until it succeeds.
 
-          # 無限ループによるコスト増大を防ぐためのセーフガード
-          claude_args: "--max-turns 25"
+            2. Next, run the smoke test: `uv run python -m src.main --smoke-test`. If it fails, you MUST analyze the error, fix the Python code, and re-run the test. Repeat this fix-and-run cycle until it passes.
 
-      # 5. 実験結果のコミットとプッシュ
+            3. After the smoke test passes, run the full experiment: `uv run python -m src.main --full-experiment`. Again, if it fails, you MUST fix the code and re-run the experiment until it succeeds.
+
+            4. Log all standard and error outputs from these commands into the directory at ${{ env.ITERATION_DIR }}.
+
+            5. If you make any code corrections, you MUST commit and push them to the current branch. Use a clear commit message like "[Claude Fix] Automated code correction".
+
+          claude_args: "--max-turns 30"
+
+      # 5. 実験結果のコミットとプッシュ (フォールバック)
       - name: Commit and push experiment results
+        if: always()
         run: |
-          iteration_dir=".research/iteration${{ github.event.inputs.experiment_iteration }}"
-          if [ ! -d "$iteration_dir" ]; then
-            echo "Research directory not found. Skipping results commit."
-            exit 0
-          fi
-          
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add .research/
           
           if ! git diff --staged --quiet; then
             git commit -m "Add experiment results (iteration ${{ github.event.inputs.experiment_iteration }})"
-            for i in {1..5}; do git push && break || sleep $((2**i)); done
+            for i in {1..5}; do
+              git push && break
+              echo "Push failed on attempt $i. Retrying in $((2**i)) seconds..."
+              sleep $((2**i))
+            done
           else
             echo "No new experiment results to commit."
           fi
