@@ -84,15 +84,16 @@ jobs:
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add .research/
+          git remote set-url origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}"
+          git add .
           
           if ! git diff --staged --quiet; then
-            git commit -m "Add experiment results (iteration ${{ github.event.inputs.experiment_iteration }})"
+            git commit -m "[CI] Commit all changes from autonomous run (iteration ${{ github.event.inputs.experiment_iteration }})"
             for i in {1..5}; do
               git push && break
               echo "Push failed on attempt $i. Retrying in $((2**i)) seconds..."
               sleep $((2**i))
             done
           else
-            echo "No new experiment results to commit."
+            echo "No changes were made by the agent or the experiment."
           fi
