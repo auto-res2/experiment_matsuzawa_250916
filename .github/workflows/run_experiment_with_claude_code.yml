@@ -22,13 +22,13 @@ jobs:
   autonomous-experiment-and-fix:
     name: Autonomous Experiment and Fix Cycle
     runs-on: ${{ fromJSON(github.event.inputs.runner_type) }}
-    # ジョブ全体にタイムアウトを設定し、無限ループやスタックを防ぐ
     timeout-minutes: 360 # 6 hours
 
     steps:
       # 1. 指定されたブランチをチェックアウト
+      # (修正点) name と uses を一つのステップに統合
       - name: Checkout target branch
-      - uses: actions/checkout@v4
+        uses: actions/checkout@v4
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
@@ -46,7 +46,7 @@ jobs:
       - name: Claude Code Autonomous Run
         uses: anthropics/claude-code-action@v1
         with:
-          # ドキュメントに従い anthropic_api_key を使用
+          # (修正点) 正しいパラメータ名を使用
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           prompt: |
             You are an autonomous agent responsible for running a research experiment.
@@ -63,11 +63,9 @@ jobs:
           claude_args: "--max-turns 25"
 
       # 5. 実験結果のコミットとプッシュ
-      # Claudeが結果のコミットまで行わない可能性を考慮し、明示的なステップとして残す
       - name: Commit and push experiment results
         run: |
           iteration_dir=".research/iteration${{ github.event.inputs.experiment_iteration }}"
-          # 結果が生成されているか確認
           if [ ! -d "$iteration_dir" ]; then
             echo "Research directory not found. Skipping results commit."
             exit 0
@@ -79,7 +77,6 @@ jobs:
           
           if ! git diff --staged --quiet; then
             git commit -m "Add experiment results (iteration ${{ github.event.inputs.experiment_iteration }})"
-            # プッシュはリトライ処理を入れる
             for i in {1..5}; do git push && break || sleep $((2**i)); done
           else
             echo "No new experiment results to commit."
