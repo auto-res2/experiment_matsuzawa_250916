@@ -60,15 +60,12 @@ jobs:
             You are an autonomous agent running a research experiment. Your goal is to make the code run successfully.
             Follow these steps precisely. Do not ask for permission. Execute all tasks autonomously.
 
-            1. First, install dependencies using `uv sync`. If it fails, you MUST fix the underlying issue (e.g., in pyproject.toml) and retry until it succeeds.
-
-            2. Next, run the smoke test: `uv run python -m src.main --smoke-test`. If it fails, you MUST analyze the error, fix the Python code, and re-run the test. Repeat this fix-and-run cycle until it passes.
-
-            3. After the smoke test passes, run the full experiment: `uv run python -m src.main --full-experiment`. Again, if it fails, you MUST fix the code and re-run the experiment until it succeeds.
-
-            4. Log all standard and error outputs from these commands into the directory at ${{ env.ITERATION_DIR }}.
-
-            5. If you make any code corrections, you MUST commit and push them to the current branch. Use a clear commit message like "[Claude Fix] Automated code correction".
+            1.  Run the smoke test using the EXACT command: `uv run python -m src.main --smoke-test`.
+            2.  If it fails, analyze the error, fix the Python code, and re-run the EXACT same command. Repeat until it passes.
+            3.  After it passes, run the full experiment using the EXACT command: `uv run python -m src.main --full-experiment`.
+            4.  If this fails, fix the code and re-run it until it succeeds.
+            5.  If you fix any code, commit and push it with the message "[Claude Fix] Automated code correction".
+            6.  Do not ask for permission. Execute all tasks autonomously.
 
           claude_args: "--max-turns 30"
 
