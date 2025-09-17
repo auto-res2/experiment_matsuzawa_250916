@@ -1,0 +1,89 @@
+name: Autonomous Experiment with Claude Code
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'The branch to run the experiment on'
+        required: true
+      experiment_iteration:
+        description: "Iteration count for logging and results"
+        required: true
+      runner_type:
+        description: 'Runner type (e.g., ["ubuntu-latest"], ["self-hosted", "A100"])'
+        required: true
+        default: '["ubuntu-latest"]'
+
+permissions:
+  contents: write # Claudeがコードを修正してコミット＆プッシュするために必須
+
+defaults:
+  run:
+    shell: bash
+
+jobs:
+  autonomous-experiment-and-fix:
+    name: Autonomous Experiment and Fix Cycle
+    runs-on: ${{ fromJSON(github.event.inputs.runner_type) }}
+    # ジョブ全体にタイムアウトを設定し、無限ループやスタックを防ぐ
+    timeout-minutes: 360 # 6 hours
+
+    steps:
+      # 1. 指定されたブランチをチェックアウト
+      - name: Checkout target branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch }}
+
+      # 2. Pythonとuvの環境設定
+      - name: Install uv
+        uses: astral-sh/setup-uv@v6
+        with:
+          python-version: "3.11"
+
+      # 3. 依存関係のインストール (Claudeにも実行させるが、念のため事前に行う)
+      - name: Install dependencies
+        run: uv sync
+
+      # 4. ★ Claude Codeによる自律的な実行・修正ループ ★
+      - name: Claude Code Autonomous Run
+        uses: anthropics/claude-code-action@v1
+        with:
+          # ドキュメントに従い anthropic_api_key を使用
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            You are an autonomous agent responsible for running a research experiment.
+            Your task is to ensure the code runs successfully. Follow these steps precisely:
+
+            1.  First, run the smoke test using the command: `uv run python -m src.main --smoke-test`
+            2.  If the command fails, you MUST analyze the error output, fix the code in the repository, and then re-run the smoke test. Repeat this fix-and-run cycle until the smoke test passes.
+            3.  Once the smoke test passes, run the full experiment using the command: `uv run python -m src.main --full-experiment`
+            4.  If this command fails, you MUST also fix the code and re-run the full experiment. Repeat until it succeeds.
+            5.  If you make any code corrections, you MUST commit and push them to the current branch. Use a commit message like "[Claude Fix] Automated code correction".
+            6.  Do not ask for permission at any stage. Execute all tasks autonomously. Complete all steps successfully.
+
+          # 無限ループによるコスト増大を防ぐためのセーフガード
+          claude_args: "--max-turns 25"
+
+      # 5. 実験結果のコミットとプッシュ
+      # Claudeが結果のコミットまで行わない可能性を考慮し、明示的なステップとして残す
+      - name: Commit and push experiment results
+        run: |
+          iteration_dir=".research/iteration${{ github.event.inputs.experiment_iteration }}"
+          # 結果が生成されているか確認
+          if [ ! -d "$iteration_dir" ]; then
+            echo "Research directory not found. Skipping results commit."
+            exit 0
+          fi
+          
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .research/
+          
+          if ! git diff --staged --quiet; then
+            git commit -m "Add experiment results (iteration ${{ github.event.inputs.experiment_iteration }})"
+            # プッシュはリトライ処理を入れる
+            for i in {1..5}; do git push && break || sleep $((2**i)); done
+          else
+            echo "No new experiment results to commit."
+          fi
