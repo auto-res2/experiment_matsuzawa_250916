@@ -71,7 +71,7 @@ experiments:
       lr_warmup_steps: 500
     seeds: [7, 11, 13]
 
-  exp3_temporal_variance:
+  exp3_temporal_variance
     dataset:
       name: 'youtube-u2g'
       path: 'data/processed/youtube-u2g.pt'
