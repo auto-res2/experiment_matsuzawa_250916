@@ -28,6 +28,7 @@ jobs:
     env:
       SYNC_COMMAND: "uv sync"
       SMOKE_TEST_COMMAND: |
+        echo "=== [PHASE 1/2] Smoke test start $(date -u) ===" | tee -a "$ITERATION_DIR/output.txt"
         uv run python -u -m src.main --smoke-test \
           > >(tee -a "$ITERATION_DIR/output.txt") \
           2> >(tee -a "$ITERATION_DIR/error.txt" >&2)
@@ -36,6 +37,7 @@ jobs:
         if [ -n "$ITERATION_DIR" ] && [ -d "$ITERATION_DIR" ]; then
           find "$ITERATION_DIR" -mindepth 1 -delete
         fi
+        echo "=== [PHASE 2/2] Full experiment start $(date -u) ===" | tee -a "$ITERATION_DIR/output.txt"
         uv run python -u -m src.main --full-experiment \
           > >(tee -a "$ITERATION_DIR/output.txt") \
           2> >(tee -a "$ITERATION_DIR/error.txt" >&2)
